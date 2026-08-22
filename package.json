@@ -3,15 +3,18 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Loft — an infinite design canvas with real project boards on it.",
+  "description": "Loft \u2014 an infinite design canvas with real project boards on it.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b --noCheck && vite build",
+    "build:demo": "tsc -b --noCheck && VITE_LOFT_DEMO=1 vite build",
     "typecheck": "tsc -b",
     "preview": "vite preview",
-    "bundle": "npm run build && node scripts/inline.mjs"
+    "bundle": "npm run build:demo && node scripts/inline.mjs",
+    "package": "npm run build && node scripts/package.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "immer": "^10.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

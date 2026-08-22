@@ -1,4 +1,4 @@
-import { actions, currentPage, store } from '../store/store'
+import { actions, canComment, canEdit, currentPage, store } from '../store/store'
 import { useStore } from '../store/useStore'
 import { MOD, zoomToFit } from '../lib/commands'
 import { viewCenter, viewportSize } from '../canvas/viewportRef'
@@ -48,6 +48,8 @@ export function StatusBar() {
   const snap = useStore((s) => s.snap)
   const grid = useStore((s) => s.showGrid)
   const nodeCount = useStore((s) => currentPage(s).order.length)
+  const editable = useStore(canEdit)
+  const commentable = useStore(canComment)
 
   const setZoom = (next: number) => {
     const c = viewCenter()
@@ -57,7 +59,13 @@ export function StatusBar() {
 
   return (
     <div className="statusbar">
-      <span className="status-hint">{hintFor(tool, selectionCount, editing)}</span>
+      <span className="status-hint">
+        {editable
+          ? hintFor(tool, selectionCount, editing)
+          : commentable
+            ? 'You can tick things off and leave notes here, but not change the canvas.'
+            : 'View only — you can look around and search, but nothing you do is saved.'}
+      </span>
       <span style={{ flex: 1 }} />
 
       <span>{nodeCount} objects</span>

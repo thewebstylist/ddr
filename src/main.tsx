@@ -1,19 +1,35 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/globals.css'
-import { App } from './App'
+import { Shell } from './Shell'
 import { initStore, type AppState } from './store/store'
 import { loadAssets } from './store/assets'
 import { loadDoc, loadView } from './store/persistence'
 import { createSampleDoc } from './store/sampleDoc'
 import { INK_COLORS } from './lib/palette'
+import { config } from './config'
+import { uid } from './lib/id'
+import type { Doc } from './types'
+
+/** A blank document to hold the store until a real project is opened. */
+function emptyDoc(): Doc {
+  return {
+    id: uid('doc'),
+    name: 'Loading…',
+    pages: [{ id: uid('pg'), name: 'Page 1', nodes: {}, order: [], background: '#101215' }],
+    labels: [],
+    members: [],
+    schema: 1,
+  }
+}
 
 async function bootstrap() {
   // Images must be in memory before the first paint, or nodes flash empty.
   await loadAssets()
 
-  const saved = loadDoc()
-  const doc = saved ?? createSampleDoc()
+  const local = config.mode === 'demo'
+  const saved = local ? loadDoc() : null
+  const doc = local ? (saved ?? createSampleDoc()) : emptyDoc()
   const view = saved ? loadView() : null
 
   const initial: AppState = {
@@ -41,6 +57,7 @@ async function bootstrap() {
     historyLabels: [],
     redoLabels: [],
     fileDropActive: false,
+    role: 'owner',
     saveState: 'idle',
   }
 
@@ -48,7 +65,7 @@ async function bootstrap() {
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <App freshStart={!view} />
+      <Shell freshStart={!view} />
     </StrictMode>,
   )
 }

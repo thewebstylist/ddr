@@ -74,6 +74,63 @@ export async function pruneAssets(keep: Set<Id>): Promise<void> {
   })
 }
 
+// ---------------------------------------------------------------------------
+// Shared images
+//
+// The local store above is this browser's copy. On a shared project the file
+// also lives in the backend, so a teammate opening the document sees the
+// picture rather than a placeholder. Resolution prefers the local copy — it is
+// instant — and falls back to a signed URL.
+// ---------------------------------------------------------------------------
+
+const remoteUrls = new Map<Id, string>()
+const inFlight = new Map<Id, Promise<string | null>>()
+
+export function cachedRemoteUrl(id: Id): string | undefined {
+  return remoteUrls.get(id)
+}
+
+/** Resolves the best available source for an image, or null if there is none. */
+export function resolveAssetUrl(
+  id: Id,
+  fetcher: () => Promise<string | null>,
+): Promise<string | null> {
+  const local = memory.get(id)
+  if (local) return Promise.resolve(local.dataUrl)
+
+  const cached = remoteUrls.get(id)
+  if (cached) return Promise.resolve(cached)
+
+  const existing = inFlight.get(id)
+  if (existing) return existing
+
+  const request = fetcher()
+    .then((url) => {
+      if (url) remoteUrls.set(id, url)
+      return url
+    })
+    .catch(() => null)
+    .finally(() => inFlight.delete(id))
+
+  inFlight.set(id, request)
+  return request
+}
+
+/** Signed URLs are project-scoped; drop them when leaving a project. */
+export function forgetRemoteUrls(): void {
+  remoteUrls.clear()
+  inFlight.clear()
+}
+
+export function dataUrlToBlob(dataUrl: string): Blob {
+  const [header, encoded] = dataUrl.split(',')
+  const mime = /:(.*?);/.exec(header)?.[1] ?? 'application/octet-stream'
+  const binary = atob(encoded)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return new Blob([bytes], { type: mime })
+}
+
 export function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()

@@ -76,6 +76,8 @@ export interface AppState {
   redoLabels: string[]
   /** Set while the pointer is over the window during a file drag. */
   fileDropActive: boolean
+  /** What this signed-in person is allowed to do with the open project. */
+  role: Member['role']
   saveState: 'idle' | 'saving' | 'saved'
 }
 
@@ -238,6 +240,16 @@ export function initStore(initial: AppState) {
 // Selectors
 // ---------------------------------------------------------------------------
 
+/** Owners and editors may change the canvas itself. */
+export function canEdit(s: AppState): boolean {
+  return s.role === 'owner' || s.role === 'editor'
+}
+
+/** Commenters may also tick things off and leave notes, but not restructure. */
+export function canComment(s: AppState): boolean {
+  return s.role !== 'viewer'
+}
+
 export function currentPage(s: AppState): Page {
   return s.doc.pages.find((p) => p.id === s.pageId) ?? s.doc.pages[0]
 }
@@ -362,6 +374,16 @@ export const actions = {
     delete toastTimer[id]
     store.commit((d) => {
       d.toasts = d.toasts.filter((t) => t.id !== id)
+    })
+  },
+
+  setRole(role: Member['role']) {
+    store.commit((d) => {
+      d.role = role
+      if (role === 'viewer' || role === 'commenter') {
+        d.tool = 'select'
+        d.editingId = null
+      }
     })
   },
 
@@ -1057,6 +1079,13 @@ export const actions = {
       { history: 'Invite member' },
     )
     return member.id
+  },
+
+  /** Replaces the roster wholesale — used when it arrives from the server. */
+  setMembers(members: Member[]) {
+    store.commit((d) => {
+      d.doc.members = members
+    })
   },
 
   setMemberRole(id: Id, role: Member['role']) {

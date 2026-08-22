@@ -1,4 +1,4 @@
-import { currentPage, selectionBounds } from '../store/store'
+import { canEdit, currentPage, selectionBounds } from '../store/store'
 import { useStore, shallowObject } from '../store/useStore'
 import type { Rect } from '../types'
 
@@ -40,6 +40,7 @@ export function SelectionLayer({ hoverId }: { hoverId: string | null }) {
   const selection = useStore((s) => s.selection)
   const page = useStore(currentPage)
   const editing = useStore((s) => s.editingId)
+  const editable = useStore(canEdit)
 
   const hovered = hoverId && !selection.includes(hoverId) ? page.nodes[hoverId] : null
   const handleSize = 8 / zoom
@@ -75,7 +76,7 @@ export function SelectionLayer({ hoverId }: { hoverId: string | null }) {
         />
       ))}
 
-      {bounds && !editing && (
+      {bounds && !editing && editable && (
         <>
           <div
             className="selection-box"

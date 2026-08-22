@@ -1522,3 +1522,290 @@ kbd {
   color: var(--text-faint);
   line-height: 1.5;
 }
+
+/* ==========================================================================
+   Sign-in, invitations and the project list
+   The first screen anyone sees, including people who have never met the
+   product. It carries the same palette as the canvas so arriving inside the
+   app feels like the same place, not a different site.
+   ========================================================================== */
+
+.gate {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-shell);
+}
+
+.gate-inner {
+  width: 100%;
+  max-width: 392px;
+  margin: auto;
+  padding: 40px 24px 56px;
+}
+
+.gate-wide {
+  max-width: 880px;
+}
+
+.gate-mark {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 26px;
+}
+
+.gate-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.gate-card h1 {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.gate-card p.sub {
+  margin: 0 0 20px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+.gate-field {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.gate-field > span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 5px;
+}
+
+.gate-field .input {
+  width: 100%;
+  height: 36px;
+  font-size: 13.5px;
+}
+
+.gate-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.gate-actions .btn-primary {
+  flex: 1;
+  height: 36px;
+}
+
+.gate-alt {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--text-faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+}
+
+.gate-alt button {
+  color: var(--accent);
+  font-weight: 550;
+}
+
+.gate-alt button:hover {
+  text-decoration: underline;
+}
+
+.notice {
+  display: flex;
+  gap: 9px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.notice[data-tone='error'] {
+  background: rgba(242, 112, 79, 0.12);
+  border: 1px solid rgba(242, 112, 79, 0.35);
+  color: #ffb9a3;
+}
+
+.notice[data-tone='ok'] {
+  background: rgba(91, 208, 127, 0.12);
+  border: 1px solid rgba(91, 208, 127, 0.32);
+  color: #a8e8bd;
+}
+
+.notice[data-tone='warn'] {
+  background: rgba(240, 180, 41, 0.12);
+  border: 1px solid rgba(240, 180, 41, 0.32);
+  color: #f5d68a;
+}
+
+.strength {
+  display: flex;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.strength > span {
+  height: 3px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--bg-active);
+  transition: background 0.2s;
+}
+
+.strength-label {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 5px;
+  display: block;
+}
+
+/* Project list -------------------------------------------------------------- */
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.project-card {
+  text-align: left;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 15px 16px;
+  transition: border-color 0.12s, transform 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 104px;
+}
+
+.project-card:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.project-card h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-card .meta {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.project-new {
+  border-style: dashed;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  gap: 8px;
+  flex-direction: row;
+}
+
+.gate-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.gate-header h1 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.setup-steps {
+  counter-reset: step;
+  padding: 0;
+  margin: 0 0 4px;
+  list-style: none;
+}
+
+.setup-steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.setup-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-active);
+  color: var(--text);
+  font-size: 10.5px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.setup-steps code,
+.inline-code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--text);
+}
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: rgba(240, 180, 41, 0.12);
+  border-bottom: 1px solid rgba(240, 180, 41, 0.28);
+  font-size: 11.5px;
+  color: #f5d68a;
+}

@@ -1,4 +1,4 @@
-import { actions } from '../store/store'
+import { actions, canEdit } from '../store/store'
 import { useStore } from '../store/useStore'
 import type { Tool } from '../types'
 import { importImages } from '../lib/commands'
@@ -30,10 +30,14 @@ const TOOLS: ToolDef[] = [
 export function Toolbar() {
   const tool = useStore((s) => s.tool)
   const locked = useStore((s) => s.toolLocked)
+  const editable = useStore(canEdit)
+
+  // Showing tools that would be refused is worse than not showing them.
+  const visible = editable ? TOOLS : TOOLS.filter((t) => t.tool === 'select' || t.tool === 'hand')
 
   return (
     <div className="toolbar" data-interactive="true">
-      {TOOLS.map((t) => (
+      {visible.map((t) => (
         <button
           key={t.tool}
           className="tool"
@@ -51,14 +55,21 @@ export function Toolbar() {
         </button>
       ))}
 
-      <button className="tool" title="Upload an image — you can also drag files straight onto the canvas" onClick={() => void importImages()}>
-        <span className="tool-key">U</span>
-        <Icon.image size={17} />
-        <span className="tool-label">Image</span>
-      </button>
+      {editable && (
+        <button
+          className="tool"
+          title="Upload an image — you can also drag files straight onto the canvas"
+          onClick={() => void importImages()}
+        >
+          <span className="tool-key">U</span>
+          <Icon.image size={17} />
+          <span className="tool-label">Image</span>
+        </button>
+      )}
 
-      <div className="toolbar-sep" />
+      {editable && <div className="toolbar-sep" />}
 
+      {editable && (
       <button
         className="lock-toggle"
         data-active={locked}
@@ -71,6 +82,7 @@ export function Toolbar() {
       >
         {locked ? <Icon.lock size={15} /> : <Icon.unlock size={15} />}
       </button>
+      )}
     </div>
   )
 }

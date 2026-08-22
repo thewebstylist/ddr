@@ -174,20 +174,31 @@ marquee, snapping, align and distribute; boards with cards, checklists, labels, 
 dates; cards dragged between lists; sticky↔card conversion; pages; layers; named undo history;
 command palette; member roles and invitations; autosave and JSON export/import.
 
-**Modelled in the interface, not yet real:** collaboration. Members, roles, invitations and presence
-are designed and rendered, but there is no server, so nothing is shared between browsers yet. This
-is deliberate — the interaction design is the part worth settling first, and it is the part that
-determines what the backend has to do.
+**Real once a backend is connected:** accounts, invitation by email with the invitee choosing their
+own password, password reset, projects stored server-side, and access decided by the database rather
+than the interface — a project row is returned only to people on its member list. `DEPLOY.md` covers
+standing it up; `./scripts/test-schema.sh` asserts the rules actually hold.
+
+**Not yet real:** *simultaneous* editing. Saves carry the version they were based on, so two people
+working at once collide honestly — the second save is refused and the app asks which copy to keep.
+Nothing is silently overwritten, but there are no shared cursors and no live merge.
+
+**One role is weaker than it looks.** Owner, editor and viewer are enforced in the database.
+Commenter is enforced in the interface only, because a project's document is a single JSON value:
+Postgres can allow or refuse a write, but cannot tell "ticked a box" from "deleted the canvas".
+Fixing that is the same change as item 1 below — cards have to stop being buried inside a blob.
 
 **Next, in order:**
 
-1. **Real-time multiplayer.** The document is already a flat, id-addressed node map with per-node
+1. **Promote cards out of the document blob.** Their own table with their own rules. This is what
+   turns commenter into a real boundary, and it is also the groundwork for everything else here.
+2. **Real-time multiplayer.** The document is already a flat, id-addressed node map with per-node
    updates, which is the shape a CRDT wants. Presence cursors and per-node selection locks follow.
-2. **Comments as first-class nodes.** Pinned to a point or a card, resolvable, with an inbox. The
+3. **Comments as first-class nodes.** Pinned to a point or a card, resolvable, with an inbox. The
    commenter role is only half useful without them.
-3. **Views over the same nodes.** A timeline and a calendar reading the same cards, since due dates
+4. **Views over the same nodes.** A timeline and a calendar reading the same cards, since due dates
    and assignees are already in the model.
-4. **Templates.** A workshop board, a delivery board, a client review — the sample project in this
+5. **Templates.** A workshop board, a delivery board, a client review — the sample project in this
    repo is really the first one of these.
-5. **Export that looks like the canvas.** PNG and PDF of a section or a selection, for the deck that
+6. **Export that looks like the canvas.** PNG and PDF of a section or a selection, for the deck that
    always gets asked for.

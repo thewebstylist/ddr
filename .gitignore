@@ -4,3 +4,6 @@ bundle
 *.local
 .DS_Store
 tsconfig.tsbuildinfo
+
+package/
+loft-deploy.zip

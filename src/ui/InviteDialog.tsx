@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { actions } from '../store/store'
+import { collab } from '../collab'
+import { config } from '../config'
 import { useStore } from '../store/useStore'
 import { initials } from '../lib/palette'
 import type { Member } from '../types'
@@ -33,13 +35,36 @@ export function InviteDialog() {
     .map((e) => e.trim())
     .filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))
 
-  const send = () => {
-    if (parsed.length === 0) return
-    for (const email of parsed) actions.inviteMember(email, role)
-    actions.toast(`Invited ${parsed.length} ${parsed.length === 1 ? 'person' : 'people'} as ${role}.`)
-    setEmails('')
-    actions.setPanel('right', 'members')
-    close()
+  const [sending, setSending] = useState(false)
+
+  const send = async () => {
+    if (parsed.length === 0 || sending) return
+    setSending(true)
+    const failures: string[] = []
+    for (const address of parsed) {
+      try {
+        await collab.invite(address, role)
+      } catch (err) {
+        failures.push(`${address}: ${err instanceof Error ? err.message : 'failed'}`)
+      }
+    }
+    setSending(false)
+
+    const sent = parsed.length - failures.length
+    if (sent > 0) {
+      actions.toast(
+        config.mode === 'supabase'
+          ? `Invitation email sent to ${sent} ${sent === 1 ? 'person' : 'people'}.`
+          : `Added ${sent} ${sent === 1 ? 'person' : 'people'} as ${role}.`,
+      )
+    }
+    for (const failure of failures) actions.toast(failure)
+
+    if (failures.length === 0) {
+      setEmails('')
+      actions.setPanel('right', 'members')
+      close()
+    }
   }
 
   return (
@@ -64,7 +89,7 @@ export function InviteDialog() {
               value={emails}
               onChange={(e) => setEmails(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') send()
+                if (e.key === 'Enter') void send()
                 e.stopPropagation()
               }}
             />
@@ -101,7 +126,9 @@ export function InviteDialog() {
                   <select
                     className="role-select"
                     value={m.role}
-                    onChange={(e) => actions.setMemberRole(m.id, e.target.value as Member['role'])}
+                    onChange={(e) =>
+                      collab.run(collab.setRole(m.id, e.target.value as Member['role']), 'Could not change that role.')
+                    }
                   >
                     <option value="editor">Editor</option>
                     <option value="commenter">Commenter</option>
@@ -110,7 +137,7 @@ export function InviteDialog() {
                   <button
                     className="btn btn-icon btn-ghost-danger"
                     title={`Remove ${m.name}`}
-                    onClick={() => actions.removeMember(m.id)}
+                    onClick={() => collab.run(collab.remove(m.id), 'Could not remove that person.')}
                   >
                     <Icon.close size={13} />
                   </button>
@@ -135,8 +162,10 @@ export function InviteDialog() {
           <button className="btn" onClick={close}>
             Cancel
           </button>
-          <button className="btn btn-primary" disabled={parsed.length === 0} onClick={send}>
-            Send {parsed.length > 0 ? `${parsed.length} invite${parsed.length === 1 ? '' : 's'}` : 'invite'}
+          <button className="btn btn-primary" disabled={parsed.length === 0 || sending} onClick={() => void send()}>
+            {sending
+              ? 'Sending…'
+              : `Send ${parsed.length > 0 ? `${parsed.length} invite${parsed.length === 1 ? '' : 's'}` : 'invite'}`}
           </button>
         </div>
       </div>

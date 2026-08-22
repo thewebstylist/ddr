@@ -18,7 +18,14 @@ import { useHotkeys } from './hooks/useHotkeys'
 import { usePersistence } from './hooks/usePersistence'
 import { zoomToFit } from './lib/commands'
 
-export function App({ freshStart }: { freshStart: boolean }) {
+export interface AppProps {
+  freshStart: boolean
+  /** Present only when a backend is in play. */
+  onLeaveProject?: () => void
+  onSignOut?: () => void
+}
+
+export function App({ freshStart, onLeaveProject, onSignOut }: AppProps) {
   const leftPanel = useStore((s) => s.leftPanel)
 
   useHotkeys()
@@ -38,7 +45,7 @@ export function App({ freshStart }: { freshStart: boolean }) {
 
   return (
     <div className="app">
-      <TopBar />
+      <TopBar onLeaveProject={onLeaveProject} onSignOut={onSignOut} />
       <div className="app-body">
         {leftPanel && <LeftPanel />}
         <div style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex' }}>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { actions, store } from '../store/store'
+import { actions, canComment, canEdit, store } from '../store/store'
 import { useStore } from '../store/useStore'
 import type { BoardNode, Card, Id, Label, Member } from '../types'
 import { boardProgress } from '../lib/factory'
@@ -156,6 +156,8 @@ function CardView({
   dragging: boolean
 }) {
   const focused = useStore((s) => s.focusedCardId === card.id)
+  const editable = useStore(canEdit)
+  const commentable = useStore(canComment)
   const [menuAt, setMenuAt] = useState<{ x: number; y: number } | null>(null)
 
   const cardLabels = card.labels.map((id) => labels.find((l) => l.id === id)).filter(Boolean) as Label[]
@@ -173,11 +175,13 @@ function CardView({
       data-focused={focused}
       data-dragging={dragging}
       onPointerDown={(e) => {
+        if (!editable) return
         if ((e.target as HTMLElement).closest('[data-no-drag]')) return
         beginCardDrag(e, card.id, boardId, card.title)
       }}
       onClick={(e) => {
         if (isDraggingCard()) return
+        if (!commentable) return
         if ((e.target as HTMLElement).closest('[data-no-drag]')) return
         actions.setFocusedCard(card.id)
       }}
@@ -195,16 +199,17 @@ function CardView({
           className="checkbox"
           data-no-drag="true"
           data-done={card.done}
+          disabled={!commentable}
           aria-label={card.done ? 'Mark not done' : 'Mark done'}
           onClick={(e) => {
             e.stopPropagation()
-            actions.toggleCardDone(card.id)
+            if (commentable) actions.toggleCardDone(card.id)
           }}
         >
           {card.done && <Icon.check size={10} />}
         </button>
 
-        {focused ? (
+        {focused && editable ? (
           <AutoTextarea
             className="card-title"
             data-no-drag="true"
@@ -237,6 +242,7 @@ function CardView({
           </div>
         )}
 
+        {editable && (
         <button
           className="layer-action"
           data-no-drag="true"
@@ -250,6 +256,7 @@ function CardView({
         >
           <Icon.chevronDown size={13} />
         </button>
+        )}
       </div>
 
       {(card.checklist.length > 0 || assigned.length > 0 || due || card.notes) && (
@@ -294,7 +301,7 @@ function CardView({
 
       {expanded && (card.checklist.length > 0 || focused) && (
         <div className="card-expand" data-no-drag="true">
-          {focused && (
+          {focused && commentable && (
             <AutoTextarea
               className="card-notes"
               value={card.notes}
@@ -311,9 +318,10 @@ function CardView({
               <button
                 className="check-box-sm"
                 data-done={item.done}
+                disabled={!commentable}
                 onClick={(e) => {
                   e.stopPropagation()
-                  actions.updateChecklistItem(card.id, item.id, { done: !item.done })
+                  if (commentable) actions.updateChecklistItem(card.id, item.id, { done: !item.done })
                 }}
               >
                 {item.done && <Icon.check size={9} />}
@@ -321,6 +329,7 @@ function CardView({
               <AutoTextarea
                 className="check-text"
                 data-done={item.done}
+                readOnly={!editable}
                 value={item.text}
                 placeholder="Step…"
                 onChange={(e) =>
@@ -347,7 +356,7 @@ function CardView({
             </div>
           ))}
 
-          {focused && (
+          {focused && editable && (
             <button
               className="add-card"
               style={{ padding: '3px 0', fontSize: 11 }}
@@ -471,6 +480,7 @@ export function BoardView({ node, editing, selected }: { node: BoardNode; editin
   const labels = useStore((s) => s.doc.labels)
   const members = useStore((s) => s.doc.members)
   const draft = useStore((s) => (s.draft?.kind === 'card' ? s.draft : null))
+  const editable = useStore(canEdit)
   const [menuAt, setMenuAt] = useState<{ x: number; y: number } | null>(null)
 
   const progress = boardProgress(node)
@@ -508,18 +518,20 @@ export function BoardView({ node, editing, selected }: { node: BoardNode; editin
         >
           {node.collapsed ? <Icon.chevronRight size={13} /> : <Icon.chevronDown size={13} />}
         </button>
-        <button
-          className="layer-action"
-          data-interactive="true"
-          data-forced="true"
-          aria-label="List options"
-          onClick={(e) => {
-            const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
-            setMenuAt({ x: r.right, y: r.bottom + 4 })
-          }}
-        >
-          <Icon.plus size={13} style={{ transform: 'rotate(45deg)' }} />
-        </button>
+        {editable && (
+          <button
+            className="layer-action"
+            data-interactive="true"
+            data-forced="true"
+            aria-label="List options"
+            onClick={(e) => {
+              const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
+              setMenuAt({ x: r.right, y: r.bottom + 4 })
+            }}
+          >
+            <Icon.plus size={13} style={{ transform: 'rotate(45deg)' }} />
+          </button>
+        )}
       </div>
 
       <div className="board-progress">
@@ -550,12 +562,14 @@ export function BoardView({ node, editing, selected }: { node: BoardNode; editin
             )}
           </div>
 
-          <div className="board-foot" data-interactive="true">
-            <button className="add-card" onClick={() => actions.addCard(node.id)}>
-              <Icon.plus size={12} />
-              Add card
-            </button>
-          </div>
+          {editable && (
+            <div className="board-foot" data-interactive="true">
+              <button className="add-card" onClick={() => actions.addCard(node.id)}>
+                <Icon.plus size={12} />
+                Add card
+              </button>
+            </div>
+          )}
         </>
       )}
 

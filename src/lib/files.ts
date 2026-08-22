@@ -1,5 +1,7 @@
 import { actions } from '../store/store'
-import { measureImage, putAsset, readFileAsDataUrl } from '../store/assets'
+import { dataUrlToBlob, measureImage, putAsset, readFileAsDataUrl } from '../store/assets'
+import { backend } from '../auth'
+import { collab } from '../collab'
 import { makeImage, makeSticky, makeText } from './factory'
 import { uid } from './id'
 import type { Node, Vec } from '../types'
@@ -26,6 +28,20 @@ export async function addFilesToCanvas(files: File[], at: Vec): Promise<void> {
       const { w, h } = await measureImage(dataUrl)
       const assetId = uid('as')
       await putAsset({ id: assetId, name: file.name, type: file.type, dataUrl, w, h })
+
+      // On a shared project the file has to leave this browser, or teammates
+      // open the document to a placeholder where the picture should be.
+      if (collab.projectId) {
+        try {
+          await backend.uploadAsset(collab.projectId, assetId, dataUrlToBlob(dataUrl), file.type)
+        } catch (err) {
+          actions.toast(
+            `“${file.name}” is on your screen but could not be uploaded — teammates won't see it yet.`,
+          )
+          console.warn('asset upload failed', err)
+        }
+      }
+
       created.push(makeImage(spot, assetId, w, h, file.name))
       index++
     } else if (file.type.startsWith('text/') || /\.(md|txt|csv|json)$/i.test(file.name)) {

@@ -1,9 +1,10 @@
-import { actions, currentPage, selectedNodes, store } from '../store/store'
+import { actions, canEdit, currentPage, selectedNodes, store } from '../store/store'
 import { shallowArray, useStore } from '../store/useStore'
 import type { Node, ShapeKind, TextAlign } from '../types'
 import { INK_COLORS, SWATCHES, initials } from '../lib/palette'
 import { Icon } from './Icons'
 import { importImages } from '../lib/commands'
+import { collab } from '../collab'
 
 function NumberField({
   label,
@@ -116,12 +117,24 @@ function ArrangeSection({ ids }: { ids: string[] }) {
 }
 
 function DesignTab() {
+  const editable = useStore(canEdit)
   const selection = useStore((s) => s.selection, shallowArray)
   const nodes = useStore(selectedNodes, shallowArray)
   const tool = useStore((s) => s.tool)
   const inkColor = useStore((s) => s.inkColor)
   const inkSize = useStore((s) => s.inkSize)
   const highlighter = useStore((s) => s.highlighter)
+
+  if (!editable) {
+    return (
+      <Section title="View only">
+        <p className="empty-note" style={{ padding: '0 0 4px' }}>
+          You can open, read and search this project, but not change it. Ask an owner for editor access
+          if you need to.
+        </p>
+      </Section>
+    )
+  }
 
   if (tool === 'pen') {
     return (
@@ -610,7 +623,9 @@ function MembersTab() {
               <select
                 className="role-select"
                 value={m.role}
-                onChange={(e) => actions.setMemberRole(m.id, e.target.value as never)}
+                onChange={(e) =>
+                  collab.run(collab.setRole(m.id, e.target.value as never), 'Could not change that role.')
+                }
               >
                 <option value="editor">Editor</option>
                 <option value="commenter">Commenter</option>

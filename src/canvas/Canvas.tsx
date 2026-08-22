@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { actions, currentPage, selectionBounds, store } from '../store/store'
+import { actions, canEdit, currentPage, selectionBounds, store } from '../store/store'
 import { shallowArray, shallowObject, useStore } from '../store/useStore'
 import type { Id, Node, Rect, Tool, Vec } from '../types'
 import { NodeView } from '../nodes/NodeView'
@@ -158,6 +158,20 @@ export function Canvas() {
     if (e.button === 1 || spaceDown.current || state.tool === 'hand') {
       gesture.current = { kind: 'pan', lastX: e.clientX, lastY: e.clientY }
       setPanning(true)
+      return
+    }
+
+    // Without edit rights the canvas is a document to read: look around and
+    // select things to inspect them, but never move or make anything.
+    if (!canEdit(state)) {
+      const readOnlyTarget = target.closest<HTMLElement>('[data-node-id]')
+      if (readOnlyTarget?.dataset.nodeId) {
+        actions.select([readOnlyTarget.dataset.nodeId], e.shiftKey)
+      } else {
+        gesture.current = { kind: 'marquee', start: world, base: [], additive: false }
+        if (!e.shiftKey) actions.clearSelection()
+        setMarquee({ x: world.x, y: world.y, w: 0, h: 0 })
+      }
       return
     }
 
@@ -534,6 +548,7 @@ export function Canvas() {
   }
 
   const onDoubleClick = (e: React.MouseEvent) => {
+    if (!canEdit(store.getState())) return
     const target = e.target as HTMLElement
     if (target.closest('[data-interactive="true"]')) return
     const nodeEl = target.closest<HTMLElement>('[data-node-id]')

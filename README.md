@@ -4,7 +4,8 @@ A freeform project canvas with real boards on it — the Figma half and the Trel
 document, so nothing has to be kept in sync between two tools.
 
 **[DESIGN.md](./DESIGN.md) is the design of the platform**: the problem, the principles, the object
-model, and what comes next. This file covers running the code.
+model, and what comes next. **[DEPLOY.md](./DEPLOY.md) is how to put it live** with real accounts.
+This file covers running the code.
 
 ![The delivery board — Trello-style lists as objects on the canvas](./docs/board.png)
 
@@ -22,9 +23,11 @@ npm run dev          # http://localhost:5173
 Other scripts:
 
 ```bash
-npm run typecheck    # strict TypeScript, no emit
-npm run build        # production build into dist/
-npm run bundle       # build, then flatten to a single self-contained bundle/loft.html
+npm run typecheck        # strict TypeScript, no emit
+npm run build            # production build into dist/
+npm run package          # build, then zip a deployable site + backend into loft-deploy.zip
+npm run bundle           # a sandbox build flattened into one self-contained HTML file
+./scripts/test-schema.sh # run the database access rules against a throwaway Postgres
 ```
 
 It opens on a sample project — a home renovation with a discovery workshop on one page and the
@@ -44,15 +47,27 @@ back at any time.
 | Drop a screenshot on the window | Lands where you dropped it |
 | `?` | Shortcuts |
 
-## Storage
+## Two ways to run
 
-Everything is local to your browser. The document lives in `localStorage`; uploaded images live in
-IndexedDB, referenced by id, so undo history never carries binary payloads. **Export project as
-JSON** in the command palette takes a portable copy — note that it carries the document, not the
-image bytes.
+`config.js` decides, at load time, which one you get — so the same build works for both and moving
+between them needs no rebuild.
 
-There is no server. Members, roles and invitations are modelled and rendered, but nothing is shared
-between browsers yet; see the roadmap at the end of `DESIGN.md`.
+**Sandbox** (`mode: 'demo'`) — no accounts, no server. The document lives in `localStorage` and
+uploaded images in IndexedDB, all local to one browser. Good for trying the thing out; never for
+real work.
+
+**Connected** (`mode: 'supabase'`) — real accounts, invitations by email, and projects stored in
+Postgres. Nothing renders until you sign in, and the database itself refuses to hand a project to
+anyone who isn't on its member list. `DEPLOY.md` walks through it.
+
+A build that finds neither shows a setup screen rather than starting. That is deliberate: an
+unconfigured deployment should look broken, not unlocked.
+
+### The security model, in one line
+
+The app shell is public — every web app's is. The **data** is what's protected, by row-level
+security in Postgres. `./scripts/test-schema.sh` proves it: sixteen assertions covering what a
+stranger, a viewer, an editor and a removed member can each actually reach.
 
 ## Layout
 
@@ -73,8 +88,15 @@ src/
 │   └── viewportRef.ts    live canvas geometry, shared with menus and commands
 ├── nodes/                one component per node type; BoardView is the Trello half
 ├── ui/                   chrome: toolbar, panels, palette, dialogs, minimap
-├── hooks/                hotkeys, clipboard, file drop, autosave
+├── hooks/                hotkeys, clipboard, file drop, autosave, remote save
+├── auth/                 backend interface + Supabase and sandbox implementations
+├── ui/auth/              sign in, invitations, password reset, project list
 └── lib/                  geometry, factories, palette, command registry
+
+supabase/
+├── schema.sql            tables, row-level security, image bucket
+├── functions/invite/     the one step that needs a server: sending an invitation
+└── tests/                assertions that the access rules do what they claim
 ```
 
 Two conventions worth knowing before editing:
@@ -86,5 +108,9 @@ Two conventions worth knowing before editing:
 
 ## Stack
 
-React 19, TypeScript (strict), Vite, Immer. No canvas library, no drag library, no UI kit — the
-interaction model is the product, so it is written out rather than configured.
+React 19, TypeScript (strict), Vite, Immer, and the Supabase client when a backend is configured.
+No canvas library, no drag library, no UI kit — the interaction model is the product, so it is
+written out rather than configured.
+
+The backend sits behind one interface (`src/auth/types.ts`) with two implementations, so swapping
+Supabase for something else is one file, not a rewrite.

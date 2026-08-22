@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { actions, store } from '../store/store'
 import { saveDoc, saveView } from '../store/persistence'
+import { config } from '../config'
 
 const DEBOUNCE_MS = 600
 
@@ -10,6 +11,10 @@ export function usePersistence() {
   const lastDoc = useRef(store.getState().doc)
 
   useEffect(() => {
+    // With a backend, the server is the record; writing a second copy into this
+    // browser would just be a stale one waiting to confuse someone.
+    if (config.mode !== 'demo') return
+
     const flush = () => {
       const state = store.getState()
       const result = saveDoc(state.doc)

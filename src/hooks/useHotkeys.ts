@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { actions, currentPage, store } from '../store/store'
+import { actions, canEdit, currentPage, store } from '../store/store'
 import { buildCommands, importImages, zoomToFit, zoomToSelection } from '../lib/commands'
 import type { Tool } from '../types'
 import { viewCenter, viewportSize } from '../canvas/viewportRef'
@@ -51,6 +51,10 @@ export function useHotkeys() {
 
       if (isTyping(e.target)) return
 
+      // Read-only sessions keep navigation and selection; everything that would
+      // change the document is simply not wired up.
+      const editable = canEdit(state)
+
       // -- modified ---------------------------------------------------------
       if (mod) {
         const key = e.key.toLowerCase()
@@ -69,6 +73,9 @@ export function useHotkeys() {
           e.preventDefault()
           actions.selectAll()
           return
+        }
+        if (key === 'z' || key === 'y' || key === 'd' || key === 'u') {
+          if (!editable) return
         }
         if (key === 'd') {
           e.preventDefault()
@@ -119,6 +126,10 @@ export function useHotkeys() {
         return
       }
 
+      if (!editable && (e.key === 'Delete' || e.key === 'Backspace' || e.key === 'Enter' || e.key.startsWith('Arrow') || e.key === '[' || e.key === ']')) {
+        return
+      }
+
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (state.selection.length > 0) {
           e.preventDefault()
@@ -166,7 +177,7 @@ export function useHotkeys() {
       }
 
       const tool = TOOL_KEYS[e.key.toLowerCase()]
-      if (tool && !e.altKey) {
+      if (tool && !e.altKey && (editable || tool === 'select' || tool === 'hand')) {
         e.preventDefault()
         actions.setTool(tool)
       }
