@@ -71,7 +71,45 @@ export function pickFiles(accept: string, multiple = true): Promise<File[]> {
   })
 }
 
-export function downloadText(filename: string, text: string, type = 'application/json'): void {
+/**
+ * Minimal shape of the Artifact runtime. When this app is published as a
+ * hosted page the browser's own download path is blocked, and the host hands
+ * files to the viewer through this instead.
+ */
+interface ArtifactRuntime {
+  use(name: 'downloads'): Promise<{ save(req: { filename: string; data: string }): Promise<unknown> } | null>
+}
+
+function artifactRuntime(): ArtifactRuntime | null {
+  const runtime = (window as unknown as { claude?: ArtifactRuntime }).claude
+  return typeof runtime?.use === 'function' ? runtime : null
+}
+
+/** Hand a generated file to the user, by whichever route this context allows. */
+export async function offerFile(filename: string, text: string, type = 'application/json'): Promise<void> {
+  const runtime = artifactRuntime()
+  if (runtime) {
+    try {
+      const downloads = await runtime.use('downloads')
+      if (downloads) {
+        await downloads.save({ filename, data: text })
+        actions.toast(`Saved ${filename}.`)
+        return
+      }
+    } catch (err) {
+      const code = (err as { code?: string })?.code
+      // Declining the prompt is a normal answer, not something to report back.
+      if (code === 'declined') return
+      actions.toast('That download was blocked here. Copying the project to your clipboard instead.')
+      try {
+        await navigator.clipboard.writeText(text)
+      } catch {
+        actions.toast('Could not export — this browser blocked both saving and copying.')
+      }
+      return
+    }
+  }
+
   const blob = new Blob([text], { type })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -81,4 +119,5 @@ export function downloadText(filename: string, text: string, type = 'application
   a.click()
   a.remove()
   window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  actions.toast('Exported. Images are stored separately and are not included.')
 }

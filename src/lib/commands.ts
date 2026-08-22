@@ -1,7 +1,7 @@
 import { actions, currentPage, selectionBounds, store, type AppState } from '../store/store'
 import { contentBounds, dropPoint, viewCenter, viewportSize } from '../canvas/viewportRef'
 import { makeBoard, makeFrame, makeShape, makeSticky, makeText } from './factory'
-import { addFilesToCanvas, downloadText, pickFiles } from './files'
+import { addFilesToCanvas, offerFile, pickFiles } from './files'
 import { clearSaved, exportDoc, importDoc } from '../store/persistence'
 import { createSampleDoc } from '../store/sampleDoc'
 
@@ -306,8 +306,8 @@ export function buildCommands(): Command[] {
       group: 'File',
       run: () => {
         const doc = store.getState().doc
-        downloadText(`${doc.name.replace(/[^\w-]+/g, '-').toLowerCase() || 'project'}.loft.json`, exportDoc(doc))
-        actions.toast('Exported. Images are stored separately and are not included.')
+        const name = doc.name.replace(/[^\w-]+/g, '-').toLowerCase() || 'project'
+        void offerFile(`${name}.loft.json`, exportDoc(doc))
       },
     },
     {
