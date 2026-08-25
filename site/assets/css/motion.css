@@ -1,277 +1,134 @@
 /* ==========================================================================
    Motion
-   House rules:
-   1. transform, opacity, clip-path. Nothing else animates, ever.
-   2. Hidden states are scoped to .js, so with scripting off the page is
-      complete and static rather than blank.
-   3. Every device below honours prefers-reduced-motion by losing the motion
-      and keeping the content.
+   1. transform, opacity, clip-path and stroke-dashoffset only.
+   2. Hidden states are scoped to .js, so with scripting off the page is whole.
+   3. prefers-reduced-motion removes the motion, never the content.
    ========================================================================== */
 
-/* ---- Scroll progress ------------------------------------------------------- */
+/* ---- Scroll progress --------------------------------------------------------- */
 .progress {
   position: fixed;
   inset: 0 auto auto 0;
-  z-index: 70;
-  height: 1px;
+  z-index: 60;
+  height: 3px;
   width: 100%;
   transform: scaleX(var(--progress, 0));
   transform-origin: 0 50%;
-  background: var(--thread);
+  background: var(--accent);
   pointer-events: none;
 }
 
-/* ==========================================================================
-   THE THREAD — the signature move
-   One oxblood thread, one continuous path, drawn by scroll from the first
-   screen to the last. It starts where the ribbon lies in the opening plate,
-   leaves the image, becomes the rule beneath the headings, loops the peak act
-   and finishes under the closing call to action. Nothing else on the page is
-   allowed to use this colour as a line.
-   ========================================================================== */
-.thread-layer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
-}
-.thread-layer svg { width: 100%; height: 100%; display: block; }
-
-.thread-path {
-  fill: none;
-  stroke: var(--thread);
-  stroke-width: 1.25;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.55;
-  /* Drawn by JS: dasharray is the full length, dashoffset retreats with scroll. */
-  stroke-dasharray: var(--thread-len, 4000);
-  stroke-dashoffset: calc(var(--thread-len, 4000) * (1 - var(--thread-draw, 0)));
-}
-/* A faint ghost of the whole route, so the thread reads as a path being
-   followed rather than a line being grown from nothing. */
-.thread-ghost {
-  fill: none;
-  stroke: var(--thread);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.055;
-  stroke-dasharray: 1 9;
-}
-@media (prefers-reduced-motion: reduce) {
-  .thread-path { stroke-dashoffset: 0; }
-}
-
-/* ---- Reveal ----------------------------------------------------------------- */
+/* ---- Reveal -------------------------------------------------------------------- */
 .js [data-reveal] {
   opacity: 0;
-  transform: translate3d(0, var(--ry, 24px), 0);
+  transform: translate3d(0, 26px, 0);
   transition:
-    opacity var(--d-reveal) var(--ease-out) calc(var(--i, 0) * 80ms),
-    transform var(--d-reveal) var(--ease-out) calc(var(--i, 0) * 80ms);
+    opacity var(--d-reveal) var(--ease-out) calc(var(--i, 0) * 90ms),
+    transform var(--d-reveal) var(--ease-out) calc(var(--i, 0) * 90ms);
 }
-.js [data-reveal="left"]  { transform: translate3d(-32px, 0, 0); }
-.js [data-reveal="right"] { transform: translate3d(32px, 0, 0); }
+.js [data-reveal="left"]  { transform: translate3d(-30px, 0, 0); }
+.js [data-reveal="right"] { transform: translate3d(30px, 0, 0); }
+.js [data-reveal="rise"]  { transform: translate3d(0, 46px, 0); }
 .js [data-reveal="still"] { transform: none; }
 .js [data-revealed] { opacity: 1; transform: none; }
 
-/* ---- Word-split display type -------------------------------------------------
-   Each word rises into a clipped line box. Built in the markup, not by JS, so
-   the words carry their own stagger index and the a11y string is authored. */
-.split { display: block; }
-.split__line { display: block; overflow: hidden; padding-bottom: 0.08em; }
-.split__word {
+/* Below the breakpoint the split layouts stack, so a left/right entrance is
+   applied to a full-width element and its pre-reveal transform widens the
+   document. Sideways motion is also the wrong gesture on a phone. */
+@media (max-width: 900px) {
+  .js [data-reveal="left"],
+  .js [data-reveal="right"] { transform: translate3d(0, 26px, 0); }
+}
+
+/* ---- Word-split headline ---------------------------------------------------------
+   Each word rises into a clipped box. Authored in the markup so the words carry
+   their own stagger index and the accessible string is written by hand. */
+.split-line { display: block; overflow: hidden; padding-bottom: 0.1em; }
+.split-word {
   display: inline-block;
-  transform: translate3d(0, 115%, 0);
-  transition: transform 1150ms var(--ease-out) calc(var(--wi, 0) * 70ms);
+  transform: translate3d(0, 110%, 0);
+  transition: transform 1000ms var(--ease-out) calc(var(--wi, 0) * 80ms);
 }
-[data-revealed] .split__word { transform: none; }
+[data-revealed] .split-word { transform: none; }
 
-/* ---- Plate: the mount settles from a slight over-scale ------------------------ */
-.js .plate[data-reveal] .plate__window > * {
-  transform: scale(1.07);
-  transition: transform var(--d-plate) var(--ease-out);
+/* ---- Photograph settles from a slight over-scale ------------------------------------ */
+.js .shot[data-reveal] > * {
+  transform: scale(1.06);
+  transition: transform 1400ms var(--ease-out);
 }
-.js .plate[data-revealed] .plate__window > * { transform: none; }
-
-/* ---- Mask wipe ---------------------------------------------------------------- */
-.js [data-wipe] {
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 1100ms var(--ease-mask) calc(var(--i, 0) * 130ms);
-}
-.js [data-wipe="up"] { clip-path: inset(100% 0 0 0); }
-.js [data-wiped] { clip-path: inset(0 0 0 0); }
+.js .shot[data-revealed] > * { transform: none; }
 
 /* ==========================================================================
-   DEVICE: PIN
-   A tall outer section with a viewport-height sticky stage inside it. The
-   scroll distance is the act's running time.
+   SIGNATURE MOVE — "The Gold Draw"
+   Every highlighted word on the site is underscored by a gold stroke that
+   draws itself, once, as the heading arrives. It is a single hand-drawn SVG
+   path, not a border, so it has the wobble of something written rather than
+   ruled. Nothing else on the site uses this gesture.
    ========================================================================== */
-.pin { position: relative; }
-.pin__stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
+.draw {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
 }
+.draw__line {
+  position: absolute;
+  left: -2%;
+  bottom: -0.22em;
+  width: 104%;
+  height: 0.34em;
+  overflow: visible;
+  pointer-events: none;
+}
+.draw__line path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0.9;
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+  transition: stroke-dashoffset 1100ms var(--ease-out) 260ms;
+}
+[data-revealed] .draw__line path,
+.draw--on .draw__line path { stroke-dashoffset: 0; }
 
-/* Copy that assembles one line at a time while the frame holds still. */
-.pin__line {
-  display: block;
-  opacity: 0.16;
-  transform: translate3d(0, 0, 0);
-  transition: opacity var(--d-slow) var(--ease-out),
-              color var(--d-slow) var(--ease-out);
-  color: var(--fg-muted);
-}
-.pin__line[data-lit] { opacity: 1; color: var(--fg); }
-/* An accented line stays accented once lit: [data-lit] would otherwise
-   out-specify the colour utility. */
-.pin__line.in-thread[data-lit] { color: var(--thread); }
 @media (prefers-reduced-motion: reduce) {
-  .pin__line { opacity: 1; color: var(--fg); }
-  .pin__line.in-thread { color: var(--thread); }
+  .draw__line path { stroke-dashoffset: 0; transition: none; }
 }
 
-/* ==========================================================================
-   DEVICE: PAN — the peak
-   Lateral travel. Vertical scroll reads as argument; horizontal reads as a
-   corridor you are walking down, which is what seven decades of archive is.
-   ========================================================================== */
-.pan { position: relative; }
-.pan__stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  /* Clear the masthead and the running head so no card is ever clipped. */
-  padding-top: clamp(5rem, 4rem + 3vw, 7.5rem);
-  padding-bottom: var(--s-6);
-}
-.pan__track {
-  display: flex;
-  align-items: stretch;
-  gap: clamp(1.5rem, 3vw, 4rem);
-  padding-inline: var(--gutter);
-  will-change: transform;
-  transform: translate3d(var(--pan-x, 0px), 0, 0);
-}
-.pan__card {
-  flex: none;
-  width: clamp(17rem, 25vw, 23rem);
-  display: grid;
-  align-content: start;
-  gap: var(--s-5);
-}
-/* The plate inside a travelling card is sized by viewport height, not by its
-   own aspect ratio, so the card always fits the stage it moves through. */
-.pan__card .plate__window {
-  aspect-ratio: auto;
-  height: clamp(13rem, 36svh, 21rem);
-}
-.pan__card--lead {
-  width: clamp(19rem, 36vw, 34rem);
-  align-content: center;
-}
-.pan__card--lead .display-xl { font-size: clamp(2rem, 1.1rem + 2.9vw, 3.75rem); }
-.pan__era {
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 1.4rem + 3.2vw, 4.5rem);
-  line-height: 0.9;
-  letter-spacing: var(--ls-display);
-  color: var(--fg);
-}
-.pan__era sup {
-  font-family: var(--font-mono);
-  font-size: 0.16em;
-  letter-spacing: var(--ls-mono);
-  vertical-align: super;
-  color: var(--thread);
-}
-/* On narrow screens lateral travel becomes a normal scroll-snap rail: the
-   device degrades rather than breaking. */
-@media (max-width: 820px) {
-  .pan__stage { position: static; height: auto; overflow: visible; }
-  .pan__track {
-    transform: none !important;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding-block: var(--s-4);
-  }
-  .pan__card { scroll-snap-align: start; width: min(78vw, 22rem); }
-  .pan__card--lead { width: min(86vw, 26rem); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .pan__stage { position: static; height: auto; }
-  .pan__track { transform: none !important; overflow-x: auto; }
-}
+/* ---- Parallax ------------------------------------------------------------------------ */
+.js [data-parallax] { transform: translate3d(0, var(--py, 0px), 0); }
 
-/* ==========================================================================
-   DEVICE: STACK
-   Cards that stack under the masthead and release one at a time.
-   Pure sticky, no JS.
-   ========================================================================== */
-.stack-deck { display: grid; gap: var(--s-6); }
-.stack-deck__card {
-  position: sticky;
-  top: calc(6rem + var(--k, 0) * 2.5rem);
-  background: var(--bg-paper);
-  border: var(--hairline);
-  padding: clamp(1.75rem, 1rem + 2.5vw, 3.5rem);
-  box-shadow: var(--shadow-plate);
-}
-@media (prefers-reduced-motion: reduce) {
-  .stack-deck__card { position: static; }
-}
-
-/* ==========================================================================
-   DEVICE: LIVE SURFACE
-   The close stops moving and starts responding. --mx/--my are the pointer,
-   normalised and eased, written by rAF.
-   ========================================================================== */
-.magnetic { transform: translate3d(var(--mx, 0px), var(--my, 0px), 0); }
-.magnetic-host { position: relative; }
-.magnetic-host::before {
+/* ---- Live surface: the closing band answers the pointer ---------------------------------- */
+.magnet { transform: translate3d(var(--mx, 0px), var(--my, 0px), 0); }
+.magnet-host { position: relative; overflow: hidden; }
+.magnet-host::before {
   content: "";
   position: absolute;
-  inset: -20%;
-  background: radial-gradient(28rem 28rem at var(--px, 50%) var(--py, 50%),
-              var(--oxblood-wash) 0%, transparent 65%);
+  inset: -30%;
+  background: radial-gradient(26rem 26rem at var(--px, 50%) var(--py-pos, 50%),
+              rgba(232, 160, 44, 0.22) 0%, transparent 66%);
   opacity: 0;
   transition: opacity var(--d-slow) var(--ease-out);
   pointer-events: none;
 }
-.magnetic-host[data-live]::before { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .magnetic { transform: none !important; }
-  .magnetic-host::before { display: none; }
-}
+.magnet-host[data-live]::before { opacity: 1; }
 
-/* ---- Parallax ------------------------------------------------------------------ */
-.js [data-parallax] { transform: translate3d(0, var(--py-shift, 0px), 0); }
-
-/* ---- Cross-page transitions ------------------------------------------------------ */
+/* ---- Cross-page transitions ---------------------------------------------------------------- */
 @view-transition { navigation: auto; }
-::view-transition-old(root) { animation: vt-out 200ms var(--ease-inout) both; }
-::view-transition-new(root) { animation: vt-in 460ms var(--ease-out) both; }
+::view-transition-old(root) { animation: vt-out 180ms var(--ease-inout) both; }
+::view-transition-new(root) { animation: vt-in 440ms var(--ease-out) both; }
 @keyframes vt-out { to { opacity: 0; } }
-@keyframes vt-in { from { opacity: 0; transform: translateY(12px); } }
-.masthead { view-transition-name: masthead; }
-::view-transition-old(masthead), ::view-transition-new(masthead) { animation: none; }
+@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
+.nav { view-transition-name: sitenav; }
+::view-transition-old(sitenav), ::view-transition-new(sitenav) { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .js [data-reveal] { opacity: 1 !important; transform: none !important; }
-  .split__word { transform: none !important; }
-  .js [data-wipe] { clip-path: none !important; }
+  .split-word { transform: none !important; }
   .js [data-parallax] { transform: none !important; }
-  .js .plate[data-reveal] .plate__window > * { transform: none !important; }
+  .js .shot[data-reveal] > * { transform: none !important; }
+  .magnet { transform: none !important; }
+  .magnet-host::before { display: none; }
   @view-transition { navigation: none; }
 }

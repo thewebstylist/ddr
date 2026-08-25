@@ -1,226 +1,174 @@
 /* ==========================================================================
-   Base — reset, the plaster ground, typography, layout primitives
+   Base — reset, typography, layout primitives
    ========================================================================== */
 
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: 5rem;
+  scroll-padding-top: calc(var(--nav-h) + 1rem);
 }
 
 body {
-  /* The thread layer is absolutely positioned against this. Without it the
-     layer resolves against the initial containing block (one viewport) and the
-     whole path is crushed into the first screen. */
-  position: relative;
   margin: 0;
   background: var(--bg);
   color: var(--fg-body);
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--t-body);
-  line-height: var(--lh-body);
-  font-synthesis-weight: none;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* The wall. A raking shaft of north light from the upper left, fixed behind
-   every act, so scrolling feels like moving through one lit room rather than
-   past a stack of cards. Generated, so it costs nothing and never pixelates. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(112deg,
-      #FFFFFF26 0%, #FFFFFF12 18%, transparent 42%, transparent 100%),
-    radial-gradient(120% 80% at 8% -10%, #FFFFFF2E 0%, transparent 55%),
-    radial-gradient(100% 70% at 100% 108%, #14110D14 0%, transparent 60%);
-}
-:root[data-theme="dark"] body::after {
-  background:
-    linear-gradient(112deg, #FFFFFF10 0%, #FFFFFF06 18%, transparent 42%),
-    radial-gradient(120% 80% at 8% -10%, #FFFFFF14 0%, transparent 55%),
-    radial-gradient(100% 70% at 100% 108%, #00000059 0%, transparent 60%);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) body::after {
-    background:
-      linear-gradient(112deg, #FFFFFF10 0%, #FFFFFF06 18%, transparent 42%),
-      radial-gradient(120% 80% at 8% -10%, #FFFFFF14 0%, transparent 55%),
-      radial-gradient(100% 70% at 100% 108%, #00000059 0%, transparent 60%);
-  }
-}
-
-/* Plaster tooth. Sits above the light, beneath the content. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.55;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23p)' opacity='0.16'/%3E%3C/svg%3E");
-}
-:root[data-theme="dark"] body::before { mix-blend-mode: screen; opacity: 0.32; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) body::before { mix-blend-mode: screen; opacity: 0.32; }
-}
-
-/* Everything real sits above the ground layers. */
-.masthead, main, .colophon, .thread-layer, .progress { position: relative; z-index: 2; }
-
 ::selection { background: var(--selection-bg); color: var(--selection-fg); }
 
-/* ---- Type ---------------------------------------------------------------- */
+img, svg, video { display: block; max-width: 100%; height: auto; }
 
+/* ---- Headings ------------------------------------------------------------- */
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 400;
   font-optical-sizing: auto;
   color: var(--fg);
   margin: 0;
+  letter-spacing: var(--ls-display);
   text-wrap: balance;
 }
-h1 { font-size: var(--t-hero); line-height: var(--lh-display); letter-spacing: var(--ls-display); }
-h2 { font-size: var(--t-xxl);  line-height: var(--lh-tight);   letter-spacing: var(--ls-display); }
-h3 { font-size: var(--t-xl);   line-height: var(--lh-tight);   letter-spacing: var(--ls-tight); }
+h1 { font-size: var(--t-hero); line-height: 1.02; }
+h2 { font-size: var(--t-xxl);  line-height: 1.06; }
+h3 { font-size: var(--t-xl);   line-height: 1.1;  }
 
-/* h4 steps out of the didone: at this size Bodoni's hairlines disappear. */
+/* h4 leaves the didone: at this size Bodoni's hairlines vanish. */
 h4 {
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-size: var(--t-md);
   font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.005em;
+  line-height: 1.35;
   color: var(--fg);
   margin: 0;
 }
 
 p { margin: 0 0 1.15em; max-width: var(--measure); text-wrap: pretty; }
 p:last-child { margin-bottom: 0; }
-
 strong { font-weight: 600; color: var(--fg); }
 a { color: inherit; }
-img, svg, video { display: block; max-width: 100%; height: auto; }
 ul, ol { margin: 0 0 1.15em; padding-left: 1.2em; }
 li { margin-bottom: 0.45em; }
 blockquote { margin: 0; }
 
-/* ---- Type roles ---------------------------------------------------------- */
+/* ---- Type roles ------------------------------------------------------------ */
 
-/* Archive metadata. Plate numbers, dates, classifications. Mono is what
-   sells "this came out of a filing cabinet". */
-.meta {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  font-weight: 400;
-  letter-spacing: var(--ls-mono);
-  text-transform: uppercase;
-  color: var(--fg-muted);
-  margin: 0;
+/* The accent face. One highlighted word in a headline, never running text. */
+.acc {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent);
 }
-.meta--thread { color: var(--thread); }
+.acc--rose { color: var(--highlight); }
+
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--highlight);
+  margin: 0 0 var(--s-4);
+}
+.eyebrow--gold  { color: var(--accent-deep); }
+.eyebrow--quiet { color: var(--fg-muted); }
+.eyebrow--invert { color: var(--accent); }
 
 .lede {
   font-size: var(--t-md);
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--fg-body);
-  max-width: 44ch;
+  max-width: 52ch;
 }
 
-.display-xl {
-  font-family: var(--font-display);
-  font-size: var(--t-mega);
-  line-height: var(--lh-display);
-  letter-spacing: var(--ls-display);
-  font-weight: 400;
-  color: var(--fg);
-  margin: 0;
-}
-
-.italic { font-style: italic; }
-.in-thread { color: var(--thread); }
-
-.caption {
-  font-size: var(--t-xs);
-  line-height: 1.5;
-  color: var(--fg-muted);
-}
-
+.caption { font-size: var(--t-sm); line-height: 1.55; color: var(--fg-muted); }
 .num { font-variant-numeric: tabular-nums lining-nums; }
 
-/* ---- Layout -------------------------------------------------------------- */
+/* ---- Layout ---------------------------------------------------------------- */
 
-.shell {
+.w {
   width: 100%;
   max-width: var(--max-w);
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
-.shell--narrow { max-width: 72rem; }
+.w--wide { max-width: 88rem; }
+.w--tight { max-width: 60rem; }
 
-.act { padding-block: var(--act-y); position: relative; }
-.act--shade { background: var(--bg-shade); }
-.act--tight { padding-block: calc(var(--act-y) * 0.55); }
+.band { padding-block: var(--band); }
+.band--soft   { background: var(--bg-soft); }
+.band--invert { background: var(--bg-invert); color: var(--on-invert-soft); }
+.band--tight  { padding-block: calc(var(--band) * 0.6); }
 
-/* The archive grid. Twelve columns; children opt in by span and start so
-   layouts can overlap and sit off-axis rather than stacking centred. */
-.grid {
+.band--invert h1, .band--invert h2, .band--invert h3, .band--invert h4 { color: var(--on-invert); }
+.band--invert p { color: var(--on-invert-soft); }
+.band--invert .caption { color: var(--on-invert-muted); }
+
+.center { text-align: center; }
+.center p, .center .lede { margin-inline: auto; }
+
+.stack   > * + * { margin-top: var(--s-5); }
+.stack-sm> * + * { margin-top: var(--s-3); }
+.stack-lg> * + * { margin-top: var(--s-7); }
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+}
+.cluster--center { justify-content: center; }
+
+/* A two-column split that is never 50/50. */
+.split {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--s-6) var(--s-5);
+  grid-template-columns: 1fr 1.05fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
 }
+.split--text-wide { grid-template-columns: 1.2fr 1fr; }
+.split--flip > :first-child { order: 2; }
+.split--top { align-items: start; }
 @media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; gap: var(--s-7); }
-  .grid > * { grid-column: 1 / -1 !important; }
+  .split, .split--text-wide { grid-template-columns: 1fr; }
+  .split--flip > :first-child { order: 0; }
 }
 
-/* Span and start are set on separate longhands so they compose. The shorthand
-   `grid-column: span N` sets the START to a span and leaves the END auto,
-   which collapses the item to a single track the moment a start is also given. */
-.c1{grid-column-end:span 1}   .c2{grid-column-end:span 2}
-.c3{grid-column-end:span 3}   .c4{grid-column-end:span 4}
-.c5{grid-column-end:span 5}   .c6{grid-column-end:span 6}
-.c7{grid-column-end:span 7}   .c8{grid-column-end:span 8}
-.c9{grid-column-end:span 9}   .c10{grid-column-end:span 10}
-.c12{grid-column:1/-1}
-.s2{grid-column-start:2} .s3{grid-column-start:3} .s4{grid-column-start:4}
-.s5{grid-column-start:5} .s6{grid-column-start:6} .s7{grid-column-start:7}
-.s8{grid-column-start:8}
+.cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+.cols--3 { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
 
-.stack > * + * { margin-top: var(--s-5); }
-.stack-sm > * + * { margin-top: var(--s-3); }
-.stack-lg > * + * { margin-top: var(--s-7); }
-
-.cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
-
-/* ---- Accessibility -------------------------------------------------------- */
-
+/* ---- Accessibility ---------------------------------------------------------- */
 .skip {
   position: absolute;
   left: var(--s-4);
   top: -100%;
   z-index: 200;
-  background: var(--fg);
-  color: var(--bg);
+  background: var(--plum);
+  color: #fff;
   padding: var(--s-3) var(--s-5);
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: var(--ls-mono);
-  text-transform: uppercase;
+  border-radius: var(--r-pill);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  text-decoration: none;
   transition: top var(--d-fast) var(--ease-out);
 }
 .skip:focus-visible { top: var(--s-4); }
 
 :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
-  outline: 2px solid var(--thread);
+  outline: 2px solid var(--accent-deep);
   outline-offset: 3px;
+  border-radius: var(--r-sm);
 }
 
 .visually-hidden {

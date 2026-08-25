@@ -1,112 +1,75 @@
-<section class="page-hero">
-  <div class="shell">
-    <span class="folio" aria-hidden="true">06</span>
-    <p class="eyebrow" data-reveal data-stagger>Contact</p>
-    <h1 class="page-hero__title" data-reveal="none">
-      <span class="split" aria-hidden="true">
-        <span class="split__line"><span class="split__word" style="--wi:0">Start</span> <span class="split__word" style="--wi:1">the</span></span>
-        <span class="split__line"><span class="split__word italic-accent" style="--wi:2">conversation.</span></span>
-      </span>
-      <span class="visually-hidden">Start the conversation.</span>
-    </h1>
-    <p class="lede" data-reveal data-stagger>
-      Mentorship enquiries, speaking bookings, and press. Every message reaches Trish&rsquo;s desk.
+<section class="phead">
+  <div class="w phead__in">
+    <p class="eyebrow" data-reveal>Contact</p>
+    <h1 data-reveal style="--i:1">Start the <span class="draw acc">conversation<svg class="draw__line" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 13 C 74 3, 158 19, 296 6"/></svg></span></h1>
+    <p class="lede" style="margin-top:1.25rem;--i:2" data-reveal>
+      Mentorship enquiries, speaking bookings and press. Every message reaches
+      Trish&rsquo;s desk.
     </p>
   </div>
 </section>
 
-<section class="section" id="call">
-  <div class="shell">
-    <div class="row row--offset">
-      <div class="stack" data-reveal="left">
-        <p class="eyebrow">The fifteen minutes</p>
-        <h2>One short call, one&nbsp;question.</h2>
+<section class="band" id="call">
+  <div class="w split split--top">
+    <div data-reveal="left">
+      <p class="eyebrow">The fifteen minutes</p>
+      <h2>One short call, one question</h2>
+      <div class="stack" style="margin-top:1.5rem">
         <p>
-          Whether you are considering mentorship or booking Trish for a stage, the first step is
-          the same: a fifteen-minute call to determine whether you are a good fit for each other.
-          No pitch, no pressure.
+          Whether you are considering mentorship or booking Trish for a stage, the first
+          step is the same: a fifteen minute call to determine whether you are a good fit
+          for each other. No pitch, no pressure.
         </p>
 
-        <dl class="detail-list">
-          <div class="detail">
-            <dt>Telephone</dt>
-            <dd><a href="tel:+18182070867">818.207.0867</a></dd>
-          </div>
-          <div class="detail">
-            <dt>Email</dt>
-            <dd><a href="mailto:Trish@SafePassageHeals.org">Trish@SafePassageHeals.org</a></dd>
-          </div>
-          <div class="detail">
-            <dt>The non-profit</dt>
-            <dd><a href="https://safepassageheals.org" rel="noopener">safepassageheals.org</a></dd>
-          </div>
-          <div class="detail">
-            <dt>Based in</dt>
-            <dd>Los Angeles, California &middot; mentoring remotely worldwide</dd>
-          </div>
+        <dl class="details">
+          <div class="detail"><dt>Telephone</dt><dd><a href="tel:+18182070867">818.207.0867</a></dd></div>
+          <div class="detail"><dt>Email</dt><dd><a href="mailto:Trish@SafePassageHeals.org">Trish@SafePassageHeals.org</a></dd></div>
+          <div class="detail"><dt>The non-profit</dt><dd><a href="https://safepassageheals.org" rel="noopener">safepassageheals.org</a></dd></div>
+          <div class="detail"><dt>Based in</dt><dd>Los Angeles, California. Mentoring remotely worldwide.</dd></div>
         </dl>
 
-        <p class="caption" style="margin-top:2rem">
+        <p class="caption">
           Ready to be mentored rather than talk about it?
           <a class="link" href="mentorship.html#apply">Go straight to the application.</a>
         </p>
       </div>
-
-      <form class="stack" data-demo-form data-reveal="right" novalidate>
-        <div class="field-row">
-          <div class="field">
-            <label for="c-name">Your name</label>
-            <input id="c-name" name="name" type="text" autocomplete="name" required>
-          </div>
-          <div class="field">
-            <label for="c-email">Email</label>
-            <input id="c-email" name="email" type="email" autocomplete="email" required>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="c-reason">What is this about?</label>
-          <select id="c-reason" name="reason">
-            <option>Mentorship</option>
-            <option>Speaking or keynote booking</option>
-            <option>The book</option>
-            <option>Press or media</option>
-            <option>Safe Passage Heals</option>
-            <option>Something else</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="c-org">Organisation <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
-          <input id="c-org" name="organisation" type="text" autocomplete="organization">
-        </div>
-
-        <div class="field">
-          <label for="c-message">Your message</label>
-          <textarea id="c-message" name="message" required></textarea>
-        </div>
-
-        <button class="btn btn--block" type="submit">
-          Send message <span class="btn__arrow" aria-hidden="true">&rarr;</span>
-        </button>
-
-        <p class="notice" data-form-note hidden tabindex="-1">
-          <strong>This form is not wired up yet.</strong>
-          No endpoint is connected in this build, so nothing was sent. Until one is, please email
-          <a class="link" href="mailto:Trish@SafePassageHeals.org">Trish@SafePassageHeals.org</a>
-          or call <a class="link" href="tel:+18182070867">818.207.0867</a>.
-        </p>
-      </form>
     </div>
+
+    <form class="card stack" data-demo-form data-reveal="right" novalidate>
+      <div class="field-row">
+        <div class="field"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" required></div>
+        <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" required></div>
+      </div>
+      <div class="field">
+        <label for="c-reason">What is this about?</label>
+        <select id="c-reason" name="reason">
+          <option>Mentorship</option>
+          <option>Speaking or keynote booking</option>
+          <option>The book</option>
+          <option>Press or media</option>
+          <option>Safe Passage Heals</option>
+          <option>Something else</option>
+        </select>
+      </div>
+      <div class="field"><label for="c-org">Organisation (optional)</label><input id="c-org" name="organisation" type="text" autocomplete="organization"></div>
+      <div class="field"><label for="c-message">Your message</label><textarea id="c-message" name="message" required></textarea></div>
+      <button class="btn btn--block" type="submit">Send Message <span class="btn__arrow" aria-hidden="true">&rarr;</span></button>
+      <p class="notice" data-form-note hidden tabindex="-1">
+        <strong>This form is not connected yet.</strong>
+        No endpoint is wired in this build, so nothing was sent. Until one is, email
+        <a href="mailto:Trish@SafePassageHeals.org">Trish@SafePassageHeals.org</a> or call
+        <a href="tel:+18182070867">818.207.0867</a>.
+      </p>
+    </form>
   </div>
 </section>
 
-<section class="cta-band">
-  <div class="shell">
-    <p class="eyebrow" data-reveal data-stagger>Or skip ahead</p>
-    <h2 class="display-mega" data-reveal data-stagger style="max-width:18ch">Apply to be mentored.</h2>
-    <div class="cluster" style="margin-top:2.5rem" data-reveal data-stagger>
-      <a class="btn" href="mentorship.html#apply">Start the application <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+<section class="close-band magnet-host">
+  <div class="w w--tight">
+    <p class="eyebrow eyebrow--invert" data-reveal>Or skip ahead</p>
+    <h2 class="magnet" data-magnet="1" data-reveal="still">Apply to be <span class="acc">mentored.</span></h2>
+    <div class="cluster cluster--center magnet" data-magnet="0.35" style="margin-top:2.5rem">
+      <a class="btn" href="mentorship.html#apply">Start the Application <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 </section>

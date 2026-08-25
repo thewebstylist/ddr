@@ -14,10 +14,10 @@
 <meta property="og:url" content="https://trishsteele.com/{{canonical}}">
 <meta name="twitter:card" content="summary_large_image">
 
-<meta name="theme-color" content="#EDE7DC" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#100E0B" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FCF8F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#170D14" media="(prefers-color-scheme: dark)">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EDE7DC'/%3E%3Cpath d='M6 4h20M16 4v24' stroke='%236E1D24' stroke-width='2.5' fill='none'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232B1526'/%3E%3Ctext x='16' y='23' font-family='Didot,Georgia,serif' font-size='19' fill='%23E8A02C' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E">
 
 <link rel="preload" as="font" type="font/woff2" crossorigin
       href="assets/fonts/bodoni-moda-normal-400_700-latin.woff2">
@@ -32,7 +32,7 @@
 <link rel="stylesheet" href="assets/css/pages.css">
 
 <script>
-  /* Theme before first paint, so a dark viewer never sees a plaster flash. */
+  /* Theme before first paint, so a dark viewer never sees a cream flash. */
   try {
     var t = localStorage.getItem('ts-theme');
     if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
@@ -43,16 +43,6 @@
 
 <a class="skip" href="#main">Skip to content</a>
 <div class="progress" data-progress aria-hidden="true"></div>
-
-<!-- THE THREAD. One path, drawn by scroll, running the whole height of the
-     document. preserveAspectRatio="none" lets it stretch to any page length;
-     non-scaling-stroke keeps the line the same weight regardless. -->
-<div class="thread-layer" aria-hidden="true">
-  <svg viewBox="0 0 100 1000" preserveAspectRatio="none" focusable="false">
-    <path class="thread-ghost" d="{{threadpath}}"/>
-    <path class="thread-path"  d="{{threadpath}}"/>
-  </svg>
-</div>
 
 {{nav}}
 

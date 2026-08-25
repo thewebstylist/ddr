@@ -1,9 +1,8 @@
 /* ==========================================================================
-   TRISH STEELE — scroll engine
-   No dependencies. Every enhancement is additive: hidden states live behind
-   .js, so with scripting off the page renders complete and static.
-   One rAF loop reads scroll and writes custom properties. Measurement happens
-   on load and resize, never inside the loop.
+   TRISH STEELE — site behaviour
+   No dependencies. Every enhancement is additive: the hidden states live
+   behind .js, so with scripting off the page renders whole and static.
+   One rAF loop reads scroll and writes custom properties.
    ========================================================================== */
 (() => {
   'use strict';
@@ -18,10 +17,10 @@
 
   /* ---------------------------------------------------------------- theme */
   const KEY = 'ts-theme';
-  const read = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
-  const write = (v) => { try { localStorage.setItem(KEY, v); } catch { /* private mode */ } };
+  const readTheme  = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+  const writeTheme = (v) => { try { localStorage.setItem(KEY, v); } catch { /* private mode */ } };
 
-  const saved = read();
+  const saved = readTheme();
   if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
 
   const isDark = () => root.dataset.theme
@@ -33,7 +32,7 @@
     btn.addEventListener('click', () => {
       const next = isDark() ? 'light' : 'dark';
       root.dataset.theme = next;
-      write(next);
+      writeTheme(next);
       btn.setAttribute('aria-pressed', String(next === 'dark'));
     });
   });
@@ -45,34 +44,31 @@
     const set = (open) => {
       toggle.setAttribute('aria-expanded', String(open));
       panel.dataset.open = String(open);
-      document.body.style.overflow = open && window.innerWidth <= 960 ? 'hidden' : '';
+      document.body.style.overflow = open && window.innerWidth <= 1000 ? 'hidden' : '';
     };
     toggle.addEventListener('click', () =>
       set(toggle.getAttribute('aria-expanded') !== 'true'));
     panel.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
-    window.addEventListener('resize', () => { if (window.innerWidth > 960) set(false); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 1000) set(false); });
   }
 
-  /* Mark the current page without hard-coding it into seven files. */
+  /* Mark the current page rather than hard-coding it into seven files. */
   const here = location.pathname.split('/').pop() || 'index.html';
-  $$('.nav__link, .colophon__links a').forEach((a) => {
+  $$('.nav__link, .foot__links a').forEach((a) => {
     const href = a.getAttribute('href') || '';
     if (!href || /^(#|https?:|mailto:|tel:)/.test(href)) return;
     if (href.split('#')[0] === here) a.setAttribute('aria-current', 'page');
   });
 
   /* -------------------------------------------------------------- reveals */
-  const revealables = $$('[data-reveal], [data-wipe]');
-  const mark = (el) => {
-    if (el.hasAttribute('data-reveal')) el.setAttribute('data-revealed', '');
-    if (el.hasAttribute('data-wipe'))   el.setAttribute('data-wiped', '');
-  };
-
-  // Elements still waiting. The scroll loop sweeps this list too, because an
-  // IntersectionObserver never fires for content you jumped clean over.
+  const revealables = $$('[data-reveal]');
   let pending = revealables.slice();
 
+  const mark = (el) => el.setAttribute('data-revealed', '');
+
+  // The observer never fires for anything the reader jumps clean over, so the
+  // scroll loop sweeps whatever is left as well.
   const sweep = (vh) => {
     if (!pending.length) return;
     pending = pending.filter((el) => {
@@ -92,12 +88,9 @@
         mark(e.target);
         io.unobserve(e.target);
       });
-    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.06 });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
 
     revealables.forEach((el) => io.observe(el));
-
-    // Anything already on screen reveals next frame, so it transitions in
-    // rather than appearing pre-finished.
     requestAnimationFrame(() => sweep(window.innerHeight));
   }
 
@@ -115,8 +108,14 @@
         const t0 = performance.now();
         const tick = (now) => {
           const t = clamp((now - t0) / 1700);
-          el.textContent = fmt.format(Math.round(target * (1 - Math.pow(1 - t, 4))));
-          if (t < 1) requestAnimationFrame(tick);
+          if (t < 1) {
+            el.textContent = fmt.format(Math.round(target * (1 - Math.pow(1 - t, 4))));
+            requestAnimationFrame(tick);
+          } else {
+            // Land on the exact figure. Easing toward it can stop a hair short,
+            // and a philanthropy number that reads 1,998 is simply wrong.
+            el.textContent = fmt.format(target);
+          }
         };
         requestAnimationFrame(tick);
       });
@@ -124,64 +123,27 @@
     counters.forEach((el) => cio.observe(el));
   }
 
-  /* ==================================================================
-     THE THREAD
-     Measure the path once, hand its length to CSS, then let scroll
-     progress retract the dash offset.
-     ================================================================== */
-  const threadPath = $('.thread-path');
-  if (threadPath) {
-    const measure = () => {
-      try {
-        const len = threadPath.getTotalLength();
-        if (len > 0) root.style.setProperty('--thread-len', String(Math.ceil(len)));
-      } catch { /* getTotalLength unsupported: the ghost route still shows */ }
-    };
-    measure();
-    window.addEventListener('resize', measure, { passive: true });
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  /* ---------------------------------------------------- the gold draw
+     A highlighted word inside a heading that is not itself a reveal target
+     still needs its underline to draw. Observe those directly. */
+  const draws = $$('.draw').filter((d) => !d.closest('[data-reveal]'));
+  if (draws.length && 'IntersectionObserver' in window && !reduced.matches) {
+    const dio = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('draw--on');
+        dio.unobserve(e.target);
+      });
+    }, { threshold: 0.6 });
+    draws.forEach((d) => dio.observe(d));
+  } else {
+    draws.forEach((d) => d.classList.add('draw--on'));
   }
 
-  /* ==================================================================
-     DEVICE: PAN
-     The outer section is as tall as the track is wide, so one screen of
-     vertical scroll buys one screen of lateral travel.
-     ================================================================== */
-  const pans = $$('[data-pan]').map((section) => ({
-    section,
-    track: $('.pan__track', section),
-    distance: 0,
-  }));
-
-  const measurePans = () => {
-    const lateral = window.innerWidth > 820 && !reduced.matches;
-    pans.forEach((p) => {
-      if (!p.track) return;
-      if (!lateral) {
-        p.section.style.height = '';
-        p.distance = 0;
-        p.track.style.removeProperty('--pan-x');
-        return;
-      }
-      p.distance = Math.max(0, p.track.scrollWidth - window.innerWidth);
-      p.section.style.height = `${window.innerHeight + p.distance}px`;
-    });
-  };
-
-  /* ==================================================================
-     DEVICE: PIN
-     Progress through the section lights the copy one line at a time.
-     ================================================================== */
-  const pins = $$('[data-pin]').map((section) => ({
-    section,
-    lines: $$('.pin__line', section),
-  }));
-
-  /* ---------------------------------------------------- the scroll loop */
+  /* ------------------------------------------------------- the scroll loop */
   const progressBar = $('[data-progress]');
-  const masthead    = $('[data-masthead]');
+  const nav         = $('[data-nav]');
   const parallaxEls = reduced.matches ? [] : $$('[data-parallax]');
-
   let ticking = false;
 
   const frame = () => {
@@ -189,40 +151,20 @@
     const y  = window.scrollY;
     const vh = window.innerHeight;
     const max = root.scrollHeight - vh;
-    const pageProgress = max > 0 ? clamp(y / max) : 0;
 
     sweep(vh);
 
-    if (progressBar) progressBar.style.setProperty('--progress', String(pageProgress));
-    if (threadPath)  root.style.setProperty('--thread-draw', String(pageProgress));
-    if (masthead)    masthead.dataset.stuck = String(y > 24);
-
-    pans.forEach((p) => {
-      if (!p.track || p.distance <= 0) return;
-      const top = p.section.offsetTop;
-      const t = clamp((y - top) / p.distance);
-      p.track.style.setProperty('--pan-x', `${(-t * p.distance).toFixed(1)}px`);
-    });
-
-    pins.forEach((p) => {
-      if (!p.lines.length) return;
-      const rect = p.section.getBoundingClientRect();
-      const span = Math.max(1, p.section.offsetHeight - vh);
-      const t = clamp(-rect.top / span);
-      // Hold the last line lit for the final stretch: the authored silence.
-      const lit = Math.floor(t * (p.lines.length + 0.6));
-      p.lines.forEach((line, i) => {
-        if (i <= lit) line.setAttribute('data-lit', '');
-        else line.removeAttribute('data-lit');
-      });
-    });
+    if (progressBar) {
+      progressBar.style.setProperty('--progress', max > 0 ? String(clamp(y / max)) : '0');
+    }
+    if (nav) nav.dataset.stuck = String(y > 16);
 
     parallaxEls.forEach((el) => {
       const r = el.getBoundingClientRect();
       if (r.bottom < -200 || r.top > vh + 200) return;
       const speed = Number(el.dataset.parallax) || 0.1;
       const centred = (r.top + r.height / 2 - vh / 2) / vh;
-      el.style.setProperty('--py-shift', `${clamp(-centred * speed * 100, -90, 90).toFixed(1)}px`);
+      el.style.setProperty('--py', `${clamp(-centred * speed * 100, -90, 90).toFixed(1)}px`);
     });
   };
 
@@ -232,23 +174,15 @@
     requestAnimationFrame(frame);
   };
 
-  const onResize = () => { measurePans(); onScroll(); };
-
-  measurePans();
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onResize, { passive: true });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  window.addEventListener('resize', onScroll, { passive: true });
 
-  /* ==================================================================
-     DEVICE: LIVE SURFACE
-     The closing act responds to the pointer instead of to scroll.
-     ================================================================== */
+  /* ------------------------------------------------------ the live surface */
   if (!reduced.matches && window.matchMedia('(pointer: fine)').matches) {
-    $$('.magnetic-host').forEach((host) => {
-      const targets = $$('.magnetic', host);
-      let raf = null;
-      let mx = 0, my = 0, tx = 0, ty = 0;
+    $$('.magnet-host').forEach((host) => {
+      const targets = $$('.magnet', host);
+      let raf = null, mx = 0, my = 0, tx = 0, ty = 0;
 
       const loop = () => {
         // Critically damped follow: no overshoot, no rubber band.
@@ -259,22 +193,20 @@
           t.style.setProperty('--mx', `${(mx * k).toFixed(2)}px`);
           t.style.setProperty('--my', `${(my * k).toFixed(2)}px`);
         });
-        if (Math.abs(tx - mx) > 0.1 || Math.abs(ty - my) > 0.1) raf = requestAnimationFrame(loop);
-        else raf = null;
+        raf = (Math.abs(tx - mx) > 0.1 || Math.abs(ty - my) > 0.1)
+          ? requestAnimationFrame(loop) : null;
       };
-
       const start = () => { if (raf === null) raf = requestAnimationFrame(loop); };
 
       host.addEventListener('pointermove', (e) => {
         const r = host.getBoundingClientRect();
         host.style.setProperty('--px', `${e.clientX - r.left}px`);
-        host.style.setProperty('--py', `${e.clientY - r.top}px`);
-        tx = ((e.clientX - r.left) / r.width - 0.5) * 26;
-        ty = ((e.clientY - r.top) / r.height - 0.5) * 18;
+        host.style.setProperty('--py-pos', `${e.clientY - r.top}px`);
+        tx = ((e.clientX - r.left) / r.width - 0.5) * 22;
+        ty = ((e.clientY - r.top) / r.height - 0.5) * 14;
         host.dataset.live = '';
         start();
       });
-
       host.addEventListener('pointerleave', () => {
         tx = 0; ty = 0;
         delete host.dataset.live;
@@ -283,7 +215,9 @@
     });
   }
 
-  /* ------------------------------------------------------------- forms */
+  /* ------------------------------------------------------------------ forms
+     Static build: no endpoint is wired. Rather than silently doing nothing,
+     say so. Replace this with the real handler when the endpoint exists. */
   $$('form[data-demo-form]').forEach((form) => {
     form.addEventListener('submit', (e) => {
       e.preventDefault();

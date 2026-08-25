@@ -15,18 +15,6 @@ const read = (...p) => readFileSync(join(here, ...p), 'utf8');
 
 const layout = read('src', 'layout.html');
 
-/* The thread's route, in a 0 0 100 1000 viewBox stretched to the page height.
- * It leans right where the opening plate sits, crosses left for the quiet act,
- * swings widest across the peak, then settles toward centre at the close. */
-const THREAD_PATH = [
-  'M 76 0',
-  'C 76 70, 86 96, 70 132',
-  'S 18 192, 22 252',
-  'C 26 322, 88 344, 84 432',
-  'S 14 524, 20 604',
-  'C 24 684, 78 706, 74 792',
-  'S 30 884, 50 1000',
-].join(' ');
 const nav    = read('src', 'partials', 'nav.html');
 const footer = read('src', 'partials', 'footer.html');
 
@@ -86,7 +74,6 @@ for (const page of PAGES) {
     .replaceAll('{{title}}', page.title)
     .replaceAll('{{description}}', page.description)
     .replaceAll('{{canonical}}', page.file === 'index.html' ? '' : page.file)
-    .replaceAll('{{threadpath}}', THREAD_PATH)
     .replace('{{nav}}', nav.trimEnd())
     .replace('{{footer}}', footer.trimEnd())
     .replace('{{body}}', body.trimEnd());

@@ -1,137 +1,147 @@
 /* ==========================================================================
    TRISH STEELE — Design tokens
-   World: a couture house archive. Bone plaster, raking north light, ivory
-   paper, and exactly one saturated colour: oxblood.
+   Direction: warm, bright, personality-led. Colour-blocked sections rather
+   than one flat ground: cream, blush, white and plum, with a single
+   high-chroma gold carrying every call to action.
    ========================================================================== */
 
 :root {
   color-scheme: light dark;
 
-  /* ---- Ground: plaster and paper, never pure white ------------------- */
-  --plaster:      #EDE7DC;  /* the wall. page ground                     */
-  --plaster-lit:  #F7F3EB;  /* where the light falls. raised surfaces    */
-  --plaster-shade:#E1D9CB;  /* the corner. sunk bands                    */
-  --paper:        #FBF8F2;  /* tissue and pattern paper. cards           */
-  --stone:        #CFC5B2;  /* hairlines                                 */
-  --stone-deep:   #A99C84;
+  /* ---- Grounds -------------------------------------------------------- */
+  --cream:     #FCF8F1;
+  --cream-2:   #F6EFE3;
+  --blush:     #FBE9E4;
+  --blush-2:   #F7DCD5;
+  --white:     #FFFFFF;
+  --plum:      #2B1526;
+  --plum-2:    #3E1F36;
+  --plum-deep: #160B13;
 
-  --ink:          #14110D;  /* the darkest thing on the page             */
-  --ink-body:     #2B251D;
-  --ink-muted:    #6E6455;
+  /* ---- Ink ------------------------------------------------------------- */
+  --ink:   #1A1016;
+  --body:  #4A3B44;
+  --muted: #85717C;
 
-  /* ---- The one colour ------------------------------------------------- */
-  --oxblood:      #6E1D24;
-  --oxblood-lift: #8C2831;
-  --oxblood-wash: #6E1D2410;
+  /* ---- Accents ---------------------------------------------------------
+     Gold carries every CTA. Rose is a highlight only: eyebrows, small marks,
+     never a button. One primary accent keeps seven pages coherent. */
+  --gold:      #E8A02C;
+  --gold-deep: #C9821A;
+  --gold-soft: #F7DFB4;
+  --rose:      #C8446B;
 
-  /* ---- Semantic ------------------------------------------------------- */
-  --bg:          var(--plaster);
-  --bg-lit:      var(--plaster-lit);
-  --bg-shade:    var(--plaster-shade);
-  --bg-paper:    var(--paper);
-  --fg:          var(--ink);
-  --fg-body:     var(--ink-body);
-  --fg-muted:    var(--ink-muted);
-  --rule:        var(--stone);
-  --thread:      var(--oxblood);
+  /* ---- Semantic --------------------------------------------------------- */
+  --bg:        var(--cream);
+  --bg-soft:   var(--blush);
+  --bg-card:   var(--white);
+  --bg-invert: var(--plum);
+  --fg:        var(--ink);
+  --fg-body:   var(--body);
+  --fg-muted:  var(--muted);
+  --accent:    var(--gold);
+  --accent-deep: var(--gold-deep);
+  --highlight: var(--rose);
+  --rule:      rgba(43, 21, 38, 0.12);
+  --rule-firm: rgba(43, 21, 38, 0.22);
 
-  --selection-bg: var(--oxblood);
-  --selection-fg: var(--plaster-lit);
+  --on-invert:       #FFFFFF;
+  --on-invert-soft:  rgba(255, 255, 255, 0.80);
+  --on-invert-muted: rgba(255, 255, 255, 0.55);
+  --rule-invert:     rgba(255, 255, 255, 0.16);
 
-  /* ---- Type -----------------------------------------------------------
-     Bodoni Moda: the fashion-magazine didone. Enormous stroke contrast, so
-     it only works large and tightly tracked. Never below 1.5rem.
-     IBM Plex Mono: archive metadata. Plate numbers, dates, shot briefs.
-     Inter: everything a person actually has to read.
-     -------------------------------------------------------------------- */
-  --font-display: 'Bodoni Moda', 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif;
-  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --selection-bg: var(--gold);
+  --selection-fg: var(--ink);
 
-  --t-colossal: clamp(4rem, 0.5rem + 16vw, 20rem);
-  --t-mega:     clamp(3rem, 1rem + 10vw, 12rem);
-  --t-hero:     clamp(2.5rem, 1rem + 7vw, 7.5rem);
-  --t-xxl:      clamp(2rem, 1.1rem + 4.2vw, 4.75rem);
-  --t-xl:       clamp(1.6rem, 1.1rem + 2.4vw, 3rem);
-  --t-lg:       clamp(1.3rem, 1.05rem + 1.2vw, 1.9rem);
-  --t-md:       clamp(1.0625rem, 1rem + 0.4vw, 1.3rem);
-  --t-body:     clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
-  --t-sm:       0.9375rem;
-  --t-xs:       0.8125rem;
-  --t-micro:    0.6875rem;
-
-  --lh-display: 0.88;
-  --lh-tight:   1.06;
-  --lh-body:    1.66;
-
-  /* Didones want negative tracking at display size, positive at small. */
-  --ls-colossal: -0.055em;
-  --ls-display:  -0.035em;
-  --ls-tight:    -0.018em;
-  --ls-mono:      0.16em;
-
-  /* ---- Space ----------------------------------------------------------- */
-  --s-1: 0.25rem; --s-2: 0.5rem;  --s-3: 0.75rem; --s-4: 1rem;
-  --s-5: 1.5rem;  --s-6: 2rem;    --s-7: 3rem;    --s-8: 4rem;
-  --s-9: 6rem;    --s-10: 8rem;   --s-11: 12rem;
-
-  --act-y:   clamp(5rem, 3rem + 10vw, 13rem);
-  --gutter:  clamp(1.25rem, 0.5rem + 3.5vw, 5.5rem);
-  --measure: 58ch;
-  --max-w:   100rem;
-
-  /* ---- Motion -----------------------------------------------------------
-     Entrances: fast out, long settle. Reversible states: symmetric.
-     Nothing here animates anything but transform, opacity and clip-path.
+  /* ---- Type -------------------------------------------------------------
+     Bodoni Moda carries every heading and every number: high contrast, the
+     magazine voice. Cormorant italic is the accent face, one word at a time.
+     Inter is for anything a person actually has to read at length.
      ---------------------------------------------------------------------- */
+  --font-display: 'Bodoni Moda', Didot, 'Bodoni MT', Georgia, serif;
+  --font-accent:  'Cormorant Garamond', Garamond, Georgia, serif;
+  --font-ui:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  --t-hero:  clamp(2.6rem, 1rem + 6.4vw, 6.4rem);
+  --t-huge:  clamp(3rem, 1rem + 8vw, 8rem);
+  --t-xxl:   clamp(2rem, 1.1rem + 3.4vw, 4rem);
+  --t-xl:    clamp(1.7rem, 1.1rem + 2.2vw, 3rem);
+  --t-lg:    clamp(1.35rem, 1.05rem + 1.3vw, 2rem);
+  --t-md:    clamp(1.0625rem, 1rem + 0.4vw, 1.2rem);
+  --t-body:  1.0625rem;
+  --t-sm:    0.9375rem;
+  --t-xs:    0.8125rem;
+  --t-micro: 0.72rem;
+
+  --ls-display: -0.02em;
+  --ls-tight:   -0.012em;
+  --ls-eyebrow:  0.22em;
+  --ls-logo:     0.16em;
+
+  /* ---- Space -------------------------------------------------------------- */
+  --s-1:0.25rem; --s-2:0.5rem;  --s-3:0.75rem; --s-4:1rem;
+  --s-5:1.5rem;  --s-6:2rem;    --s-7:3rem;    --s-8:4rem;
+  --s-9:6rem;    --s-10:8rem;
+
+  --band:    clamp(4rem, 2.5rem + 7vw, 8rem);
+  --gutter:  clamp(1.25rem, 0.75rem + 3vw, 3rem);
+  --measure: 62ch;
+  --max-w:   78rem;
+  --nav-h:   4.75rem;
+
+  /* ---- Shape: rounded and friendly, never hard editorial edges ------------- */
+  --r-sm:   10px;
+  --r:      18px;
+  --r-lg:   28px;
+  --r-pill: 999px;
+
+  --shadow-card: 0 18px 50px -22px rgba(43, 21, 38, 0.30);
+  --shadow-cta:  0 8px 20px -10px rgba(232, 160, 44, 0.85);
+  --shadow-lift: 0 26px 60px -26px rgba(43, 21, 38, 0.42);
+
+  /* ---- Motion --------------------------------------------------------------- */
   --ease-out:   cubic-bezier(0.16, 1, 0.30, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-mask:  cubic-bezier(0.77, 0, 0.175, 1);
-
   --d-fast:   180ms;
-  --d-base:   340ms;
-  --d-slow:   680ms;
-  --d-reveal: 1000ms;
-  --d-plate:  1500ms;
-
-  --hairline: 1px solid var(--rule);
-  --shadow-plate: 0 1px 1px #14110D0A, 0 24px 60px -28px #14110D33;
+  --d-base:   300ms;
+  --d-slow:   620ms;
+  --d-reveal: 900ms;
 }
 
+/* --------------------------------------------------------------------------
+   Dark: the plum becomes the ground and cream becomes the ink. Gold is
+   already luminous on dark, so it carries across unchanged.
+   -------------------------------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:       #100E0B;
-    --bg-lit:   #191510;
-    --bg-shade: #0A0907;
-    --bg-paper: #1C1712;
-    --fg:       #F2EDE3;
-    --fg-body:  #D5CDBF;
-    --fg-muted: #918674;
-    --rule:     #2E271F;
-    --thread:      #C2545D;
-    --oxblood:     #C2545D;
-    --oxblood-lift:#D96A73;
-    --oxblood-wash:#C2545D14;
-    --selection-bg: #C2545D;
-    --selection-fg: #100E0B;
-    --shadow-plate: 0 1px 1px #00000040, 0 24px 60px -28px #000000A6;
+    --bg:        #170D14;
+    --bg-soft:   #22121D;
+    --bg-card:   #241320;
+    --bg-invert: #0E070C;
+    --fg:        #FBF4EE;
+    --fg-body:   #D8C8D0;
+    --fg-muted:  #A08D98;
+    --rule:      rgba(255, 255, 255, 0.12);
+    --rule-firm: rgba(255, 255, 255, 0.22);
+    --gold-soft: #4A3617;
+    --highlight: #E8748F;
+    --shadow-card: 0 18px 50px -22px rgba(0, 0, 0, 0.75);
+    --shadow-lift: 0 26px 60px -26px rgba(0, 0, 0, 0.85);
   }
 }
 
 :root[data-theme="dark"] {
-  --bg:       #100E0B;
-  --bg-lit:   #191510;
-  --bg-shade: #0A0907;
-  --bg-paper: #1C1712;
-  --fg:       #F2EDE3;
-  --fg-body:  #D5CDBF;
-  --fg-muted: #918674;
-  --rule:     #2E271F;
-  --thread:      #C2545D;
-  --oxblood:     #C2545D;
-  --oxblood-lift:#D96A73;
-  --oxblood-wash:#C2545D14;
-  --selection-bg: #C2545D;
-  --selection-fg: #100E0B;
-  --shadow-plate: 0 1px 1px #00000040, 0 24px 60px -28px #000000A6;
+  --bg:        #170D14;
+  --bg-soft:   #22121D;
+  --bg-card:   #241320;
+  --bg-invert: #0E070C;
+  --fg:        #FBF4EE;
+  --fg-body:   #D8C8D0;
+  --fg-muted:  #A08D98;
+  --rule:      rgba(255, 255, 255, 0.12);
+  --rule-firm: rgba(255, 255, 255, 0.22);
+  --gold-soft: #4A3617;
+  --highlight: #E8748F;
+  --shadow-card: 0 18px 50px -22px rgba(0, 0, 0, 0.75);
+  --shadow-lift: 0 26px 60px -26px rgba(0, 0, 0, 0.85);
 }
