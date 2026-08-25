@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northwind Studio — Sterling Mobile Mirror test fixture</title>
+<style>
+  :root { --fg:#101014; --muted:#63636e; }
+  * { box-sizing:border-box; margin:0; }
+  body { font: 16px/1.6 -apple-system, system-ui, sans-serif; color:var(--fg); }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 40px; }
+  nav { position:sticky; top:0; display:flex; justify-content:space-between; align-items:center;
+        height:68px; background:#fff; border-bottom:1px solid #ececed; z-index:5; }
+  nav .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  section { padding:96px 0; border-bottom:1px solid #f1f1f3; }
+  h1 { font-size:60px; line-height:1.05; letter-spacing:-.03em; max-width:12ch; }
+  h2 { font-size:34px; letter-spacing:-.02em; margin-bottom:18px; }
+  p { color:var(--muted); max-width:56ch; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:36px; }
+  .card { padding:26px; border:1px solid #ececee; border-radius:16px; background:#fafafb; }
+  .hero { background:linear-gradient(180deg,#f7f7f9,#fff); }
+  .cta { background:#0b0b0f; color:#fff; }
+  .cta p { color:#9a9aa4; }
+  @media (max-width: 700px) {
+    .wrap { padding:0 20px; }
+    nav .links { display:none; }
+    h1 { font-size:38px; }
+    h2 { font-size:26px; }
+    .grid { grid-template-columns:1fr; }
+    section { padding:56px 0; }
+  }
+</style>
+</head>
+<body>
+<nav><div class="wrap" style="display:flex;justify-content:space-between;width:100%;align-items:center">
+  <strong>Northwind</strong><div class="links"><span>Work</span><span>Studio</span><span>Journal</span><span>Contact</span></div>
+</div></nav>
+
+<section class="hero" id="hero"><div class="wrap">
+  <h1>Design that carries weight.</h1>
+  <p style="margin-top:20px">A test page with real sections, so section-sync has something honest to aim at.</p>
+</div></section>
+
+<section id="services"><div class="wrap">
+  <h2>Services</h2><p>Brand systems, product design, and the long unglamorous work of shipping.</p>
+  <div class="grid"><div class="card"><h3>Identity</h3><p>Marks, type, motion.</p></div>
+  <div class="card"><h3>Product</h3><p>Flows and interfaces.</p></div>
+  <div class="card"><h3>Build</h3><p>Front-end delivery.</p></div></div>
+</div></section>
+
+<section id="work"><div class="wrap">
+  <h2>Selected work</h2><p>Twelve projects, four industries, one standard.</p>
+  <div class="grid"><div class="card" style="height:200px"></div><div class="card" style="height:200px"></div><div class="card" style="height:200px"></div></div>
+</div></section>
+
+<section id="studio"><div class="wrap">
+  <h2>The studio</h2><p>Nine people in one room, which is the whole methodology.</p>
+</div></section>
+
+<section id="contact" class="cta"><div class="wrap">
+  <h2>Start something</h2><p>hello@northwind.test</p>
+</div></section>
+</body>
+</html>
