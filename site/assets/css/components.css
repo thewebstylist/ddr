@@ -1,0 +1,539 @@
+/* ==========================================================================
+   Components
+   ========================================================================== */
+
+/* ---- Masthead -------------------------------------------------------------
+   No border, no shadow, no filled bar. It earns its separation from a hairline
+   that only appears once you have left the first screen. */
+.masthead {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  transition: background var(--d-slow) var(--ease-out);
+}
+.masthead::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--rule);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--d-slow) var(--ease-out);
+}
+.masthead[data-stuck="true"] {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+.masthead[data-stuck="true"]::after { transform: scaleX(1); }
+
+.masthead__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  min-height: 4.5rem;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wordmark em { font-style: italic; color: var(--thread); }
+
+.nav { display: flex; align-items: center; gap: clamp(0.9rem, 2vw, 2rem); }
+
+.nav__link {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  text-decoration: none;
+  padding-block: 0.4rem;
+  transition: color var(--d-base) var(--ease-out);
+}
+.nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0.15rem;
+  width: 100%; height: 1px;
+  background: var(--thread);
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform var(--d-base) var(--ease-out);
+}
+.nav__link:hover { color: var(--fg); }
+.nav__link:hover::after { transform: scaleX(1); transform-origin: 0 50%; }
+.nav__link[aria-current="page"] { color: var(--fg); }
+.nav__link[aria-current="page"]::after { transform: scaleX(1); }
+
+.masthead__actions { display: flex; align-items: center; gap: var(--s-3); }
+
+.icon-btn {
+  appearance: none;
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--fg-muted);
+  width: 2.5rem; height: 2.5rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: color var(--d-fast) var(--ease-out),
+              border-color var(--d-fast) var(--ease-out);
+}
+.icon-btn:hover { color: var(--fg); border-color: var(--stone-deep); }
+.icon-btn svg { width: 15px; height: 15px; }
+.t-sun { display: none; }
+:root[data-theme="dark"] .t-sun { display: block; }
+:root[data-theme="dark"] .t-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .t-sun { display: block; }
+  :root:not([data-theme="light"]) .t-moon { display: none; }
+}
+
+.nav-toggle { display: none; }
+.nav-toggle__x { display: none; }
+.nav-toggle[aria-expanded="true"] .nav-toggle__x { display: block; }
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars { display: none; }
+
+@media (max-width: 960px) {
+  .nav-toggle { display: inline-flex; }
+  .masthead__nav {
+    position: fixed;
+    inset: 4.5rem 0 auto 0;
+    background: var(--bg);
+    border-bottom: var(--hairline);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--s-3) var(--gutter) var(--s-6);
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    visibility: hidden;
+    transition: clip-path var(--d-slow) var(--ease-mask),
+                opacity var(--d-base) var(--ease-out),
+                visibility var(--d-slow);
+  }
+  .masthead__nav[data-open="true"] {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    visibility: visible;
+  }
+  .masthead__nav .nav__link {
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    letter-spacing: var(--ls-tight);
+    text-transform: none;
+    padding-block: var(--s-3);
+    border-bottom: var(--hairline);
+  }
+  .masthead__nav .nav__link::after { display: none; }
+  .masthead__actions .btn { display: none; }
+}
+
+/* ---- Buttons --------------------------------------------------------------
+   Restraint. One filled, one outlined. The only motion is a 2px lift and a
+   fill that wipes from the baseline, both on the same curve. */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65em;
+  padding: 1rem 1.75rem;
+  background: var(--fg);
+  color: var(--bg);
+  border: 1px solid var(--fg);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform var(--d-base) var(--ease-out),
+              color var(--d-base) var(--ease-out),
+              border-color var(--d-base) var(--ease-out);
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--thread);
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  transition: transform var(--d-base) var(--ease-out);
+}
+.btn:hover { transform: translateY(-2px); border-color: var(--thread); color: #FBF8F2; }
+.btn:hover::before { transform: scaleY(1); }
+.btn:active { transform: translateY(0); }
+.btn__arrow { transition: transform var(--d-base) var(--ease-out); }
+.btn:hover .btn__arrow { transform: translateX(4px); }
+
+.btn--quiet {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--rule);
+}
+.btn--quiet:hover { color: #FBF8F2; }
+
+.btn--sm { padding: 0.6rem 1.1rem; }
+.btn--block { width: 100%; justify-content: center; }
+
+/* Text link: the rule retracts rather than appears. */
+.link {
+  position: relative;
+  display: inline-block;
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 500;
+  padding-bottom: 2px;
+}
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 100%; height: 1px;
+  background: var(--thread);
+  transform-origin: 0 50%;
+  transition: transform var(--d-base) var(--ease-out);
+}
+.link:hover::after { transform: scaleX(0); transform-origin: 100% 50%; }
+
+.link-meta {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--thread);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.link-meta span { transition: transform var(--d-base) var(--ease-out); }
+.link-meta:hover span { transform: translateX(4px); }
+
+/* ==========================================================================
+   THE ARCHIVE PLATE
+   Every image on this site is a plate in an archive: mounted, cornered,
+   numbered, captioned. Until the real photography lands the mount is empty,
+   and an empty mount in an archive reads as waiting, not as broken.
+   To fill one: put an <img> inside .plate__window and delete .plate__empty.
+   ========================================================================== */
+.plate { position: relative; }
+
+.plate__window {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-shade);
+  isolation: isolate;
+}
+.plate__window > img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: var(--focal, 50% 35%);
+}
+
+.plate--portrait .plate__window { aspect-ratio: 4 / 5; }
+.plate--tall     .plate__window { aspect-ratio: 3 / 4.5; }
+.plate--square   .plate__window { aspect-ratio: 1 / 1; }
+.plate--wide     .plate__window { aspect-ratio: 16 / 10; }
+.plate--cinema   .plate__window { aspect-ratio: 21 / 9; }
+.plate--full     .plate__window { aspect-ratio: auto; height: 100%; }
+
+/* The empty mount: plaster, a shaft of raking light, and the fold of silk.
+   Three stacked gradients, no asset. */
+.plate__empty {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(104deg,
+      #FFFFFF00 0%, #FFFFFF1F 26%, #FFFFFF00 46%),
+    repeating-linear-gradient(97deg,
+      #14110D00 0px, #14110D07 22px, #14110D00 46px, #14110D00 78px),
+    radial-gradient(130% 90% at 12% 4%, var(--bg-lit) 0%, transparent 58%),
+    linear-gradient(158deg, var(--bg-lit) 0%, var(--bg-shade) 62%, var(--bg) 100%);
+}
+/* Mounting corners, top-left and bottom-right only. Asymmetry reads as hand-done. */
+.plate__empty::before,
+.plate__empty::after {
+  content: "";
+  position: absolute;
+  width: 26px; height: 26px;
+  border: 1px solid var(--stone-deep);
+  opacity: 0.5;
+}
+.plate__empty::before { top: 14px; left: 14px; border-right: 0; border-bottom: 0; }
+.plate__empty::after { bottom: 14px; right: 14px; border-left: 0; border-top: 0; }
+
+/* The thread crosses every empty plate on the same diagonal, so the whole
+   page reads as strung on one line even before the photographs arrive. */
+.plate__thread {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.plate__thread line {
+  stroke: var(--thread);
+  stroke-width: 1.25;
+  /* The SVG is stretched to the mount, so without this the stroke stretches
+     with it and a hairline becomes a stripe. */
+  vector-effect: non-scaling-stroke;
+  opacity: 0.5;
+}
+
+.plate__brief {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: grid;
+  gap: 0.4rem;
+  padding: var(--s-5);
+}
+.plate__no {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--thread);
+}
+.plate__shot {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  max-width: 42ch;
+}
+
+/* Caption printed outside the mount, like an index card. */
+.plate__caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: var(--hairline);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* ---- Figures & numbers ------------------------------------------------------ */
+.figure-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: var(--s-7) var(--s-5);
+}
+.figure__n {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 1.6rem + 4.6vw, 6rem);
+  line-height: 0.9;
+  letter-spacing: var(--ls-display);
+  color: var(--fg);
+}
+.figure__label {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--thread);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  max-width: 26ch;
+}
+
+/* ---- Pull quote -------------------------------------------------------------- */
+.quote {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  font-style: italic;
+  line-height: 1.24;
+  letter-spacing: var(--ls-tight);
+  color: var(--fg);
+  max-width: 24ch;
+}
+.quote__cite {
+  display: block;
+  margin-top: var(--s-5);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-style: normal;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* ---- Accordion ----------------------------------------------------------------- */
+.accordion { border-top: var(--hairline); }
+.accordion__item { border-bottom: var(--hairline); }
+.accordion__item summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-5);
+  padding: var(--s-5) 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  letter-spacing: var(--ls-tight);
+  color: var(--fg);
+  transition: color var(--d-fast) var(--ease-out);
+}
+.accordion__item summary::-webkit-details-marker { display: none; }
+.accordion__item summary:hover { color: var(--thread); }
+.accordion__item summary::after {
+  content: "+";
+  font-family: var(--font-mono);
+  font-size: var(--t-md);
+  color: var(--thread);
+  flex: none;
+  transition: transform var(--d-base) var(--ease-out);
+}
+.accordion__item[open] summary::after { transform: rotate(45deg); }
+.accordion__body { padding-bottom: var(--s-6); }
+.accordion__body p { color: var(--fg-muted); font-size: var(--t-sm); max-width: 56ch; }
+
+/* ---- Forms ------------------------------------------------------------------- */
+.field { display: grid; gap: var(--s-2); }
+.field label {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.field input, .field textarea, .field select {
+  appearance: none;
+  width: 100%;
+  padding: 0.85rem 0;
+  background: transparent;
+  border: 0;
+  border-bottom: var(--hairline);
+  border-radius: 0;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  transition: border-color var(--d-base) var(--ease-out);
+}
+.field textarea { min-height: 7rem; resize: vertical; }
+.field input:hover, .field textarea:hover, .field select:hover { border-color: var(--stone-deep); }
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none;
+  border-color: var(--thread);
+}
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: var(--s-6);
+}
+
+/* ---- Index (post list) ---------------------------------------------------------- */
+.index { border-top: var(--hairline); }
+.index__row {
+  display: grid;
+  grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--s-5);
+  padding: var(--s-6) 0;
+  border-bottom: var(--hairline);
+  text-decoration: none;
+  position: relative;
+}
+/* The row fills from the left on hover: a page being pulled from a drawer. */
+.index__row::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--gutter) * -0.5);
+  right: calc(var(--gutter) * -0.5);
+  top: 0; bottom: 0;
+  background: var(--oxblood-wash);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--d-slow) var(--ease-out);
+  pointer-events: none;
+}
+.index__row:hover::before { transform: scaleX(1); }
+.index__row:hover .index__title { color: var(--thread); }
+.index__title {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  line-height: 1.16;
+  letter-spacing: var(--ls-tight);
+  color: var(--fg);
+  transition: color var(--d-base) var(--ease-out);
+}
+.index__sub { margin-top: var(--s-2); font-size: var(--t-sm); color: var(--fg-muted); max-width: 56ch; }
+.index__go { color: var(--thread); font-family: var(--font-mono); transition: transform var(--d-base) var(--ease-out); }
+.index__row:hover .index__go { transform: translateX(5px); }
+@media (max-width: 760px) {
+  .index__row { grid-template-columns: 1fr; gap: var(--s-2); }
+  .index__go { display: none; }
+}
+
+/* ---- Colophon (footer) ----------------------------------------------------------- */
+.colophon {
+  border-top: var(--hairline);
+  padding-block: var(--s-9) var(--s-6);
+}
+.colophon__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+  gap: var(--s-8) var(--s-5);
+}
+.colophon h4 {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 400;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: var(--s-4);
+}
+.colophon__links { list-style: none; margin: 0; padding: 0; }
+.colophon__links li { margin-bottom: var(--s-3); }
+.colophon__links a {
+  font-size: var(--t-sm);
+  color: var(--fg-body);
+  text-decoration: none;
+  transition: color var(--d-fast) var(--ease-out);
+}
+.colophon__links a:hover { color: var(--thread); }
+.colophon__base {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-top: var(--s-9);
+  padding-top: var(--s-5);
+  border-top: var(--hairline);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+}
+
+/* ---- Notice ---------------------------------------------------------------------- */
+.notice {
+  border-left: 1px solid var(--thread);
+  padding: var(--s-4) var(--s-5);
+  background: var(--oxblood-wash);
+  font-size: var(--t-sm);
+  color: var(--fg-body);
+  max-width: 60ch;
+}
+.notice strong { display: block; margin-bottom: var(--s-2); }

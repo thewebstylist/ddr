@@ -1,0 +1,137 @@
+/* ==========================================================================
+   TRISH STEELE — Design tokens
+   World: a couture house archive. Bone plaster, raking north light, ivory
+   paper, and exactly one saturated colour: oxblood.
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- Ground: plaster and paper, never pure white ------------------- */
+  --plaster:      #EDE7DC;  /* the wall. page ground                     */
+  --plaster-lit:  #F7F3EB;  /* where the light falls. raised surfaces    */
+  --plaster-shade:#E1D9CB;  /* the corner. sunk bands                    */
+  --paper:        #FBF8F2;  /* tissue and pattern paper. cards           */
+  --stone:        #CFC5B2;  /* hairlines                                 */
+  --stone-deep:   #A99C84;
+
+  --ink:          #14110D;  /* the darkest thing on the page             */
+  --ink-body:     #2B251D;
+  --ink-muted:    #6E6455;
+
+  /* ---- The one colour ------------------------------------------------- */
+  --oxblood:      #6E1D24;
+  --oxblood-lift: #8C2831;
+  --oxblood-wash: #6E1D2410;
+
+  /* ---- Semantic ------------------------------------------------------- */
+  --bg:          var(--plaster);
+  --bg-lit:      var(--plaster-lit);
+  --bg-shade:    var(--plaster-shade);
+  --bg-paper:    var(--paper);
+  --fg:          var(--ink);
+  --fg-body:     var(--ink-body);
+  --fg-muted:    var(--ink-muted);
+  --rule:        var(--stone);
+  --thread:      var(--oxblood);
+
+  --selection-bg: var(--oxblood);
+  --selection-fg: var(--plaster-lit);
+
+  /* ---- Type -----------------------------------------------------------
+     Bodoni Moda: the fashion-magazine didone. Enormous stroke contrast, so
+     it only works large and tightly tracked. Never below 1.5rem.
+     IBM Plex Mono: archive metadata. Plate numbers, dates, shot briefs.
+     Inter: everything a person actually has to read.
+     -------------------------------------------------------------------- */
+  --font-display: 'Bodoni Moda', 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif;
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --t-colossal: clamp(4rem, 0.5rem + 16vw, 20rem);
+  --t-mega:     clamp(3rem, 1rem + 10vw, 12rem);
+  --t-hero:     clamp(2.5rem, 1rem + 7vw, 7.5rem);
+  --t-xxl:      clamp(2rem, 1.1rem + 4.2vw, 4.75rem);
+  --t-xl:       clamp(1.6rem, 1.1rem + 2.4vw, 3rem);
+  --t-lg:       clamp(1.3rem, 1.05rem + 1.2vw, 1.9rem);
+  --t-md:       clamp(1.0625rem, 1rem + 0.4vw, 1.3rem);
+  --t-body:     clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --t-sm:       0.9375rem;
+  --t-xs:       0.8125rem;
+  --t-micro:    0.6875rem;
+
+  --lh-display: 0.88;
+  --lh-tight:   1.06;
+  --lh-body:    1.66;
+
+  /* Didones want negative tracking at display size, positive at small. */
+  --ls-colossal: -0.055em;
+  --ls-display:  -0.035em;
+  --ls-tight:    -0.018em;
+  --ls-mono:      0.16em;
+
+  /* ---- Space ----------------------------------------------------------- */
+  --s-1: 0.25rem; --s-2: 0.5rem;  --s-3: 0.75rem; --s-4: 1rem;
+  --s-5: 1.5rem;  --s-6: 2rem;    --s-7: 3rem;    --s-8: 4rem;
+  --s-9: 6rem;    --s-10: 8rem;   --s-11: 12rem;
+
+  --act-y:   clamp(5rem, 3rem + 10vw, 13rem);
+  --gutter:  clamp(1.25rem, 0.5rem + 3.5vw, 5.5rem);
+  --measure: 58ch;
+  --max-w:   100rem;
+
+  /* ---- Motion -----------------------------------------------------------
+     Entrances: fast out, long settle. Reversible states: symmetric.
+     Nothing here animates anything but transform, opacity and clip-path.
+     ---------------------------------------------------------------------- */
+  --ease-out:   cubic-bezier(0.16, 1, 0.30, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-mask:  cubic-bezier(0.77, 0, 0.175, 1);
+
+  --d-fast:   180ms;
+  --d-base:   340ms;
+  --d-slow:   680ms;
+  --d-reveal: 1000ms;
+  --d-plate:  1500ms;
+
+  --hairline: 1px solid var(--rule);
+  --shadow-plate: 0 1px 1px #14110D0A, 0 24px 60px -28px #14110D33;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:       #100E0B;
+    --bg-lit:   #191510;
+    --bg-shade: #0A0907;
+    --bg-paper: #1C1712;
+    --fg:       #F2EDE3;
+    --fg-body:  #D5CDBF;
+    --fg-muted: #918674;
+    --rule:     #2E271F;
+    --thread:      #C2545D;
+    --oxblood:     #C2545D;
+    --oxblood-lift:#D96A73;
+    --oxblood-wash:#C2545D14;
+    --selection-bg: #C2545D;
+    --selection-fg: #100E0B;
+    --shadow-plate: 0 1px 1px #00000040, 0 24px 60px -28px #000000A6;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:       #100E0B;
+  --bg-lit:   #191510;
+  --bg-shade: #0A0907;
+  --bg-paper: #1C1712;
+  --fg:       #F2EDE3;
+  --fg-body:  #D5CDBF;
+  --fg-muted: #918674;
+  --rule:     #2E271F;
+  --thread:      #C2545D;
+  --oxblood:     #C2545D;
+  --oxblood-lift:#D96A73;
+  --oxblood-wash:#C2545D14;
+  --selection-bg: #C2545D;
+  --selection-fg: #100E0B;
+  --shadow-plate: 0 1px 1px #00000040, 0 24px 60px -28px #000000A6;
+}

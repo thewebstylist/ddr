@@ -1,0 +1,259 @@
+/* ==========================================================================
+   Act compositions
+   ========================================================================== */
+
+/* ==========================================================================
+   ACT 1 — ARRIVAL
+   Full screen. The name is set as a colossal didone that runs past the right
+   edge of the measure, with the plate held behind and to the right so the
+   type crosses it. Nothing is centred.
+   ========================================================================== */
+.arrival {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  padding-block: clamp(6rem, 4.5rem + 4vw, 8.5rem) var(--act-y);
+  overflow: clip;
+}
+
+.arrival__grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s-5);
+  align-items: center;
+}
+
+.arrival__col {
+  grid-column: 1 / span 7;
+  grid-row: 1;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: clamp(1.5rem, 3.2vh, 3rem);
+  align-content: center;
+}
+
+/* The plate is cropped off the right edge on purpose, and its height is capped
+   by the viewport so the whole act lands on one screen. */
+.arrival__plate {
+  grid-column: 8 / -1;
+  grid-row: 1;
+  z-index: 1;
+  margin-right: calc(var(--gutter) * -1);
+}
+.arrival__plate .plate__window {
+  aspect-ratio: auto;
+  height: clamp(18rem, 62svh, 34rem);
+}
+
+.arrival__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 1rem + 5.9vw, 6.9rem);
+  line-height: 0.86;
+  letter-spacing: var(--ls-colossal);
+  font-weight: 400;
+  color: var(--fg);
+  margin: 0;
+}
+.arrival__title .l2 { font-style: italic; padding-left: 0.14em; }
+.arrival__title .l3 { color: var(--thread); }
+
+.arrival__foot { display: grid; gap: var(--s-6); justify-items: start; }
+
+/* Standfirst: mono kicker on a hairline, the way a magazine sets a strapline. */
+.standfirst {
+  display: grid;
+  gap: var(--s-3);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--thread);
+  max-width: 42ch;
+}
+
+@media (max-width: 1000px) {
+  .arrival__col { grid-column: 1 / -1; }
+  .arrival__plate {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-right: 0;
+    margin-top: var(--s-6);
+  }
+  .arrival__plate .plate__window { height: clamp(16rem, 46svh, 26rem); }
+  .arrival { min-height: 0; padding-block: clamp(6rem, 5rem + 6vw, 9rem) var(--act-y); }
+}
+
+/* ==========================================================================
+   ACT 2 — RECOGNITION (pinned, quietest act, immediately before the peak)
+   ========================================================================== */
+.recognition .pin__stage { align-items: center; }
+.recognition__copy {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1rem + 3.4vw, 4rem);
+  line-height: 1.18;
+  letter-spacing: var(--ls-tight);
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: 0;
+  text-align: left;
+}
+.recognition__copy .pin__line + .pin__line { margin-top: 0.18em; }
+
+/* ==========================================================================
+   ACT 3 — THE TURN (the peak)
+   ========================================================================== */
+.turn__head {
+  position: absolute;
+  top: clamp(5.5rem, 9vh, 8rem);
+  left: var(--gutter);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   ACT 4 — THE METHOD
+   ========================================================================== */
+.method__panel {
+  display: grid;
+  grid-template-columns: minmax(0, 5rem) minmax(0, 1fr);
+  gap: var(--s-5) clamp(1.5rem, 3vw, 3rem);
+  padding-block: var(--s-7);
+  border-top: var(--hairline);
+  align-items: start;
+}
+.method__panel:last-child { border-bottom: var(--hairline); }
+.method__mark {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  font-style: italic;
+  color: var(--thread);
+  line-height: 1;
+}
+.method__body { display: grid; gap: var(--s-4); max-width: 60ch; }
+@media (max-width: 620px) {
+  .method__panel { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   ACT 5 — THE ROOMS
+   ========================================================================== */
+.room__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-bottom: var(--s-5);
+  border-bottom: 1px solid var(--thread);
+  margin-bottom: var(--s-6);
+}
+.room__name {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  letter-spacing: var(--ls-tight);
+  color: var(--fg);
+}
+.room__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--s-6) clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+@media (max-width: 780px) { .room__grid { grid-template-columns: 1fr; } }
+
+.spec { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
+.spec li {
+  display: grid;
+  grid-template-columns: 1.2rem 1fr;
+  gap: var(--s-3);
+  font-size: var(--t-sm);
+  color: var(--fg-body);
+}
+.spec li::before {
+  content: "";
+  width: 0.75rem;
+  height: 1px;
+  background: var(--thread);
+  margin-top: 0.75em;
+}
+
+/* ==========================================================================
+   ACT 6 — COMMITMENT (live surface)
+   ========================================================================== */
+.commit {
+  position: relative;
+  min-height: 92svh;
+  display: grid;
+  align-content: center;
+  padding-block: var(--act-y);
+  overflow: clip;
+}
+.commit__title {
+  font-family: var(--font-display);
+  font-size: var(--t-colossal);
+  line-height: 0.82;
+  letter-spacing: var(--ls-colossal);
+  color: var(--fg);
+  margin: 0;
+}
+.commit__title em { font-style: italic; color: var(--thread); }
+
+/* ==========================================================================
+   Interior pages
+   ========================================================================== */
+.masthead-pad { height: 4.5rem; }
+
+.chapter {
+  padding-block: clamp(3rem, 2rem + 5vw, 6rem) var(--act-y);
+  position: relative;
+}
+.chapter__grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s-6) var(--s-5);
+  align-items: end;
+}
+.chapter__title { grid-column: 1 / span 8; }
+.chapter__aside { grid-column: 10 / -1; }
+@media (max-width: 1000px) {
+  .chapter__title, .chapter__aside { grid-column: 1 / -1; }
+  .chapter__grid { align-items: start; }
+}
+
+/* Running head: the folio and section name a magazine prints on every spread. */
+.runhead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-bottom: var(--s-4);
+  border-bottom: var(--hairline);
+  margin-bottom: var(--s-8);
+}
+
+/* A spread: text column and plate, off-axis, never a 50/50 split. */
+.spread {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s-7) var(--s-5);
+  align-items: center;
+}
+.spread__text { grid-column: 1 / span 5; }
+.spread__plate { grid-column: 7 / -1; }
+.spread--flip .spread__text { grid-column: 8 / -1; }
+.spread--flip .spread__plate { grid-column: 1 / span 5; }
+.spread--offset { align-items: start; }
+@media (max-width: 900px) {
+  .spread__text, .spread__plate,
+  .spread--flip .spread__text, .spread--flip .spread__plate { grid-column: 1 / -1; }
+}
+
+/* Marginalia: a note set in the outer column, the way an editor annotates. */
+.margin-note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  padding-left: var(--s-4);
+  border-left: 1px solid var(--thread);
+  max-width: 26ch;
+}

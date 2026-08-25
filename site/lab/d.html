@@ -1,0 +1,226 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D / Radiant</title>
+<style>
+@font-face{font-family:'Bodoni Moda';font-style:normal;font-weight:400 700;font-optical-sizing:auto;font-display:swap;src:url('../assets/fonts/bodoni-moda-normal-400_700-latin.woff2') format('woff2')}
+@font-face{font-family:'Bodoni Moda';font-style:italic;font-weight:400 600;font-optical-sizing:auto;font-display:swap;src:url('../assets/fonts/bodoni-moda-italic-400_600-latin.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../assets/fonts/inter-normal-400_600-latin.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300 600;font-display:swap;src:url('f/cormorant-garamond-italic-300_600.woff2') format('woff2')}
+
+:root{
+  --cream:#FCF8F1; --cream-2:#F6EFE3;
+  --blush:#FBE9E4; --blush-2:#F7DCD5;
+  --plum:#2B1526; --plum-2:#3E1F36;
+  --ink:#1A1016; --body:#4A3B44; --mut:#8A7681;
+  --gold:#E8A02C; --gold-dk:#C9821A;
+  --rose:#C8446B;
+  --rad:18px; --rad-lg:28px; --rad-pill:999px;
+  --disp:'Bodoni Moda',Didot,Georgia,serif;
+  --scr:'Cormorant Garamond',Garamond,serif;
+  --ui:'Inter',system-ui,sans-serif;
+  --shadow:0 18px 50px -22px rgba(43,21,38,.35);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--body);font-family:var(--ui);
+  font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+.w{max-width:1240px;margin-inline:auto;padding-inline:clamp(1.25rem,4vw,3rem)}
+h1,h2,h3{font-family:var(--disp);font-weight:400;color:var(--ink);margin:0;letter-spacing:-.02em}
+.acc{font-family:var(--scr);font-style:italic;font-weight:500;color:var(--gold)}
+.eyebrow{font-family:var(--ui);font-size:.72rem;font-weight:600;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--rose);margin:0 0 1.1rem}
+
+/* pill buttons, the Marie Forleo move: high-chroma accent on neutral */
+.btn{display:inline-flex;align-items:center;gap:.6em;font-family:var(--ui);font-weight:600;
+  font-size:.9rem;letter-spacing:.02em;padding:1.05rem 2.1rem;border-radius:var(--rad-pill);
+  background:var(--gold);color:var(--ink);text-decoration:none;border:2px solid var(--gold);
+  box-shadow:0 8px 20px -10px rgba(232,160,44,.8);transition:transform .25s cubic-bezier(.16,1,.3,1),background .25s}
+.btn:hover{transform:translateY(-2px);background:var(--gold-dk);border-color:var(--gold-dk)}
+.btn.dark{background:var(--plum);border-color:var(--plum);color:#fff;box-shadow:none}
+.btn.out{background:transparent;color:var(--ink);border-color:rgba(43,21,38,.22);box-shadow:none}
+.btn.light{background:#fff;border-color:#fff;color:var(--ink);box-shadow:none}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:40;background:rgba(252,248,241,.9);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(43,21,38,.08)}
+.nav .in{display:flex;align-items:center;justify-content:space-between;gap:2rem;min-height:76px}
+.logo{font-family:var(--disp);font-size:1.15rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);text-decoration:none}
+.nav nav{display:flex;gap:1.8rem}
+.nav nav a{font-size:.88rem;font-weight:500;color:var(--body);text-decoration:none}
+.nav nav a:hover{color:var(--rose)}
+
+/* HERO: full-bleed photograph, dark scrim, centred serif headline */
+.hero{position:relative;min-height:88vh;display:grid;place-items:center;text-align:center;
+  color:#fff;overflow:hidden;background:linear-gradient(150deg,#3E1F36,#2B1526 55%,#160B13)}
+.hero .ph{position:absolute;inset:0;
+  background:
+    radial-gradient(70% 55% at 22% 18%, rgba(232,160,44,.28) 0%, transparent 60%),
+    radial-gradient(60% 50% at 82% 78%, rgba(200,68,107,.30) 0%, transparent 62%),
+    repeating-linear-gradient(101deg, rgba(255,255,255,.05) 0 2px, transparent 2px 68px);}
+.hero .ph::after{content:"HERO FILM / PORTRAIT 01";position:absolute;left:50%;bottom:26px;
+  transform:translateX(-50%);font-family:var(--ui);font-size:.66rem;font-weight:600;
+  letter-spacing:.24em;color:rgba(255,255,255,.42)}
+.hero .in{position:relative;z-index:2;padding:7rem 1.5rem 6rem;max-width:1000px}
+.hero h1{color:#fff;font-size:clamp(2.6rem, 1rem + 6.4vw, 6.4rem);line-height:1.02}
+.hero p{margin:1.8rem auto 0;max-width:52ch;color:rgba(255,255,255,.84);font-size:1.13rem}
+.hero .btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2.6rem}
+.hero .tag{font-family:var(--ui);font-size:.72rem;font-weight:600;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--gold);margin:0 0 1.6rem}
+
+/* capture bar */
+.cap{background:var(--blush);padding:3.2rem 0;text-align:center}
+.cap h2{font-size:clamp(1.9rem, 1rem + 2.4vw, 3rem)}
+.cap p{margin:.9rem auto 1.8rem;max-width:46ch;color:var(--body)}
+.cap form{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
+.cap input{font-family:var(--ui);font-size:.95rem;padding:1rem 1.4rem;border-radius:var(--rad-pill);
+  border:2px solid rgba(43,21,38,.14);min-width:270px;background:#fff;color:var(--ink)}
+
+/* intro */
+.intro{padding:clamp(4rem,7vw,7rem) 0}
+.intro .g{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(2rem,5vw,5rem);align-items:center}
+.intro h2{font-size:clamp(3rem, 1rem + 8vw, 8rem);line-height:.92}
+.intro .ph{aspect-ratio:4/4.4;border-radius:var(--rad-lg);box-shadow:var(--shadow);position:relative;
+  background:linear-gradient(150deg,var(--blush),var(--cream-2) 55%,var(--blush-2));overflow:hidden}
+.intro .ph::after{content:"PORTRAIT 02 / INTRO";position:absolute;left:22px;bottom:20px;
+  font-size:.66rem;font-weight:600;letter-spacing:.22em;color:var(--mut)}
+
+/* press bar */
+.press{background:var(--plum);color:#fff;padding:2.8rem 0;text-align:center}
+.press p{font-family:var(--disp);font-size:1.5rem;color:#fff;margin:0 0 1.6rem}
+.press .row{display:flex;gap:clamp(1.5rem,4vw,3.5rem);justify-content:center;flex-wrap:wrap;
+  align-items:center;opacity:.72}
+.press .row span{font-family:var(--disp);font-size:1rem;letter-spacing:.14em;
+  text-transform:uppercase;color:#fff}
+
+/* offer cards */
+.offers{padding:clamp(4rem,7vw,7rem) 0;display:grid;gap:2rem}
+.card{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(1.5rem,4vw,4rem);align-items:center;
+  background:#fff;border-radius:var(--rad-lg);padding:clamp(1.75rem,3vw,3.25rem);box-shadow:var(--shadow)}
+.card:nth-child(even){background:var(--blush)}
+.card:nth-child(even) .cimg{order:-1}
+.card h3{font-size:clamp(1.7rem,1rem + 2vw, 2.9rem);line-height:1.05;margin-bottom:1rem}
+.card .cimg{aspect-ratio:16/11;border-radius:var(--rad);position:relative;overflow:hidden;
+  background:linear-gradient(150deg,var(--cream-2),var(--blush-2))}
+.card .cimg::after{content:attr(data-l);position:absolute;left:18px;bottom:16px;font-size:.64rem;
+  font-weight:600;letter-spacing:.2em;color:var(--mut)}
+.card .lk{display:inline-block;margin-top:1.4rem}
+
+/* mosaic */
+.mos{padding:clamp(3rem,6vw,6rem) 0 clamp(4rem,7vw,7rem);text-align:center}
+.mos h2{font-size:clamp(2rem,1rem + 3vw,3.6rem);margin-bottom:2.5rem}
+.mos .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.mos .t{aspect-ratio:1;border-radius:var(--rad);background:linear-gradient(150deg,var(--blush),var(--cream-2));
+  position:relative}
+.mos .t:nth-child(3n){background:linear-gradient(150deg,var(--cream-2),var(--blush-2))}
+.mos .t:nth-child(4n){background:linear-gradient(150deg,#EBD9E2,var(--blush))}
+.mos .t::after{content:attr(data-l);position:absolute;inset:auto 0 12px 0;font-size:.6rem;
+  font-weight:600;letter-spacing:.18em;color:var(--mut)}
+@media(max-width:900px){
+  .intro .g,.card{grid-template-columns:1fr}
+  .card:nth-child(even) .cimg{order:0}
+  .mos .grid{grid-template-columns:repeat(2,1fr)}
+}
+
+</style></head>
+<body>
+
+<header class="nav"><div class="w in">
+  <a class="logo" href="#">Trish Steele</a>
+  <nav><a>Mentorship</a><a>Her Story</a><a>Speaking</a><a>The Book</a><a>Journal</a><a>Contact</a></nav>
+  <a class="btn" style="padding:.75rem 1.5rem;font-size:.82rem">Apply Now</a>
+</div></header>
+
+<section class="hero">
+  <div class="ph"></div>
+  <div class="in">
+    <p class="tag">Philanthropist &middot; Speaker &middot; Author &middot; Mentor</p>
+    <h1>Become Ageless, Fearless<br>and <span class="acc">Divinely Connected</span></h1>
+    <p>You reached the summit and found it quiet up there. Trish mentors accomplished
+       women through the renewal that success never delivered.</p>
+    <div class="btns">
+      <a class="btn">Apply for Mentorship &rarr;</a>
+      <a class="btn light">Book a 15 Minute Call</a>
+    </div>
+  </div>
+</section>
+
+<section class="cap"><div class="w">
+  <h2>Ready to <span class="acc">begin?</span></h2>
+  <p>Get Trish&rsquo;s 5 Day Mindset Renewal, free. One short note a day, for women who
+     are done waiting for permission.</p>
+  <form onsubmit="return false">
+    <input placeholder="Your email address">
+    <button class="btn dark" type="submit">Send It To Me</button>
+  </form>
+</div></section>
+
+<section class="intro"><div class="w g">
+  <div>
+    <p class="eyebrow">Seven decades, one invincible journey</p>
+    <h2>I&rsquo;m <span class="acc">Trish.</span></h2>
+    <p style="margin-top:1.6rem">Twenty five years styling Hollywood. A survivor of domestic
+      violence. Founder and CEO of Women Crowned In Glory, Inc., serving more than two thousand
+      women and children through Safe Passage Heals. Recipient of the President&rsquo;s Volunteer
+      Service Award.</p>
+    <p>Now I mentor the woman the world already calls successful, and who privately knows
+      something still has to change.</p>
+    <a class="btn out" style="margin-top:1.6rem">Read My Story</a>
+  </div>
+  <div class="ph"></div>
+</div></section>
+
+<section class="press"><div class="w">
+  <p>You might have seen her</p>
+  <div class="row">
+    <span>Los Angeles Times</span><span>Studio City Sun</span>
+    <span>Beautiful People Awards</span><span>LA Family Housing</span>
+    <span>SCMPC</span>
+  </div>
+</div></section>
+
+<div class="w offers">
+  <article class="card">
+    <div>
+      <p class="eyebrow">Flagship mentorship</p>
+      <h3>The Invincible Year</h3>
+      <p>Twelve months, one to one. The whole method at the pace real change takes:
+        renew the mind, reclaim the woman, rebuild the legacy.</p>
+      <a class="btn lk">Apply Now &rarr;</a>
+    </div>
+    <div class="cimg" data-l="PLATE 03 / SESSION"></div>
+  </article>
+
+  <article class="card">
+    <div>
+      <p class="eyebrow">Speaking &amp; keynotes</p>
+      <h3>Bring Trish to your room</h3>
+      <p>Conferences, companies and churches. Every message is written for the audience
+        in front of her and the outcome you asked for.</p>
+      <a class="btn out lk">Check Availability</a>
+    </div>
+    <div class="cimg" data-l="PLATE 04 / STAGE"></div>
+  </article>
+
+  <article class="card">
+    <div>
+      <p class="eyebrow">The book</p>
+      <h3>Discover the <span class="acc">Mind of Steele</span></h3>
+      <p>The Invincible Journey of 7 Decades to Becoming Ageless, Fearless, and
+        Divinely Connected.</p>
+      <a class="btn lk">Get the Book &rarr;</a>
+    </div>
+    <div class="cimg" data-l="PLATE 05 / BOOK"></div>
+  </article>
+</div>
+
+<section class="mos"><div class="w">
+  <h2>Will you be the next <span class="acc">success story?</span></h2>
+  <div class="grid">
+    <div class="t" data-l="EVENT 01"></div><div class="t" data-l="EVENT 02"></div>
+    <div class="t" data-l="STAGE 03"></div><div class="t" data-l="GALA 04"></div>
+    <div class="t" data-l="TEAM 05"></div><div class="t" data-l="PRESS 06"></div>
+    <div class="t" data-l="EVENT 07"></div><div class="t" data-l="AWARD 08"></div>
+  </div>
+</div></section>
+
+</body></html>
