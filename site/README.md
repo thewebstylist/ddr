@@ -13,7 +13,14 @@ pictures into the reserved slots.
 ```bash
 node build.mjs                 # assemble the seven pages
 npx http-server -p 8899 .      # or open index.html directly
+
+node preview.mjs               # flatten all seven into one shareable file
 ```
+
+`preview.mjs` writes `preview.html`: the whole site in a single self-contained
+document, fonts base64'd inline and a hash router standing in for the nav. It is
+for sending someone a link with nothing to host. It is build output and is
+gitignored; the seven files at the root are what actually deploys.
 
 There is no bundler, no framework, and nothing to install. `build.mjs` is a
 single dependency-free script that stitches page fragments into the shared
