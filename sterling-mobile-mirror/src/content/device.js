@@ -124,6 +124,24 @@
     };
   };
 
+  /**
+   * Give the framed copy phone-like scrollbars.
+   *
+   * iOS draws overlay scrollbars; desktop Chrome would draw a solid ~15px
+   * gutter inside the phone, which looks wrong and eats into the 430px mobile
+   * viewport. The rule is added to the framed copy only — same-origin, gone on
+   * reload, and never applied to the page the user is actually on.
+   */
+  SMM.dressFrame = (doc) => {
+    if (!doc || doc.getElementById('smm-frame-chrome')) return;
+    const style = doc.createElement('style');
+    style.id = 'smm-frame-chrome';
+    style.textContent =
+      'html { scrollbar-width: none !important; }' +
+      '::-webkit-scrollbar { width: 0 !important; height: 0 !important; }';
+    (doc.head || doc.documentElement).append(style);
+  };
+
   /** Outer size of the phone at scale 1, chrome excluded. */
   SMM.deviceSize = () => ({
     width: SMM.SCREEN.width + (SMM.FRAME.bezel + SMM.FRAME.band) * 2,

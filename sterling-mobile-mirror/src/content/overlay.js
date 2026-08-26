@@ -411,6 +411,7 @@
       if (SMM.frameIsLive(device.iframe)) {
         frameStatus = 'live';
         hideFallback();
+        SMM.dressFrame(SMM.frameDoc(device.iframe));
         updatePlateHost();
         if (prefs.autoSync) syncSection({ quiet: true });
       } else {

@@ -29,7 +29,12 @@ const OVERLAY_FILES = [
  * Toolbar click
  * ------------------------------------------------------------------ */
 
-chrome.action.onClicked.addListener(async (tab) => {
+/**
+ * The whole of the toolbar-click behaviour, named so it can be exercised
+ * directly from the service-worker context by the integration test.
+ * @param {chrome.tabs.Tab} tab the tab the user clicked on
+ */
+async function toggleOverlay(tab) {
   if (!tab?.id) return;
 
   try {
@@ -58,7 +63,9 @@ chrome.action.onClicked.addListener(async (tab) => {
     console.warn('[Sterling Mobile Mirror] injection blocked:', error);
     await flashBadge(tab.id, 'n/a');
   }
-});
+}
+
+chrome.action.onClicked.addListener(toggleOverlay);
 
 /** Show a short-lived badge message on the toolbar icon. */
 async function flashBadge(tabId, text) {

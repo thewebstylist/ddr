@@ -13,7 +13,8 @@ One click to open. One click to close. Nothing left behind.
 
 - **Real mobile rendering.** The phone holds an iframe of the current URL at a 430 × 932
   CSS-pixel viewport, so the site's own responsive breakpoints do the work. It is the
-  actual page, not a screenshot.
+  actual page, not a screenshot. Desktop scrollbars are suppressed *inside the preview
+  only*, so the mobile viewport is a true 430px with overlay scrolling, like iOS.
 - **Stays put while you scroll.** The phone is fixed to the viewport; the desktop page
   scrolls behind it.
 - **Follows the section you're reading.** As you scroll the desktop page, the extension
@@ -157,22 +158,45 @@ never read except to find the section you are looking at, and never leaves the b
 8. **Isolation.** Try a heavily styled site; the overlay's typography, spacing and colours
    are unaffected by the page's CSS.
 
-### Automated harness
+### Automated tests
+
+Two suites, both dependency-light and both run against the code as shipped.
+
+#### 1. Integration test — real Chrome APIs
+
+`tools/extension-test.mjs` loads the extension **unpacked into a real Chromium profile**
+and drives it through the genuine `chrome.scripting`, `chrome.storage` and `chrome.tabs`
+APIs — nothing stubbed. It covers the toolbar-click injection and toggle cycle, the
+430px preview, the promo export travelling through the service worker's
+`captureVisibleTab`, dragging, persistence, and preferences surviving a page reload.
+
+```bash
+cd sterling-mobile-mirror
+npm i -D playwright && npx playwright install chromium
+
+node tools/extension-test.mjs              # 11 checks
+xvfb-run -a node tools/extension-test.mjs  # on a headless machine
+```
+
+Chrome refuses to load extensions in the headless shell, so this one needs a display (or
+`xvfb-run`). It copies the source to a temp directory and patches two things **in the test
+build only**: `host_permissions` (a physical toolbar click, which grants `activeTab`,
+cannot be synthesised by any automation API) and an open shadow root (so the rail buttons
+can be clicked). The shipped extension keeps `activeTab` and a closed root.
+
+#### 2. Preview harness — the overlay's internals
 
 `tools/preview-harness.mjs` runs the content scripts *as shipped* inside plain Chromium,
 standing in for the two extension APIs they touch, then drives every control and writes
 screenshots and exported PNGs to `tools/.preview/`.
 
 ```bash
-cd sterling-mobile-mirror
-npm i -D playwright && npx playwright install chromium
-
 node tools/preview-harness.mjs            # normal run — 9 checks
 node tools/preview-harness.mjs --blocked  # site sends X-Frame-Options: DENY
 node tools/preview-harness.mjs --light    # natural titanium finish
 ```
 
-It exits non-zero if any check fails. `tools/fixtures/site.html` is the test page: real
+Both exit non-zero if any check fails. `tools/fixtures/site.html` is the test page: real
 sections, real breakpoints, nothing else.
 
 ---
@@ -193,7 +217,8 @@ sterling-mobile-mirror/
 │       └── overlay.js             Mount, controls, drag, scale, storage, teardown
 ├── icons/                         Toolbar icons (regenerate: node tools/make-icons.mjs)
 └── tools/
-    ├── preview-harness.mjs        Headless Chromium harness (dev only)
+    ├── extension-test.mjs         Real unpacked extension in real Chromium (dev only)
+    ├── preview-harness.mjs        Overlay internals in headless Chromium (dev only)
     ├── make-icons.mjs             Dependency-free PNG icon generator
     └── fixtures/site.html         Test page for the harness
 ```
