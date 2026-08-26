@@ -16,11 +16,32 @@
 (() => {
   const SMM = (globalThis.__SMM__ = globalThis.__SMM__ || {});
 
-  // Re-injection guard: the service worker calls toggle() on later clicks, but
-  // if the files are ever run twice we must not build a second overlay.
-  if (globalThis.__STERLING_MOBILE_MIRROR__) {
-    globalThis.__STERLING_MOBILE_MIRROR__.toggle();
-    return;
+  /** This build's version, read from the manifest so it can never drift. */
+  const VERSION = (() => {
+    try {
+      return chrome.runtime.getManifest().version;
+    } catch {
+      return 'unknown';
+    }
+  })();
+
+  // Re-injection guard.
+  //
+  // A live module of this same build just toggles — that is the normal second
+  // click. Anything else is a leftover from a previous build (an extension
+  // reload orphans content scripts without refreshing the page), so it is
+  // retired and replaced rather than called into.
+  const previous = globalThis.__STERLING_MOBILE_MIRROR__;
+  if (previous) {
+    if (previous.version === VERSION && previous.alive?.()) {
+      previous.toggle();
+      return;
+    }
+    try {
+      previous.close();
+    } catch {
+      /* the stale copy may be half dead; its DOM is swept below regardless */
+    }
   }
 
   const HOST_TAG = 'sterling-mobile-mirror';
@@ -119,6 +140,9 @@
   }
 
   function createHost() {
+    // Sweep any overlay left behind by a previous build of this extension.
+    for (const orphan of document.querySelectorAll(HOST_TAG)) orphan.remove();
+
     host = document.createElement(HOST_TAG);
     host.setAttribute('role', 'region');
     host.setAttribute('aria-label', 'Sterling Mobile Mirror');
@@ -554,9 +578,51 @@
    * Mount / unmount
    * ------------------------------------------------------------------ */
 
+  /**
+   * Mount the overlay. Any failure here is reported rather than swallowed:
+   * a click that appears to do nothing is the worst possible symptom.
+   */
   async function open() {
     if (isOpen) return;
+    try {
+      await mount();
+    } catch (error) {
+      reportFailure(error);
+    }
+  }
 
+  /**
+   * Tear down whatever was half-built, then tell the service worker why, so
+   * the failure reaches the toolbar badge, the icon's tooltip and the console
+   * instead of dying quietly in the isolated world.
+   */
+  function reportFailure(error) {
+    console.error('[Sterling Mobile Mirror] the overlay could not open:', error);
+
+    try {
+      unbindAll();
+      host?.remove();
+    } catch {
+      /* nothing left to clean up */
+    }
+
+    host = shadow = stage = rail = plate = device = null;
+    plateHost = plateScale = toast = ghost = null;
+    buttons = {};
+    isOpen = false;
+    frameStatus = 'idle';
+
+    try {
+      chrome.runtime.sendMessage({
+        type: 'SMM_FAILED',
+        reason: `Could not open on this page — ${error?.message || error}`
+      });
+    } catch {
+      /* the worker may be gone; the console message stands */
+    }
+  }
+
+  async function mount() {
     const restored = await loadPrefs();
     createHost();
 
@@ -643,8 +709,11 @@
   }
 
   function toggle() {
+    // Deliberately returns nothing: the service worker injects this call, and
+    // a returned promise would surface a page-side error as an injection
+    // failure. Failures report themselves through reportFailure() instead.
     if (isOpen) close();
-    else open();
+    else void open();
   }
 
   /* ------------------------------------------------------------------ *
@@ -652,7 +721,15 @@
    * ------------------------------------------------------------------ */
 
   globalThis.__STERLING_MOBILE_MIRROR__ = {
-    version: '1.0.0',
+    version: VERSION,
+    /** False once an extension reload has orphaned this copy. */
+    alive: () => {
+      try {
+        return Boolean(chrome.runtime?.id);
+      } catch {
+        return false;
+      }
+    },
     toggle,
     open,
     close,

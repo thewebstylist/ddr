@@ -16,6 +16,24 @@
  * anything remembered here.
  */
 
+/**
+ * URL schemes no extension may script. Chrome refuses injection on these, so
+ * they get a plain explanation rather than a generic failure.
+ */
+const RESTRICTED = [
+  { test: /^chrome:/i, why: 'Chrome blocks extensions on chrome:// pages.' },
+  { test: /^edge:/i, why: 'The browser blocks extensions on edge:// pages.' },
+  { test: /^about:/i, why: 'Chrome blocks extensions on about: pages.' },
+  { test: /^devtools:/i, why: 'Chrome blocks extensions inside DevTools.' },
+  { test: /^view-source:/i, why: 'Chrome blocks extensions on view-source: pages.' },
+  { test: /^(chrome|moz)-extension:/i, why: 'Extensions cannot script other extensions.' },
+  { test: /^file:/i, why: 'Allow file:// access for this extension in chrome://extensions first.' },
+  {
+    test: /^https:\/\/(chrome\.google\.com\/webstore|chromewebstore\.google\.com)/i,
+    why: 'Chrome blocks extensions on the Web Store.'
+  }
+];
+
 /** Content scripts, injected in order. They share one isolated-world scope. */
 const OVERLAY_FILES = [
   'src/content/theme.js',   // design tokens + stylesheet text
@@ -37,14 +55,33 @@ const OVERLAY_FILES = [
 async function toggleOverlay(tab) {
   if (!tab?.id) return;
 
+  const blocked = RESTRICTED.find((rule) => tab.url && rule.test.test(tab.url));
+  if (blocked) return report(tab.id, 'n/a', blocked.why);
+
   try {
-    // Ask the page whether our overlay module is already resident.
+    // Ask the page whether a *live* overlay module is resident.
+    //
+    // Reloading or updating an extension orphans the content scripts already
+    // running in open tabs: their globals survive, but chrome.runtime does
+    // not. Calling into that dead copy fails on every click until the tab is
+    // refreshed, so a module without a working runtime counts as absent and
+    // gets replaced by a fresh injection.
     const [probe] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      func: () => Boolean(globalThis.__STERLING_MOBILE_MIRROR__)
+      func: () => {
+        try {
+          const module = globalThis.__STERLING_MOBILE_MIRROR__;
+          if (!module || !chrome.runtime?.id) return null;
+          return module.version || 'unknown';
+        } catch {
+          return null;
+        }
+      }
     });
 
-    if (probe?.result) {
+    const resident = probe?.result === chrome.runtime.getManifest().version;
+
+    if (resident) {
       // Already loaded — just flip it on/off, no re-injection.
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -58,11 +95,30 @@ async function toggleOverlay(tab) {
       });
     }
   } catch (error) {
-    // chrome://, the Web Store, PDF viewers and similar are off-limits to
-    // every extension. Say so on the badge instead of failing silently.
-    console.warn('[Sterling Mobile Mirror] injection blocked:', error);
-    await flashBadge(tab.id, 'n/a');
+    // Anything else — a page Chrome will not let us script, a navigation
+    // mid-injection, an error thrown by the overlay itself. Say which.
+    const message = String(error?.message || error);
+    const restricted = /cannot access|must request permission|cannot be scripted/i.test(message);
+    report(tab.id, restricted ? 'n/a' : 'err', message);
   }
+}
+
+/**
+ * Surface a failure where the user can actually find it: the toolbar badge,
+ * the icon's hover text, and the service-worker console. Silent failure is
+ * what makes an extension feel broken rather than blocked.
+ */
+function report(tabId, badge, message) {
+  console.error(`[Sterling Mobile Mirror] ${message}`);
+
+  chrome.action.setTitle({ tabId, title: `Sterling Mobile Mirror — ${message}` }).catch(() => {});
+  flashBadge(tabId, badge);
+
+  setTimeout(() => {
+    chrome.action
+      .setTitle({ tabId, title: 'Sterling Mobile Mirror — toggle iPhone preview' })
+      .catch(() => {});
+  }, 12000);
 }
 
 chrome.action.onClicked.addListener(toggleOverlay);
@@ -83,6 +139,13 @@ async function flashBadge(tabId, text) {
  * ------------------------------------------------------------------ */
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // The overlay reporting its own failure from inside the page.
+  if (message?.type === 'SMM_FAILED') {
+    if (sender.tab?.id) report(sender.tab.id, 'err', message.reason || 'The overlay failed to open.');
+    sendResponse({ ok: true });
+    return undefined;
+  }
+
   if (message?.type !== 'SMM_CAPTURE_VISIBLE') return undefined;
 
   const windowId = sender.tab?.windowId;

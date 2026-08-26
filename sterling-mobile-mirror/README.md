@@ -122,6 +122,36 @@ simply shows the card instead of the site.
 
 ---
 
+## Troubleshooting
+
+### The icon does nothing, then shows a badge
+
+The badge is the extension telling you why, and **hovering the icon spells it out in
+full** — the tooltip carries the actual reason for about twelve seconds after a failure.
+The same message is logged to the service-worker console (`chrome://extensions` → the
+extension's card → **service worker** → Console).
+
+| Badge | Meaning |
+|---|---|
+| `n/a` | Chrome will not let *any* extension run on this page — `chrome://` pages, the Web Store, DevTools, `view-source:`, other extensions, or `file://` URLs without file access enabled. |
+| `err` | Something went wrong opening the overlay. The tooltip and the console carry the error. |
+
+### After updating or reloading the extension, clicks stop working
+
+**Refresh the page.** Reloading an unpacked extension orphans the content scripts already
+running in tabs you had open: their code stays in the page but loses its connection to the
+extension, so clicks land on a dead copy.
+
+The extension now detects that and replaces the stale copy on the next click, so this
+should heal itself — but a refresh is the instant fix, and it is worth doing on any tab
+that was open while you were installing a new build.
+
+### The phone shows a card instead of the site
+
+That site refuses to be framed. See [When a site blocks embedding](#when-a-site-blocks-embedding).
+
+---
+
 ## Permissions, storage and privacy
 
 | Permission | Why |

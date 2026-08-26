@@ -189,6 +189,37 @@ check('second click closes it', !(await mounted()));
 await clickToolbarIcon();
 check('third click re-opens it', await mounted());
 
+// An extension reload orphans the content scripts already running in open
+// tabs: their globals survive, chrome.runtime does not. Simulate that leftover
+// and confirm a click replaces it instead of calling into the dead copy.
+await worker.evaluate(async () => {
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: () => {
+      globalThis.__STERLING_MOBILE_MIRROR__.close();
+      const orphan = document.createElement('sterling-mobile-mirror');
+      orphan.dataset.orphan = 'yes';
+      document.documentElement.append(orphan);
+      globalThis.__STERLING_MOBILE_MIRROR__ = {
+        version: '0.0.0-previous-build',
+        alive: () => false,
+        toggle() { throw new Error('the stale build was called'); },
+        close() { throw new Error('the stale build was called'); }
+      };
+    }
+  });
+});
+await page.waitForTimeout(400);
+await clickToolbarIcon();
+check(
+  'stale build from an extension reload is replaced',
+  (await mounted()) &&
+    (await page.evaluate(() => !document.querySelector('[data-orphan]'))) &&
+    (await page.evaluate(() => window.__STERLING_MOBILE_MIRROR__ === undefined ||
+      document.querySelectorAll('sterling-mobile-mirror').length === 1))
+);
+
 // Preferences survive a page reload and a fresh injection.
 await page.reload({ waitUntil: 'load' });
 await clickToolbarIcon();
