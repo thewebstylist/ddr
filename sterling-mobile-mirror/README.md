@@ -17,6 +17,9 @@ One click to open. One click to close. Nothing left behind.
   only*, so the mobile viewport is a true 430px with overlay scrolling, like iOS.
 - **Stays put while you scroll.** The phone is fixed to the viewport; the desktop page
   scrolls behind it.
+- **Rests on the floor.** By default the phone sits flush with the bottom edge of the
+  window rather than floating above it, so promo images all land on the same line. Drag it
+  anywhere you like — bring it back within 30px of the bottom and it clicks flush again.
 - **Follows the section you're reading.** As you scroll the desktop page, the extension
   works out which section sits nearest the middle of your viewport and scrolls the phone
   to the matching section.
@@ -64,7 +67,7 @@ corner. Hover any button for its name.
 
 | Control | What it does |
 |---|---|
-| **Move** (grip) | Drag the phone anywhere in the viewport. The phone's titanium frame is also a drag handle — press the bezel, not the screen. |
+| **Move** (grip) | Drag the phone anywhere in the viewport; near the bottom edge it snaps flush. The phone's titanium frame is also a drag handle — press the bezel, not the screen. |
 | **Sync section** | Scrolls the phone to the section nearest the centre of the desktop viewport. **Alt-click** turns auto-follow on/off (it starts on; the button glows pink while active). |
 | **Reload** | Reloads whatever the phone is currently showing. **Alt-click** re-mirrors the desktop page's current URL — useful after navigating inside the phone. |
 | **Scale up / down** | Resizes the phone in 5% steps, from 30% to 100%. The percentage appears on the button and in a brief toast. |

@@ -99,7 +99,7 @@ button {
 
 .rail {
   position: absolute;
-  bottom: 0;
+  bottom: 10px;
   left: calc(100% + 8px);
   display: flex;
   flex-direction: column;
@@ -484,7 +484,7 @@ button {
 
 .ghost {
   position: absolute;
-  bottom: 0;
+  bottom: 10px;
   left: calc(100% + 8px);
   display: none;
   place-items: center;

@@ -45,11 +45,18 @@
   }
 
   const HOST_TAG = 'sterling-mobile-mirror';
+
+  /** Distance from the bottom edge within which the phone snaps flush, px. */
+  const SNAP = 30;
   const PREFS_KEY = 'sterlingMobileMirror.prefs.v1';
 
+  /** Bumped when a default changes in a way saved preferences must adopt. */
+  const REVISION = 2;
+
   const DEFAULTS = {
+    revision: REVISION,
     right: 72,      // distance from the right edge of the viewport, px
-    bottom: 28,     // distance from the bottom edge, px
+    bottom: 0,      // flush with the bottom edge — the phone rests on the floor
     scale: SMM.SCALE.default,
     light: false,   // false = Black Titanium, true = Natural Titanium
     autoSync: true, // follow the desktop scroll position
@@ -109,6 +116,15 @@
       const stored = await store.get(PREFS_KEY);
       if (!stored?.[PREFS_KEY]) return false;
       prefs = { ...DEFAULTS, ...stored[PREFS_KEY] };
+
+      // The phone used to float above the bottom edge. Anyone carrying a
+      // position from before that change is brought down to the floor once.
+      if (prefs.revision !== REVISION) {
+        prefs.bottom = DEFAULTS.bottom;
+        prefs.revision = REVISION;
+        savePrefs();
+      }
+
       return true;
     } catch {
       /* first run, or storage unavailable — defaults are fine */
@@ -290,10 +306,10 @@
 
     const minRight = railGutter + 16;
     const maxRight = Math.max(minRight, window.innerWidth - width - 8);
-    const maxBottom = Math.max(8, window.innerHeight - height - toastGutter - 8);
+    const maxBottom = Math.max(0, window.innerHeight - height - toastGutter - 8);
 
     prefs.right = Math.min(Math.max(minRight, Math.round(prefs.right)), maxRight);
-    prefs.bottom = Math.min(Math.max(8, Math.round(prefs.bottom)), maxBottom);
+    prefs.bottom = Math.min(Math.max(0, Math.round(prefs.bottom)), maxBottom);
   }
 
   function applyLayout() {
@@ -317,7 +333,7 @@
   /** A first-run scale that guarantees the phone fits the current window. */
   function fittedScale() {
     const size = SMM.deviceSize();
-    const room = window.innerHeight - 86;
+    const room = window.innerHeight - 56;
     return Math.max(
       SMM.SCALE.min,
       Math.min(SMM.SCALE.default, Math.round((room / size.height) * 100) / 100)
@@ -380,6 +396,11 @@
     const move = (moveEvent) => {
       prefs.right = originRight - (moveEvent.clientX - originX);
       prefs.bottom = originBottom - (moveEvent.clientY - originY);
+
+      // Magnetic floor: near the bottom edge the phone clicks flush, so every
+      // promo image lands with the device resting on the same line.
+      if (prefs.bottom < SNAP) prefs.bottom = 0;
+
       applyLayout();
     };
 

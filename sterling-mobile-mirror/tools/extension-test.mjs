@@ -178,6 +178,22 @@ check(
   `${Math.round(before.x - after.x)}px left, ${Math.round(before.y - after.y)}px up`
 );
 
+// Drag it back down: inside the snap zone the phone clicks flush with the
+// bottom edge, so every promo image lands on the same line.
+const lifted = await control('Move').boundingBox();
+await page.mouse.move(lifted.x + lifted.width / 2, lifted.y + lifted.height / 2);
+await page.mouse.down();
+await page.mouse.move(lifted.x + lifted.width / 2, lifted.y + lifted.height / 2 + 88, { steps: 10 });
+await page.mouse.up();
+await page.waitForTimeout(600);
+const floored = await host.boundingBox();
+const viewport = page.viewportSize();
+check(
+  'phone snaps flush to the bottom edge',
+  Math.abs(floored.y + floored.height - viewport.height) < 1,
+  `phone bottom ${Math.round(floored.y + floored.height)} of ${viewport.height}`
+);
+
 const stored = await worker.evaluate(() => chrome.storage.sync.get('sterlingMobileMirror.prefs.v1'));
 check(
   'preferences written to chrome.storage.sync',
@@ -228,7 +244,7 @@ await clickToolbarIcon();
 const restored = await host.boundingBox();
 check(
   'position restored after reload',
-  Math.abs(restored.x - after.x) < 4 && Math.abs(restored.y - after.y) < 4,
+  Math.abs(restored.x - floored.x) < 4 && Math.abs(restored.y - floored.y) < 4,
   `${Math.round(restored.x)},${Math.round(restored.y)}`
 );
 await page.screenshot({ path: resolve(OUT, 'extension-restored.png') });
