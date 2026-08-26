@@ -14,8 +14,8 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, '..', 'icons');
 
-const INK = [8, 9, 13];
-const INK_TOP = [22, 24, 32];
+const INK = [6, 7, 11];
+const INK_TOP = [20, 22, 30];
 const WHITE = [255, 255, 255];
 const PINK = [255, 46, 136];
 const BLUE = [46, 212, 255];
@@ -34,28 +34,52 @@ const mix = (a, b, t) => [
   a[2] + (b[2] - a[2]) * t
 ];
 
-/** Colour of one sub-sample, or null where the icon is transparent. */
+const clamp01 = (value) => Math.min(1, Math.max(0, value));
+
+/**
+ * Colour of one sub-sample, or null where the icon is transparent.
+ *
+ * The mark: a black squircle rimmed in a neon pink-to-blue gradient, lit from
+ * two corners, with a white iPhone at the centre — pink Dynamic Island, blue
+ * home indicator.
+ */
 function sample(x, y, size) {
   const s = size;
   const tile = sdRoundRect(x, y, s / 2, s / 2, s / 2, s / 2, s * 0.225);
   if (tile > 0) return null;
 
+  // Black tile, lifted slightly at the top.
   let colour = mix(INK_TOP, INK, y / s);
 
-  // Phone body: a white outline, thick enough to survive 16px.
-  const bodyHalfW = s * 0.2;
-  const bodyHalfH = s * 0.33;
-  const stroke = Math.max(s * 0.055, 1);
-  const body = sdRoundRect(x, y, s / 2, s / 2, bodyHalfW, bodyHalfH, s * 0.085);
+  // Ambient neon: pink from the top-left, blue from the bottom-right.
+  const pinkGlow = clamp01(1 - Math.hypot(x - s * 0.16, y - s * 0.14) / (s * 0.82));
+  const blueGlow = clamp01(1 - Math.hypot(x - s * 0.86, y - s * 0.9) / (s * 0.82));
+  colour = mix(colour, PINK, pinkGlow ** 2 * 0.2);
+  colour = mix(colour, BLUE, blueGlow ** 2 * 0.2);
+
+  // Phone: a soft-lit screen inside a white outline.
+  const bodyHalfW = s * 0.205;
+  const bodyHalfH = s * 0.325;
+  const stroke = Math.max(s * 0.05, 1);
+  const body = sdRoundRect(x, y, s / 2, s / 2, bodyHalfW, bodyHalfH, s * 0.08);
+
+  if (body <= 0) colour = mix(colour, WHITE, 0.1);
   if (body <= 0 && body >= -stroke) colour = WHITE;
 
-  // Dynamic Island, in Sterling pink.
-  const island = sdRoundRect(x, y, s / 2, s / 2 - bodyHalfH + s * 0.1, s * 0.075, s * 0.024, s * 0.024);
+  // Dynamic Island and home indicator carry the two brand accents.
+  const island = sdRoundRect(x, y, s / 2, s / 2 - bodyHalfH + s * 0.105, s * 0.072, s * 0.023, s * 0.023);
   if (island <= 0) colour = PINK;
 
-  // Home indicator, in electric blue.
-  const home = sdRoundRect(x, y, s / 2, s / 2 + bodyHalfH - s * 0.075, s * 0.065, s * 0.017, s * 0.017);
+  const home = sdRoundRect(x, y, s / 2, s / 2 + bodyHalfH - s * 0.078, s * 0.062, s * 0.016, s * 0.016);
   if (home <= 0) colour = BLUE;
+
+  // Neon rim, pink at the top-left running to blue at the bottom-right.
+  const rim = Math.max(s * 0.03, 1);
+  if (tile >= -rim) {
+    const along = clamp01((x / s + y / s) / 2);
+    const fade = clamp01((tile + rim) / rim);
+    colour = mix(colour, mix(PINK, BLUE, along), 0.35 + 0.65 * fade);
+  }
 
   return colour;
 }

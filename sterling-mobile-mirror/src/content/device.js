@@ -40,6 +40,10 @@
       '<path d="M3.2 12.4v1.6a1.4 1.4 0 0 0 1.4 1.4h8.8a1.4 1.4 0 0 0 1.4-1.4v-1.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
     close:
       '<path d="M5.2 5.2 12.8 12.8M12.8 5.2 5.2 12.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    hide:
+      '<path d="M1.9 9S4.7 4.3 9 4.3 16.1 9 16.1 9 13.3 13.7 9 13.7 1.9 9 1.9 9Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '<circle cx="9" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+      '<path d="M3.5 14.5 14.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
     external:
       '<path d="M7.4 3.6H4.2A1.6 1.6 0 0 0 2.6 5.2v8.6a1.6 1.6 0 0 0 1.6 1.6h8.6a1.6 1.6 0 0 0 1.6-1.6v-3.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' +
       '<path d="M10.6 2.6h4.8v4.8M15.4 2.6 8.6 9.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'

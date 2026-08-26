@@ -27,11 +27,12 @@
   const PREFS_KEY = 'sterlingMobileMirror.prefs.v1';
 
   const DEFAULTS = {
-    right: 28,      // distance from the right edge of the viewport, px
+    right: 72,      // distance from the right edge of the viewport, px
     bottom: 28,     // distance from the bottom edge, px
     scale: SMM.SCALE.default,
     light: false,   // false = Black Titanium, true = Natural Titanium
-    autoSync: true  // follow the desktop scroll position
+    autoSync: true, // follow the desktop scroll position
+    bare: false     // controls dismissed, leaving only the phone
   };
 
   /** Live state; a copy is persisted on every settled change. */
@@ -46,6 +47,7 @@
   let plateHost = null;
   let plateScale = null;
   let toast = null;
+  let ghost = null;
   let device = null;
   let buttons = {};
 
@@ -220,10 +222,34 @@
       railButton({ name: 'shot', icon: 'shot', tip: 'Capture phone', onClick: capturePhone }),
       railButton({ name: 'promo', icon: 'promo', tip: 'Download promo image', onClick: capturePromo }),
       separator(),
+      railButton({ name: 'bare', icon: 'hide', tip: 'Hide controls', onClick: () => setBare(true) }),
       railButton({ name: 'close', icon: 'close', tip: 'Close', className: 'is-danger', onClick: () => close() })
     );
 
     stage.append(rail);
+  }
+
+  /**
+   * With the controls dismissed the phone stands alone, so one quiet chip is
+   * left where the rail was — dim until hovered, and the only way back.
+   */
+  function buildGhost() {
+    ghost = document.createElement('button');
+    ghost.type = 'button';
+    ghost.className = 'ghost';
+    ghost.dataset.tip = 'Show controls';
+    ghost.setAttribute('aria-label', 'Show controls');
+    ghost.innerHTML = '<span class="ghost__mark"></span>';
+    bind(ghost, 'click', () => setBare(false));
+    stage.append(ghost);
+  }
+
+  /** Dismiss or restore the rail and the plate. */
+  function setBare(bare) {
+    prefs.bare = bare;
+    host.classList.toggle('smm-bare', bare);
+    if (!bare) notify('Controls restored');
+    savePrefs();
   }
 
   function buildToast() {
@@ -254,15 +280,17 @@
   }
 
   function clampPosition(width, height) {
-    // The rail hangs off the left edge and the plate above the top edge; both
-    // have to stay on screen too.
+    // The rail hangs off the right edge of the phone and the plate above its
+    // top edge; both have to stay on screen. The gutters are reserved even
+    // while the controls are hidden, so restoring them never shifts the phone.
     const railGutter = (rail?.offsetWidth || 44) + 12;
     const plateGutter = (plate?.offsetHeight || 30) + 14;
 
-    const maxRight = Math.max(8, window.innerWidth - width - railGutter - 8);
+    const minRight = railGutter + 16;
+    const maxRight = Math.max(minRight, window.innerWidth - width - 8);
     const maxBottom = Math.max(8, window.innerHeight - height - plateGutter - 8);
 
-    prefs.right = Math.min(Math.max(8, Math.round(prefs.right)), maxRight);
+    prefs.right = Math.min(Math.max(minRight, Math.round(prefs.right)), maxRight);
     prefs.bottom = Math.min(Math.max(8, Math.round(prefs.bottom)), maxBottom);
   }
 
@@ -282,6 +310,7 @@
 
     if (plateScale) plateScale.textContent = `${Math.round(prefs.scale * 100)}%`;
     host.classList.toggle('smm-light', prefs.light);
+    host.classList.toggle('smm-bare', prefs.bare);
   }
 
   /** A first-run scale that guarantees the phone fits the current window. */
@@ -536,6 +565,7 @@
 
     buildPlate();
     buildRail();
+    buildGhost();
     buildToast();
 
     // A saved scale always wins; on a first run, fit the phone to this window.
@@ -603,7 +633,7 @@
     const outgoingStage = stage;
 
     host = shadow = stage = rail = plate = device = null;
-    plateHost = plateScale = toast = null;
+    plateHost = plateScale = toast = ghost = null;
     buttons = {};
     frameStatus = 'idle';
 

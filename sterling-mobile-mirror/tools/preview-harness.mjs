@@ -189,6 +189,26 @@ if (!BLOCKED) {
   check('scale control', readout.trim() === '65%', readout.trim());
   check('preferences persisted', stored?.scale === 0.65, JSON.stringify(stored));
 
+  // Controls can be dismissed down to the phone alone, and brought back.
+  await control('Hide controls').click();
+  await page.waitForTimeout(350);
+  const bare = await page.evaluate(() => {
+    const element = document.querySelector('sterling-mobile-mirror');
+    const rail = element.shadowRoot.querySelector('.rail');
+    return {
+      flagged: element.classList.contains('smm-bare'),
+      railHidden: getComputedStyle(rail).visibility === 'hidden',
+      chipShown: getComputedStyle(element.shadowRoot.querySelector('.ghost')).display !== 'none'
+    };
+  });
+  check('hide controls', bare.flagged && bare.railHidden && bare.chipShown, JSON.stringify(bare));
+  await page.screenshot({ path: resolve(OUT, 'overlay-bare.png') });
+
+  await host.locator('.ghost').click();
+  await page.waitForTimeout(350);
+  check('restore controls', await page.evaluate(
+    () => !document.querySelector('sterling-mobile-mirror').classList.contains('smm-bare')));
+
   // Frame finish flips between black and natural titanium.
   const isLight = () =>
     page.evaluate(() => document.querySelector('sterling-mobile-mirror').classList.contains('smm-light'));

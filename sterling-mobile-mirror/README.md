@@ -22,8 +22,8 @@ One click to open. One click to close. Nothing left behind.
   to the matching section.
 - **Exports the whole composition.** "Download promo image" saves the desktop page *and*
   the phone together as a high-resolution PNG, with the extension's own controls hidden.
-- **Remembers how you like it.** Position, scale and frame finish persist across pages and
-  sessions through `chrome.storage`.
+- **Remembers how you like it.** Position, scale, frame finish and whether the controls are
+  hidden persist across pages and sessions through `chrome.storage`.
 - **Never touches the site.** The interface lives in a closed Shadow DOM inside a single
   custom element. Closing removes that element and every listener it registered.
 
@@ -59,7 +59,8 @@ Open any normal website and click the pinned icon.
 
 ### The controls
 
-They sit in a compact rail down the left edge of the phone. Hover any button for its name.
+They sit in a compact rail down the right edge of the phone, aligned to its bottom
+corner. Hover any button for its name.
 
 | Control | What it does |
 |---|---|
@@ -69,6 +70,7 @@ They sit in a compact rail down the left edge of the phone. Hover any button for
 | **Scale up / down** | Resizes the phone in 5% steps, from 30% to 100%. The percentage shows in the header plate. |
 | **Frame finish** | Switches between **Black Titanium** and **Natural Titanium**. |
 | **Capture phone** | Saves a high-resolution PNG of just the phone and its shadow. |
+| **Hide controls** | Dismisses the rail and the header plate, leaving the phone alone on the page. A dim chip stays where the rail was — click it to bring everything back. The choice is remembered. |
 | **Download promo image** | Saves the whole visible composition — desktop page plus phone — as a high-resolution PNG. |
 | **Close** | Removes the overlay. `Esc` also works while focus is inside the overlay. |
 
@@ -150,12 +152,14 @@ never read except to find the section you are looking at, and never leaves the b
 5. **Move, scale, finish.** Drag the phone by the grip or the plate; scale it up and down;
    switch to Natural Titanium. Reload the page and click the icon again — the phone
    returns exactly where and how you left it.
-6. **Exports.** Click *Download promo image*, then open the PNG: the desktop page and the
+6. **Hide the controls.** Click *Hide controls*: the rail and plate go, leaving the phone
+   and one dim chip. Click the chip to bring them back.
+7. **Exports.** Click *Download promo image*, then open the PNG: the desktop page and the
    phone, no extension controls, at twice the CSS resolution.
-7. **Blocked site.** Try a site that refuses framing (for example `https://www.google.com`)
+8. **Blocked site.** Try a site that refuses framing (for example `https://www.google.com`)
    and confirm the fallback card explains itself and that the pop-out button opens a
    430 × 932 window.
-8. **Isolation.** Try a heavily styled site; the overlay's typography, spacing and colours
+9. **Isolation.** Try a heavily styled site; the overlay's typography, spacing and colours
    are unaffected by the page's CSS.
 
 ### Automated tests
@@ -191,7 +195,7 @@ standing in for the two extension APIs they touch, then drives every control and
 screenshots and exported PNGs to `tools/.preview/`.
 
 ```bash
-node tools/preview-harness.mjs            # normal run — 9 checks
+node tools/preview-harness.mjs            # normal run — 11 checks
 node tools/preview-harness.mjs --blocked  # site sends X-Frame-Options: DENY
 node tools/preview-harness.mjs --light    # natural titanium finish
 ```
@@ -262,3 +266,9 @@ state, **electric blue** `#2ED4FF` for focus and numerals. The device itself is 
 ornament: brushed titanium band with a hairline edge highlight, black bezel, Dynamic
 Island, home indicator, machined side buttons, and a three-layer shadow that grounds it
 against the page.
+
+The toolbar mark follows the same rules: a black squircle rimmed in a pink-to-blue neon
+gradient, lit from two corners, with a white iPhone at the centre carrying a pink Dynamic
+Island and a blue home indicator. It is generated, not drawn by hand — `node
+tools/make-icons.mjs` re-renders all four sizes from the shape maths in that file, so the
+mark stays crisp at 16px.

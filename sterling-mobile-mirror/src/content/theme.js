@@ -165,8 +165,8 @@ button {
 
 .rail {
   position: absolute;
-  top: 0;
-  right: calc(100% + 8px);
+  bottom: 0;
+  left: calc(100% + 8px);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -528,11 +528,84 @@ button {
 .toast.is-error::before { background: var(--smm-pink); box-shadow: 0 0 8px var(--smm-pink); }
 
 /* ------------------------------------------------------------------ *
+ * Bare mode — controls dismissed, one quiet chip left to bring them back
+ * ------------------------------------------------------------------ */
+
+:host(.smm-bare) .rail,
+:host(.smm-bare) .plate {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ghost {
+  position: absolute;
+  bottom: 0;
+  left: calc(100% + 8px);
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--smm-edge);
+  border-radius: 14px;
+  background: rgba(6, 7, 11, 0.72);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+  opacity: 0.42;
+  transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+:host(.smm-bare) .ghost { display: grid; }
+
+.ghost:hover { opacity: 1; border-color: var(--smm-edge-strong); }
+.ghost:active { transform: scale(0.94); }
+
+.ghost:focus-visible {
+  outline: none;
+  opacity: 1;
+  border-color: var(--smm-blue);
+  box-shadow: 0 0 0 3px rgba(46, 212, 255, 0.22);
+}
+
+.ghost__mark {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--smm-pink);
+  box-shadow: 0 0 10px rgba(255, 46, 136, 0.8);
+}
+
+.ghost::after {
+  content: attr(data-tip);
+  position: absolute;
+  right: calc(100% + 9px);
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+  padding: 4px 8px;
+  border: 1px solid var(--smm-edge);
+  border-radius: 7px;
+  background: rgba(6, 7, 11, 0.95);
+  color: var(--smm-paper);
+  font-size: var(--smm-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 130ms ease, transform 130ms ease;
+}
+
+.ghost:hover::after,
+.ghost:focus-visible::after { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+/* ------------------------------------------------------------------ *
  * Capture mode — hide our own chrome so exports show only the artwork
  * ------------------------------------------------------------------ */
 
 :host(.smm-capturing) .rail,
 :host(.smm-capturing) .plate,
+:host(.smm-capturing) .ghost,
 :host(.smm-capturing) .toast { opacity: 0 !important; transition: none !important; }
 `;
 })();
