@@ -33,19 +33,56 @@
   ];
 
   /**
-   * Room the shadow needs around the phone, in CSS pixels, so the export is
-   * cropped to where the shadow actually fades out rather than to a guess.
+   * Room to draw the shadow into, in CSS pixels. Deliberately generous: the
+   * canvas is trimmed to the pixels that actually carry alpha afterwards, so
+   * this only has to be big enough, never exact.
    */
   SMM.shadowMargin = (scale) => {
-    const spread = SHADOW[0].blur * scale;
-    const drop = SHADOW[0].offsetY * scale;
-    return {
-      top: Math.ceil(spread * 0.55),
-      right: Math.ceil(spread * 0.8),
-      bottom: Math.ceil(spread + drop * 0.5),
-      left: Math.ceil(spread * 0.8)
-    };
+    const pad = Math.ceil((SHADOW[0].blur + SHADOW[0].offsetY) * scale);
+    return { top: pad, right: pad, bottom: pad, left: pad };
   };
+
+  /**
+   * Photoshop's Trim, on a canvas: crop away every fully transparent row and
+   * column, so the file ends exactly where the shadow does and carries no
+   * empty margin at all.
+   */
+  function trimTransparent(canvas) {
+    const { width, height } = canvas;
+    const { data } = canvas.getContext('2d').getImageData(0, 0, width, height);
+
+    const rowHasInk = (y) => {
+      const end = (y + 1) * width * 4;
+      for (let i = y * width * 4 + 3; i < end; i += 4) if (data[i] !== 0) return true;
+      return false;
+    };
+
+    let top = 0;
+    let bottom = height - 1;
+    while (top < bottom && !rowHasInk(top)) top += 1;
+    while (bottom > top && !rowHasInk(bottom)) bottom -= 1;
+
+    const columnHasInk = (x) => {
+      for (let y = top; y <= bottom; y += 1) if (data[(y * width + x) * 4 + 3] !== 0) return true;
+      return false;
+    };
+
+    let left = 0;
+    let right = width - 1;
+    while (left < right && !columnHasInk(left)) left += 1;
+    while (right > left && !columnHasInk(right)) right -= 1;
+
+    const cropped = { width: right - left + 1, height: bottom - top + 1 };
+    if (cropped.width === width && cropped.height === height) return canvas;
+
+    const trimmed = document.createElement('canvas');
+    trimmed.width = cropped.width;
+    trimmed.height = cropped.height;
+    trimmed
+      .getContext('2d')
+      .drawImage(canvas, left, top, cropped.width, cropped.height, 0, 0, cropped.width, cropped.height);
+    return trimmed;
+  }
 
   /** Ask the service worker for a screenshot of the visible viewport. */
   SMM.captureVisible = () =>
@@ -184,8 +221,11 @@
     ctx.drawImage(frame, sx, sy, sw, sh, left, top, width, height);
     ctx.restore();
 
+    // A cut-out ends where its pixels end.
+    const sheet = radius > 0 ? trimTransparent(out) : out;
+
     return new Promise((resolve, reject) => {
-      out.toBlob(
+      sheet.toBlob(
         (blob) => (blob ? resolve(blob) : reject(new Error('PNG encoding failed'))),
         'image/png'
       );

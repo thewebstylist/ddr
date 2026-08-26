@@ -31,13 +31,14 @@
     minus:
       '<path d="M4.4 9h9.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
     frame:
-      '<rect x="5.6" y="2.4" width="6.8" height="13.2" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
-      '<path d="M7.7 4.6h2.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' +
-      '<path d="M12.4 6.2A4.6 4.6 0 0 1 12.4 11.8z" fill="currentColor" opacity=".55"/>',
+      '<circle cx="9" cy="9" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+      '<path d="M9 2.8a6.2 6.2 0 0 1 0 12.4z" fill="currentColor"/>',
     shot:
-      '<rect x="2.4" y="4.8" width="13.2" height="9.6" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
-      '<circle cx="9" cy="9.6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
-      '<path d="M6.6 4.8 7.6 3h2.8l1 1.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+      '<rect x="5.3" y="2.1" width="7.4" height="13.8" rx="2.3" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+      '<path d="M7.9 3.9h2.2" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>' +
+      '<path d="M9 6.4v4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' +
+      '<path d="M7.3 9.2 9 10.9l1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M7.2 13.3h3.6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>',
     promo:
       '<path d="M9 2.6v8.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
       '<path d="M5.8 8.2 9 11.4l3.2-3.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +

@@ -200,7 +200,8 @@ if (!BLOCKED) {
   }
 
   // The cut-out must be the phone on transparency: clear at the corners, a
-  // soft shadow fading through the margin, and the canvas cropped to it.
+  // soft shadow fading outward, and trimmed so the file ends where the shadow
+  // ends — every edge row and column carrying at least one lit pixel.
   const cutout = await page.evaluate(async (b64) => {
     const image = new Image();
     image.src = `data:image/png;base64,${b64}`;
@@ -211,31 +212,41 @@ if (!BLOCKED) {
     canvas.height = image.height;
     const context = canvas.getContext('2d');
     context.drawImage(image, 0, 0);
-    const alphaAt = (x, y) => context.getImageData(Math.round(x), Math.round(y), 1, 1).data[3];
+
+    const { width, height } = image;
+    const { data } = context.getImageData(0, 0, width, height);
+    const alphaAt = (x, y) => data[(Math.round(y) * width + Math.round(x)) * 4 + 3];
+
+    const rowHasInk = (y) => {
+      for (let x = 0; x < width; x += 1) if (alphaAt(x, y) !== 0) return true;
+      return false;
+    };
+    const columnHasInk = (x) => {
+      for (let y = 0; y < height; y += 1) if (alphaAt(x, y) !== 0) return true;
+      return false;
+    };
 
     const shadow = document.querySelector('sterling-mobile-mirror').shadowRoot;
     const rect = shadow.querySelector('.device').getBoundingClientRect();
-    const scale = rect.width / window.__SMM__.deviceSize().width;
-    const margin = window.__SMM__.shadowMargin(scale);
-    const density = 2;
 
     return {
-      size: [image.width, image.height],
-      expected: [
-        Math.round((rect.width + margin.left + margin.right) * density),
-        Math.round((rect.height + margin.top + margin.bottom) * density)
-      ],
+      size: [width, height],
+      frame: [Math.round(rect.width * 2), Math.round(rect.height * 2)],
       corners: [
         alphaAt(1, 1),
-        alphaAt(image.width - 2, 1),
-        alphaAt(1, image.height - 2),
-        alphaAt(image.width - 2, image.height - 2)
+        alphaAt(width - 2, 1),
+        alphaAt(1, height - 2),
+        alphaAt(width - 2, height - 2)
       ],
-      // Just below the phone, inside the shadow: neither clear nor solid.
-      shadowBand: alphaAt(image.width / 2, (margin.top + rect.height) * density + 12),
-      // The phone's own top edge and middle stay fully opaque.
-      frameTop: alphaAt(image.width / 2, margin.top * density + 3),
-      middle: alphaAt(image.width / 2, image.height / 2)
+      middle: alphaAt(width / 2, height / 2),
+      // Halfway down the left margin: shadow, so neither clear nor solid.
+      shadowBand: alphaAt(4, height / 2),
+      edges: {
+        top: rowHasInk(0),
+        bottom: rowHasInk(height - 1),
+        left: columnHasInk(0),
+        right: columnHasInk(width - 1)
+      }
     };
   }, readFileSync(resolve(OUT, 'phone.png')).toString('base64'));
 
@@ -244,21 +255,21 @@ if (!BLOCKED) {
     cutout.corners.every((alpha) => alpha < 8),
     `corners ${cutout.corners.join('/')}`
   );
-  check(
-    'phone itself is opaque',
-    cutout.frameTop === 255 && cutout.middle === 255,
-    `frame top ${cutout.frameTop}, middle ${cutout.middle}`
-  );
+  check('phone itself is opaque', cutout.middle === 255, `middle ${cutout.middle}`);
   check(
     'shadow is soft, not solid',
-    cutout.shadowBand > 8 && cutout.shadowBand < 235,
-    `alpha ${cutout.shadowBand} just below the frame`
+    cutout.shadowBand > 0 && cutout.shadowBand < 235,
+    `alpha ${cutout.shadowBand} in the margin`
   );
   check(
-    'canvas is cropped to the shadow',
-    Math.abs(cutout.size[0] - cutout.expected[0]) <= 2 &&
-      Math.abs(cutout.size[1] - cutout.expected[1]) <= 2,
-    `${cutout.size.join('x')}, expected ${cutout.expected.join('x')}`
+    'shadow has room around the frame',
+    cutout.size[0] > cutout.frame[0] && cutout.size[1] > cutout.frame[1],
+    `${cutout.size.join('x')} around a ${cutout.frame.join('x')} frame`
+  );
+  check(
+    'trimmed to the shadow, no empty margin',
+    Object.values(cutout.edges).every(Boolean),
+    Object.entries(cutout.edges).map(([side, ink]) => `${side}:${ink ? 'ink' : 'empty'}`).join(' ')
   );
 
   // Scale + persistence. The size is reported on the button and in a toast,

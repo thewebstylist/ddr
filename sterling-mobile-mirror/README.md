@@ -107,10 +107,13 @@ cut-out is placed on another colour.
 The shadow is **drawn, not captured**. `captureVisibleTab` returns the on-screen shadow
 already blended with whatever page was behind it, and no amount of processing recovers its
 alpha from that — so the cut-out gets its own, composited onto the canvas in three passes
-the way the CSS is layered: a wide ambient fall, a mid body, and a tight contact edge. The
-canvas grows to exactly the room that shadow needs, so the file is cropped to where the
-shadow fades out rather than to a guess. Alt-click the button to skip the shadow and crop
-tight to the frame instead.
+the way the CSS is layered: a wide ambient fall, a mid body, and a tight contact edge.
+
+The canvas is then **trimmed the way Photoshop trims**: every fully transparent row and
+column is scanned off, so the file ends exactly where the shadow's last lit pixel is, with
+no empty margin anywhere. The drawing area is deliberately generous and the trim decides
+the real bounds, rather than a formula guessing them. Alt-click the button to skip the
+shadow and crop tight to the frame instead.
 
 Only what the window shows can be captured, so a phone hanging off the edge of the window
 would come out with a slice missing. Rather than hand over a broken cut-out, the extension
