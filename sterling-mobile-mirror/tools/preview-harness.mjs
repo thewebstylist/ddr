@@ -183,7 +183,7 @@ if (!BLOCKED) {
   // Exports.
   for (const [label, suffix] of [
     ['Download promo image', 'promo'],
-    ['Phone cut-out · transparent PNG', 'phone']
+    ['Phone cut-out · alt-click: no shadow', 'phone']
   ]) {
     const download = await Promise.all([
       page.waitForEvent('download'),
@@ -199,8 +199,8 @@ if (!BLOCKED) {
     );
   }
 
-  // The phone cut-out must be the frame and nothing else: transparent outside
-  // the rounded silhouette, opaque within, cropped to the frame's own edges.
+  // The cut-out must be the phone on transparency: clear at the corners, a
+  // soft shadow fading through the margin, and the canvas cropped to it.
   const cutout = await page.evaluate(async (b64) => {
     const image = new Image();
     image.src = `data:image/png;base64,${b64}`;
@@ -211,35 +211,54 @@ if (!BLOCKED) {
     canvas.height = image.height;
     const context = canvas.getContext('2d');
     context.drawImage(image, 0, 0);
-    const alphaAt = (x, y) => context.getImageData(x, y, 1, 1).data[3];
+    const alphaAt = (x, y) => context.getImageData(Math.round(x), Math.round(y), 1, 1).data[3];
 
-    const device = document.querySelector('sterling-mobile-mirror').shadowRoot.querySelector('.device');
-    const rect = device.getBoundingClientRect();
+    const shadow = document.querySelector('sterling-mobile-mirror').shadowRoot;
+    const rect = shadow.querySelector('.device').getBoundingClientRect();
+    const scale = rect.width / window.__SMM__.deviceSize().width;
+    const margin = window.__SMM__.shadowMargin(scale);
+    const density = 2;
 
     return {
-      width: image.width,
-      height: image.height,
-      expected: [Math.round(rect.width * 2), Math.round(rect.height * 2)],
-      corners: [
-        alphaAt(2, 2),
-        alphaAt(image.width - 3, 2),
-        alphaAt(2, image.height - 3),
-        alphaAt(image.width - 3, image.height - 3)
+      size: [image.width, image.height],
+      expected: [
+        Math.round((rect.width + margin.left + margin.right) * density),
+        Math.round((rect.height + margin.top + margin.bottom) * density)
       ],
-      middle: alphaAt(image.width >> 1, image.height >> 1),
-      edgeMidpoint: alphaAt(image.width >> 1, 3)
+      corners: [
+        alphaAt(1, 1),
+        alphaAt(image.width - 2, 1),
+        alphaAt(1, image.height - 2),
+        alphaAt(image.width - 2, image.height - 2)
+      ],
+      // Just below the phone, inside the shadow: neither clear nor solid.
+      shadowBand: alphaAt(image.width / 2, (margin.top + rect.height) * density + 12),
+      // The phone's own top edge and middle stay fully opaque.
+      frameTop: alphaAt(image.width / 2, margin.top * density + 3),
+      middle: alphaAt(image.width / 2, image.height / 2)
     };
   }, readFileSync(resolve(OUT, 'phone.png')).toString('base64'));
 
   check(
-    'cut-out is transparent outside the frame',
-    cutout.corners.every((alpha) => alpha === 0) && cutout.middle === 255 && cutout.edgeMidpoint === 255,
-    `corners ${cutout.corners.join('/')}, middle ${cutout.middle}, top edge ${cutout.edgeMidpoint}`
+    'cut-out is transparent at the corners',
+    cutout.corners.every((alpha) => alpha < 8),
+    `corners ${cutout.corners.join('/')}`
   );
   check(
-    'cut-out is cropped to the frame',
-    Math.abs(cutout.width - cutout.expected[0]) <= 2 && Math.abs(cutout.height - cutout.expected[1]) <= 2,
-    `${cutout.width}x${cutout.height}, frame ${cutout.expected.join('x')}`
+    'phone itself is opaque',
+    cutout.frameTop === 255 && cutout.middle === 255,
+    `frame top ${cutout.frameTop}, middle ${cutout.middle}`
+  );
+  check(
+    'shadow is soft, not solid',
+    cutout.shadowBand > 8 && cutout.shadowBand < 235,
+    `alpha ${cutout.shadowBand} just below the frame`
+  );
+  check(
+    'canvas is cropped to the shadow',
+    Math.abs(cutout.size[0] - cutout.expected[0]) <= 2 &&
+      Math.abs(cutout.size[1] - cutout.expected[1]) <= 2,
+    `${cutout.size.join('x')}, expected ${cutout.expected.join('x')}`
   );
 
   // Scale + persistence. The size is reported on the button and in a toast,

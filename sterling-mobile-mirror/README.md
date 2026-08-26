@@ -72,7 +72,7 @@ corner. Hover any button for its name.
 | **Reload** | Reloads whatever the phone is currently showing. **Alt-click** re-mirrors the desktop page's current URL — useful after navigating inside the phone. |
 | **Scale up / down** | Resizes the phone in 5% steps, from 30% to 100%. The percentage appears on the button and in a brief toast. |
 | **Frame finish** | Switches between **Black Titanium** and **Natural Titanium**. |
-| **Phone cut-out** | Saves the phone alone as a transparent PNG, cropped to the outside of its frame — drops straight onto any background. |
+| **Phone cut-out** | Saves the phone alone as a transparent PNG with a soft drop shadow, cropped to where that shadow fades out — drops straight onto any background. **Alt-click** crops tight to the frame with no shadow. |
 | **Hide controls** | Dismisses the control rail, leaving the phone alone on the page. A dim chip stays where the rail was — click it to bring everything back. The choice is remembered. |
 | **Download promo image** | Saves the whole visible composition — desktop page plus phone — as a high-resolution PNG. |
 | **Close** | Removes the overlay. `Esc` also works while focus is inside the overlay. |
@@ -98,12 +98,19 @@ Both exports are taken with `chrome.tabs.captureVisibleTab`, then cropped and re
 a canvas to at least **2× CSS pixels** (higher if your display is denser). On a 1440 × 900
 window, "Download promo image" produces a 2880 × 1800 PNG.
 
-**Phone cut-out** goes further: it crops to the frame's own outer edge — no padding — and
-masks everything outside the rounded silhouette to full transparency, so the corners are
-clear rather than showing the page behind them. The mask is pulled in by a hair, because
-the outermost row of captured pixels is the frame blended against whatever was behind it
-and that fringe would read as a halo once the cut-out is placed on another colour. The
-result is the device and nothing else, ready to composite.
+**Phone cut-out** goes further: everything outside the phone's rounded silhouette is masked
+to full transparency, so the corners are clear rather than showing the page behind them.
+The mask is pulled in by a hair, because the outermost row of captured pixels is the frame
+blended against whatever was behind it, and that fringe would read as a halo once the
+cut-out is placed on another colour.
+
+The shadow is **drawn, not captured**. `captureVisibleTab` returns the on-screen shadow
+already blended with whatever page was behind it, and no amount of processing recovers its
+alpha from that — so the cut-out gets its own, composited onto the canvas in three passes
+the way the CSS is layered: a wide ambient fall, a mid body, and a tight contact edge. The
+canvas grows to exactly the room that shadow needs, so the file is cropped to where the
+shadow fades out rather than to a guess. Alt-click the button to skip the shadow and crop
+tight to the frame instead.
 
 Only what the window shows can be captured, so a phone hanging off the edge of the window
 would come out with a slice missing. Rather than hand over a broken cut-out, the extension

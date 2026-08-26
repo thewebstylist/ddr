@@ -240,7 +240,7 @@
       railButton({
         name: 'shot',
         icon: 'shot',
-        tip: 'Phone cut-out · transparent PNG',
+        tip: 'Phone cut-out · alt-click: no shadow',
         onClick: capturePhone
       }),
       railButton({ name: 'promo', icon: 'promo', tip: 'Download promo image', onClick: capturePromo }),
@@ -584,14 +584,16 @@
   }
 
   /**
-   * The phone alone, cut to the outside of its frame with transparent corners
-   * — a PNG that drops straight onto any background.
+   * The phone alone on transparency, with a soft drop shadow drawn into the
+   * alpha channel and the canvas cropped to where that shadow fades out.
+   * Alt-click crops tight to the frame instead, with no shadow at all.
    *
    * Only what the window shows can be captured, so a phone hanging off the
    * edge would come out clipped. Better to say so than to hand over a cut-out
-   * with a slice missing.
+   * with a slice missing. (The shadow is drawn, not captured, so it may sit
+   * outside the window quite happily.)
    */
-  function capturePhone() {
+  function capturePhone(event) {
     const rect = device.root.getBoundingClientRect();
     const spills =
       rect.left < -1 ||
@@ -604,9 +606,17 @@
       return Promise.resolve();
     }
 
-    return runCapture(buttons.shot, phoneRegion(), 'phone', 'Transparent cut-out saved', {
-      radius: SMM.FRAME.radius * prefs.scale
-    });
+    const withShadow = !event?.altKey;
+    return runCapture(
+      buttons.shot,
+      phoneRegion(),
+      'phone',
+      withShadow ? 'Cut-out saved with shadow' : 'Cut-out saved, frame only',
+      {
+        radius: SMM.FRAME.radius * prefs.scale,
+        shadowScale: withShadow ? prefs.scale : 0
+      }
+    );
   }
 
   const capturePromo = () =>
