@@ -68,7 +68,7 @@
    */
   SMM.buildDevice = () => {
     const { width, height } = SMM.SCREEN;
-    const { bezel, band } = SMM.FRAME;
+    const { bezel, band, radius } = SMM.FRAME;
 
     const root = document.createElement('div');
     root.className = 'device';
@@ -76,6 +76,7 @@
     root.style.setProperty('--smm-screen-h', `${height}px`);
     root.style.setProperty('--smm-bezel-w', `${bezel}px`);
     root.style.setProperty('--smm-band-w', `${band}px`);
+    root.style.setProperty('--smm-band-r', `${radius}px`);
 
     root.innerHTML = `
       <div class="device__band">

@@ -14,7 +14,7 @@
   SMM.SCREEN = { width: 430, height: 932 };
 
   /** Bezel + band thickness around the screen, at scale 1. */
-  SMM.FRAME = { bezel: 13, band: 4 };
+  SMM.FRAME = { bezel: 13, band: 4, radius: 68 };
 
   SMM.SCALE = { min: 0.3, max: 1, step: 0.05, default: 0.55 };
 
@@ -207,7 +207,7 @@ button {
 .device__band {
   position: relative;
   cursor: grab;
-  border-radius: 68px;
+  border-radius: var(--smm-band-r, 68px);
   background: var(--smm-band);
   padding: var(--smm-band-w, 3px);
   box-shadow:

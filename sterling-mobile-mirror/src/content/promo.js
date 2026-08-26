@@ -58,11 +58,16 @@
 
   /**
    * Crop and rescale a captured frame, then hand back a PNG blob.
+   *
    * @param {string} dataUrl  frame from captureVisibleTab
    * @param {{x:number,y:number,width:number,height:number}|null} cropCss
    *        region in CSS pixels of the viewport; null means "whole viewport"
+   * @param {{radius?: number}} [options]
+   *        `radius` (CSS px) masks the export to a rounded rectangle, leaving
+   *        everything outside it fully transparent — a cut-out of the phone
+   *        rather than a rectangle with the page showing in its corners.
    */
-  SMM.composePng = async (dataUrl, cropCss) => {
+  SMM.composePng = async (dataUrl, cropCss, { radius = 0 } = {}) => {
     const frame = await loadImage(dataUrl);
 
     // captureVisibleTab returns device pixels; work out the real ratio from
@@ -90,6 +95,23 @@
     const ctx = out.getContext('2d');
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
+
+    if (radius > 0) {
+      // Pull the mask in by a hair: the outermost row of captured pixels is
+      // the frame blended against whatever was behind it, and that fringe
+      // would read as a halo once the cut-out is placed on another colour.
+      const inset = Math.max(1, Math.round(density * 0.75));
+      ctx.beginPath();
+      ctx.roundRect(
+        inset,
+        inset,
+        out.width - inset * 2,
+        out.height - inset * 2,
+        Math.max(0, radius * density - inset)
+      );
+      ctx.clip();
+    }
+
     ctx.drawImage(frame, sx, sy, sw, sh, 0, 0, out.width, out.height);
 
     return new Promise((resolve, reject) => {

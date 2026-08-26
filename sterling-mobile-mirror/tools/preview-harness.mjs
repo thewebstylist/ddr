@@ -183,7 +183,7 @@ if (!BLOCKED) {
   // Exports.
   for (const [label, suffix] of [
     ['Download promo image', 'promo'],
-    ['Capture phone', 'phone']
+    ['Phone cut-out · transparent PNG', 'phone']
   ]) {
     const download = await Promise.all([
       page.waitForEvent('download'),
@@ -193,11 +193,54 @@ if (!BLOCKED) {
     await download.saveAs(file);
     const bytes = readFileSync(file);
     check(
-      `${label.toLowerCase()} export`,
+      `${suffix} export`,
       bytes.length > 5000,
       `${bytes.readUInt32BE(16)}x${bytes.readUInt32BE(20)} px, ${download.suggestedFilename()}`
     );
   }
+
+  // The phone cut-out must be the frame and nothing else: transparent outside
+  // the rounded silhouette, opaque within, cropped to the frame's own edges.
+  const cutout = await page.evaluate(async (b64) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${b64}`;
+    await image.decode();
+
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0);
+    const alphaAt = (x, y) => context.getImageData(x, y, 1, 1).data[3];
+
+    const device = document.querySelector('sterling-mobile-mirror').shadowRoot.querySelector('.device');
+    const rect = device.getBoundingClientRect();
+
+    return {
+      width: image.width,
+      height: image.height,
+      expected: [Math.round(rect.width * 2), Math.round(rect.height * 2)],
+      corners: [
+        alphaAt(2, 2),
+        alphaAt(image.width - 3, 2),
+        alphaAt(2, image.height - 3),
+        alphaAt(image.width - 3, image.height - 3)
+      ],
+      middle: alphaAt(image.width >> 1, image.height >> 1),
+      edgeMidpoint: alphaAt(image.width >> 1, 3)
+    };
+  }, readFileSync(resolve(OUT, 'phone.png')).toString('base64'));
+
+  check(
+    'cut-out is transparent outside the frame',
+    cutout.corners.every((alpha) => alpha === 0) && cutout.middle === 255 && cutout.edgeMidpoint === 255,
+    `corners ${cutout.corners.join('/')}, middle ${cutout.middle}, top edge ${cutout.edgeMidpoint}`
+  );
+  check(
+    'cut-out is cropped to the frame',
+    Math.abs(cutout.width - cutout.expected[0]) <= 2 && Math.abs(cutout.height - cutout.expected[1]) <= 2,
+    `${cutout.width}x${cutout.height}, frame ${cutout.expected.join('x')}`
+  );
 
   // Scale + persistence. The size is reported on the button and in a toast,
   // now that the header plate is gone.

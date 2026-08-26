@@ -237,7 +237,12 @@
       railButton({ name: 'zoomOut', icon: 'minus', tip: 'Scale down', onClick: () => nudgeScale(-1) }),
       railButton({ name: 'frame', icon: 'frame', tip: 'Frame finish', onClick: toggleFinish }),
       separator(),
-      railButton({ name: 'shot', icon: 'shot', tip: 'Capture phone', onClick: capturePhone }),
+      railButton({
+        name: 'shot',
+        icon: 'shot',
+        tip: 'Phone cut-out · transparent PNG',
+        onClick: capturePhone
+      }),
       railButton({ name: 'promo', icon: 'promo', tip: 'Download promo image', onClick: capturePromo }),
       separator(),
       railButton({ name: 'bare', icon: 'hide', tip: 'Hide controls', onClick: () => setBare(true) }),
@@ -556,26 +561,18 @@
    * Capture
    * ------------------------------------------------------------------ */
 
-  /** Viewport rectangle of the phone, padded so its shadow is included. */
+  /** The phone's exact outer rectangle, with no padding around it. */
   function phoneRegion() {
     const rect = device.root.getBoundingClientRect();
-    const pad = 34;
-    const x = Math.max(0, rect.left - pad);
-    const y = Math.max(0, rect.top - pad);
-    return {
-      x,
-      y,
-      width: Math.min(window.innerWidth - x, rect.width + pad * 2),
-      height: Math.min(window.innerHeight - y, rect.height + pad * 2)
-    };
+    return { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
   }
 
-  async function runCapture(button, region, suffix, message) {
+  async function runCapture(button, region, suffix, message, options) {
     button.classList.add('is-busy');
     try {
       const blob = await SMM.withoutChrome(host, async () => {
         const frame = await SMM.captureVisible();
-        return SMM.composePng(frame, region);
+        return SMM.composePng(frame, region, options);
       });
       SMM.download(blob, SMM.exportName(suffix));
       notify(message);
@@ -586,8 +583,31 @@
     }
   }
 
-  const capturePhone = () =>
-    runCapture(buttons.shot, phoneRegion(), 'phone', 'Phone capture saved');
+  /**
+   * The phone alone, cut to the outside of its frame with transparent corners
+   * — a PNG that drops straight onto any background.
+   *
+   * Only what the window shows can be captured, so a phone hanging off the
+   * edge would come out clipped. Better to say so than to hand over a cut-out
+   * with a slice missing.
+   */
+  function capturePhone() {
+    const rect = device.root.getBoundingClientRect();
+    const spills =
+      rect.left < -1 ||
+      rect.top < -1 ||
+      rect.right > window.innerWidth + 1 ||
+      rect.bottom > window.innerHeight + 1;
+
+    if (spills) {
+      notify('Phone runs past the window — scale it down for a clean cut-out', { error: true });
+      return Promise.resolve();
+    }
+
+    return runCapture(buttons.shot, phoneRegion(), 'phone', 'Transparent cut-out saved', {
+      radius: SMM.FRAME.radius * prefs.scale
+    });
+  }
 
   const capturePromo = () =>
     runCapture(buttons.promo, null, 'promo', 'Promo image saved');

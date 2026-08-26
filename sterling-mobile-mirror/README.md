@@ -72,7 +72,7 @@ corner. Hover any button for its name.
 | **Reload** | Reloads whatever the phone is currently showing. **Alt-click** re-mirrors the desktop page's current URL — useful after navigating inside the phone. |
 | **Scale up / down** | Resizes the phone in 5% steps, from 30% to 100%. The percentage appears on the button and in a brief toast. |
 | **Frame finish** | Switches between **Black Titanium** and **Natural Titanium**. |
-| **Capture phone** | Saves a high-resolution PNG of just the phone and its shadow. |
+| **Phone cut-out** | Saves the phone alone as a transparent PNG, cropped to the outside of its frame — drops straight onto any background. |
 | **Hide controls** | Dismisses the control rail, leaving the phone alone on the page. A dim chip stays where the rail was — click it to bring everything back. The choice is remembered. |
 | **Download promo image** | Saves the whole visible composition — desktop page plus phone — as a high-resolution PNG. |
 | **Close** | Removes the overlay. `Esc` also works while focus is inside the overlay. |
@@ -96,8 +96,21 @@ depth in the document. A toast tells you which happened.
 
 Both exports are taken with `chrome.tabs.captureVisibleTab`, then cropped and re-scaled on
 a canvas to at least **2× CSS pixels** (higher if your display is denser). On a 1440 × 900
-window, "Download promo image" produces a 2880 × 1800 PNG. Files land in your normal
-Chrome downloads folder, named like:
+window, "Download promo image" produces a 2880 × 1800 PNG.
+
+**Phone cut-out** goes further: it crops to the frame's own outer edge — no padding — and
+masks everything outside the rounded silhouette to full transparency, so the corners are
+clear rather than showing the page behind them. The mask is pulled in by a hair, because
+the outermost row of captured pixels is the frame blended against whatever was behind it
+and that fringe would read as a halo once the cut-out is placed on another colour. The
+result is the device and nothing else, ready to composite.
+
+Only what the window shows can be captured, so a phone hanging off the edge of the window
+would come out with a slice missing. Rather than hand over a broken cut-out, the extension
+says so and asks you to scale down. (The promo export has no such limit — it is the
+viewport by definition.)
+
+Files land in your normal Chrome downloads folder, named like:
 
 ```
 sterling-mobile-mirror-example-com-promo-20260825-1412.png
