@@ -297,9 +297,13 @@ sterling-mobile-mirror/
 Sterling Creations AI: black glass, white type, hairline edges at 13% white, micro-labels
 at 9px with wide tracking. Two accents, used sparingly — **neon pink** `#FF2E88` for active
 state, **electric blue** `#2ED4FF` for focus and numerals. The device itself is the only
-ornament: brushed titanium band with a hairline edge highlight, black bezel, Dynamic
-Island, home indicator, machined side buttons, and a three-layer shadow that grounds it
-against the page.
+ornament: brushed titanium band with a hairline edge highlight, black bezel, home
+indicator, machined side buttons, and a three-layer shadow that grounds it against the
+page.
+
+The Dynamic Island is deliberately absent. It is true to the device, but it lands on top of
+the site's own header — the part of a mobile layout people most want to look at — and the
+preview is the point, not the prop.
 
 The toolbar mark belongs to the wider Sterling extension family rather than to the
 overlay's own palette: a squircle of light neon running pink at the top-left through

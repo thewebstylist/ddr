@@ -2,9 +2,13 @@
  * Sterling Mobile Mirror — the device itself.
  *
  * Builds the iPhone 15 Pro Max: titanium band, black bezel, machined side
- * buttons, Dynamic Island, home indicator, and the 430 x 932 screen that
- * hosts the live iframe. Also owns the fallback card shown when a site
- * refuses to be embedded, and the small SVG icon set used by the rail.
+ * buttons, home indicator, and the 430 x 932 screen that hosts the live
+ * iframe. Also owns the fallback card shown when a site refuses to be
+ * embedded, and the small SVG icon set used by the rail.
+ *
+ * The Dynamic Island is deliberately absent. It is true to the device, but it
+ * sits on top of the site's own header — the one part of a mobile layout
+ * people most want to look at — so the screen is left unobstructed.
  */
 
 (() => {
@@ -89,7 +93,6 @@
               allow="clipboard-read; clipboard-write; fullscreen"></iframe>
 
             <div class="screen__glare"></div>
-            <div class="island"><span class="island__lens"></span></div>
 
             <div class="urlbar"><span class="urlbar__text" data-role="url"></span></div>
             <div class="home"></div>

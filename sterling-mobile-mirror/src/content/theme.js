@@ -300,35 +300,6 @@ button {
   pointer-events: none;
 }
 
-/* Dynamic Island */
-.island {
-  position: absolute;
-  z-index: 4;
-  top: 11px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 125px;
-  height: 35px;
-  padding-right: 9px;
-  border-radius: 20px;
-  background: #000;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-              0 1px 3px rgba(0, 0, 0, 0.35);
-  pointer-events: none;
-}
-
-.island__lens {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 34% 30%, rgba(70, 110, 160, 0.55) 0%, rgba(10, 14, 22, 0.9) 46%, #05070b 100%);
-  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.14);
-}
-
 /* Address pill — the site's host name, sitting in the phone's footer the way
    a mobile browser shows it. Never takes pointer events: the site underneath
    stays fully interactive. */
