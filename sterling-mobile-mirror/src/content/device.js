@@ -58,8 +58,9 @@
   /**
    * Build the phone.
    * @returns {{root: HTMLElement, screen: HTMLElement, iframe: HTMLIFrameElement,
-   *            fallback: HTMLElement, fallbackBody: HTMLElement,
-   *            retryBtn: HTMLElement, popoutBtn: HTMLElement}}
+   *            urlText: HTMLElement, fallback: HTMLElement,
+   *            fallbackBody: HTMLElement, retryBtn: HTMLElement,
+   *            popoutBtn: HTMLElement}}
    */
   SMM.buildDevice = () => {
     const { width, height } = SMM.SCREEN;
@@ -89,6 +90,8 @@
 
             <div class="screen__glare"></div>
             <div class="island"><span class="island__lens"></span></div>
+
+            <div class="urlbar"><span class="urlbar__text" data-role="url"></span></div>
             <div class="home"></div>
 
             <div class="fallback" role="status">
@@ -121,6 +124,7 @@
       root,
       screen: q('.screen'),
       iframe: q('.screen__frame'),
+      urlText: q('[data-role="url"]'),
       fallback: q('.fallback'),
       fallbackBody: q('[data-role="reason"]'),
       retryBtn: q('[data-role="retry"]'),

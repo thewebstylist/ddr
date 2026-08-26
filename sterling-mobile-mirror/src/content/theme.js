@@ -94,73 +94,7 @@ button {
 }
 
 /* ------------------------------------------------------------------ *
- * Plate — brand mark, live host name, scale readout. Doubles as a
- * drag handle so the whole header is grabbable.
- * ------------------------------------------------------------------ */
-
-.plate {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 10px);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 30px;
-  max-width: 92vw;
-  padding: 0 12px 0 11px;
-  border: 1px solid var(--smm-edge);
-  border-radius: 999px;
-  background: rgba(6, 7, 11, 0.82);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  cursor: grab;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.plate:active { cursor: grabbing; }
-
-.plate__mark {
-  width: 7px;
-  height: 7px;
-  flex: 0 0 auto;
-  border-radius: 2px;
-  background: var(--smm-pink);
-  box-shadow: 0 0 10px rgba(255, 46, 136, 0.75);
-}
-
-.plate__name {
-  font-size: var(--smm-micro);
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-  color: var(--smm-paper);
-}
-
-.plate__rule {
-  width: 1px;
-  height: 12px;
-  background: var(--smm-edge);
-}
-
-.plate__host {
-  overflow: hidden;
-  max-width: 190px;
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  color: var(--smm-muted);
-  text-overflow: ellipsis;
-}
-
-.plate__scale {
-  font-size: var(--smm-micro);
-  letter-spacing: 0.14em;
-  color: var(--smm-blue);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ------------------------------------------------------------------ *
- * Rail — the compact control column, left of the phone
+ * Rail — the compact control column, right of the phone
  * ------------------------------------------------------------------ */
 
 .rail {
@@ -272,6 +206,7 @@ button {
 
 .device__band {
   position: relative;
+  cursor: grab;
   border-radius: 68px;
   background: var(--smm-band);
   padding: var(--smm-band-w, 3px);
@@ -284,6 +219,8 @@ button {
 }
 
 /* Hairline highlight riding the outer edge of the titanium band */
+.device__band:active { cursor: grabbing; }
+
 .device__band::after {
   content: "";
   position: absolute;
@@ -333,6 +270,7 @@ button {
 
 .screen {
   position: relative;
+  cursor: auto;
   overflow: hidden;
   width: var(--smm-screen-w, 430px);
   height: var(--smm-screen-h, 932px);
@@ -389,6 +327,42 @@ button {
   background:
     radial-gradient(circle at 34% 30%, rgba(70, 110, 160, 0.55) 0%, rgba(10, 14, 22, 0.9) 46%, #05070b 100%);
   box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.14);
+}
+
+/* Address pill — the site's host name, sitting in the phone's footer the way
+   a mobile browser shows it. Never takes pointer events: the site underneath
+   stays fully interactive. */
+.urlbar {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46%;
+  max-width: 78%;
+  height: 46px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: rgba(22, 22, 26, 0.86);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.urlbar__text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Home indicator — the difference blend keeps it visible on light and dark sites */
@@ -489,13 +463,13 @@ button {
 }
 
 /* ------------------------------------------------------------------ *
- * Toast — capture + sync feedback, anchored under the plate
+ * Toast — capture + sync feedback, floating above the phone
  * ------------------------------------------------------------------ */
 
 .toast {
   position: absolute;
   right: 0;
-  bottom: calc(100% + 48px);
+  bottom: calc(100% + 12px);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -531,8 +505,7 @@ button {
  * Bare mode — controls dismissed, one quiet chip left to bring them back
  * ------------------------------------------------------------------ */
 
-:host(.smm-bare) .rail,
-:host(.smm-bare) .plate {
+:host(.smm-bare) .rail {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -604,7 +577,6 @@ button {
  * ------------------------------------------------------------------ */
 
 :host(.smm-capturing) .rail,
-:host(.smm-capturing) .plate,
 :host(.smm-capturing) .ghost,
 :host(.smm-capturing) .toast { opacity: 0 !important; transition: none !important; }
 `;

@@ -43,7 +43,7 @@
     });
 
   /**
-   * Hide the extension's own chrome (rail, plate, toasts), run `task`, then
+   * Hide the extension's own chrome (rail, chip, toasts), run `task`, then
    * put everything back — even if `task` throws.
    */
   SMM.withoutChrome = async (host, task) => {

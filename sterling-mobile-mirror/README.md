@@ -64,18 +64,20 @@ corner. Hover any button for its name.
 
 | Control | What it does |
 |---|---|
-| **Move** (grip) | Drag the phone anywhere in the viewport. The header plate is also a drag handle. |
+| **Move** (grip) | Drag the phone anywhere in the viewport. The phone's titanium frame is also a drag handle — press the bezel, not the screen. |
 | **Sync section** | Scrolls the phone to the section nearest the centre of the desktop viewport. **Alt-click** turns auto-follow on/off (it starts on; the button glows pink while active). |
 | **Reload** | Reloads whatever the phone is currently showing. **Alt-click** re-mirrors the desktop page's current URL — useful after navigating inside the phone. |
-| **Scale up / down** | Resizes the phone in 5% steps, from 30% to 100%. The percentage shows in the header plate. |
+| **Scale up / down** | Resizes the phone in 5% steps, from 30% to 100%. The percentage appears on the button and in a brief toast. |
 | **Frame finish** | Switches between **Black Titanium** and **Natural Titanium**. |
 | **Capture phone** | Saves a high-resolution PNG of just the phone and its shadow. |
-| **Hide controls** | Dismisses the rail and the header plate, leaving the phone alone on the page. A dim chip stays where the rail was — click it to bring everything back. The choice is remembered. |
+| **Hide controls** | Dismisses the control rail, leaving the phone alone on the page. A dim chip stays where the rail was — click it to bring everything back. The choice is remembered. |
 | **Download promo image** | Saves the whole visible composition — desktop page plus phone — as a high-resolution PNG. |
 | **Close** | Removes the overlay. `Esc` also works while focus is inside the overlay. |
 
-The header plate above the phone shows the brand mark, the URL currently loaded inside the
-phone, and the current scale.
+Inside the phone's footer sits an address pill showing the host currently loaded, the way a
+mobile browser does. It is part of the device rather than part of the controls: it stays
+during captures and while the controls are hidden, and it never takes pointer events, so
+the site underneath stays fully interactive.
 
 ### How section sync decides
 
@@ -99,8 +101,9 @@ sterling-mobile-mirror-example-com-promo-20260825-1412.png
 sterling-mobile-mirror-example-com-phone-20260825-1412.png
 ```
 
-The rail, the header plate and any toast are hidden for the duration of the capture, so
-exports show only the artwork.
+The control rail, the restore chip and any toast are hidden for the duration of the
+capture, so exports show only the phone and the page. The address pill stays, since it is
+part of how the phone reads.
 
 ---
 
@@ -175,15 +178,16 @@ never read except to find the section you are looking at, and never leaves the b
    its mobile layout. Click again — it disappears with no layout shift on the page.
 2. **The page stays whole.** Scroll the desktop page; it scrolls fully behind a stationary
    phone. Nothing about the site's own layout changes.
-3. **Live and interactive.** Scroll inside the phone, tap a link, watch the header plate's
-   URL follow along.
+3. **Live and interactive.** Scroll inside the phone, tap a link, watch the address pill in
+   its footer follow along.
 4. **Section sync.** Scroll to a mid-page section on the desktop and watch the phone move
    to the same section. Alt-click *Sync section* to turn auto-follow off and on.
-5. **Move, scale, finish.** Drag the phone by the grip or the plate; scale it up and down;
+5. **Move, scale, finish.** Drag the phone by the grip or by its titanium frame; scale it
+   up and down;
    switch to Natural Titanium. Reload the page and click the icon again — the phone
    returns exactly where and how you left it.
-6. **Hide the controls.** Click *Hide controls*: the rail and plate go, leaving the phone
-   and one dim chip. Click the chip to bring them back.
+6. **Hide the controls.** Click *Hide controls*: the rail goes, leaving the phone, its
+   address pill, and one dim chip. Click the chip to bring the controls back.
 7. **Exports.** Click *Download promo image*, then open the PNG: the desktop page and the
    phone, no extension controls, at twice the CSS resolution.
 8. **Blocked site.** Try a site that refuses framing (for example `https://www.google.com`)

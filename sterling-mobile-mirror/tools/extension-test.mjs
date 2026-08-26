@@ -162,11 +162,13 @@ check(
   `${bytes.readUInt32BE(16)}x${bytes.readUInt32BE(20)} px, ${download.suggestedFilename()}`
 );
 
-// Drag: pointer events reach the shadow UI, and the position is persisted.
+// Drag by the rail's grip: pointer events reach the shadow UI, and the
+// position is persisted.
 const before = await host.boundingBox();
-await page.mouse.move(before.x + before.width - 60, before.y - 25);
+const grip = await control('Move').boundingBox();
+await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
 await page.mouse.down();
-await page.mouse.move(before.x + before.width - 260, before.y - 125, { steps: 12 });
+await page.mouse.move(grip.x + grip.width / 2 - 200, grip.y + grip.height / 2 - 100, { steps: 12 });
 await page.mouse.up();
 await page.waitForTimeout(600);
 const after = await host.boundingBox();

@@ -105,7 +105,7 @@ const context = await browser.newContext({
 const page = await context.newPage();
 
 // Stand-in for chrome.tabs.captureVisibleTab(): a live frame, taken at the
-// moment the overlay asks for one — so it proves the rail and plate are
+// moment the overlay asks for one — so it proves the rail and chip are
 // hidden during export.
 await page.exposeFunction('__grabFrame', async () => (await page.screenshot()).toString('base64'));
 
@@ -141,6 +141,25 @@ const host = page.locator('sterling-mobile-mirror');
 const control = (label) => host.locator(`button[aria-label="${label}"]`);
 
 check('overlay mounted', await page.evaluate(() => Boolean(window.__STERLING_MOBILE_MIRROR__?.isOpen)));
+
+// The address pill sits inside the phone's footer and shows the live host.
+check(
+  'address pill in the footer',
+  await page.evaluate(() => {
+    const shadow = document.querySelector('sterling-mobile-mirror').shadowRoot;
+    const bar = shadow.querySelector('.urlbar');
+    const screen = shadow.querySelector('.screen');
+    if (!bar || !screen) return false;
+    const barBox = bar.getBoundingClientRect();
+    const screenBox = screen.getBoundingClientRect();
+    const inFooter = barBox.top > screenBox.top + screenBox.height * 0.75;
+    const centred = Math.abs((barBox.left + barBox.right) / 2 - (screenBox.left + screenBox.right) / 2) < 2;
+    return inFooter && centred &&
+      getComputedStyle(bar).pointerEvents === 'none' &&
+      bar.textContent.includes('localhost') &&
+      !shadow.querySelector('.plate');
+  })
+);
 check(
   BLOCKED ? 'fallback card shown' : 'preview frame is live',
   await page.evaluate((blocked) => {
@@ -180,13 +199,14 @@ if (!BLOCKED) {
     );
   }
 
-  // Scale + persistence.
+  // Scale + persistence. The size is reported on the button and in a toast,
+  // now that the header plate is gone.
   await control('Scale up').click();
   await control('Scale up').click();
   await page.waitForTimeout(400);
-  const readout = await host.locator('[data-role="scale"]').textContent();
+  const readout = await host.locator('button[aria-label="Scale up"]').getAttribute('data-tip');
   const stored = await page.evaluate(() => window.__prefs['sterlingMobileMirror.prefs.v1']);
-  check('scale control', readout.trim() === '65%', readout.trim());
+  check('scale control', readout.endsWith('65%'), readout);
   check('preferences persisted', stored?.scale === 0.65, JSON.stringify(stored));
 
   // Controls can be dismissed down to the phone alone, and brought back.

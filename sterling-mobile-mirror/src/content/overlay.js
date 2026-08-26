@@ -64,9 +64,6 @@
   let shadow = null;
   let stage = null;
   let rail = null;
-  let plate = null;
-  let plateHost = null;
-  let plateScale = null;
   let toast = null;
   let ghost = null;
   let device = null;
@@ -170,27 +167,8 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Chrome: plate (header + drag handle) and rail (controls)
+   * Chrome: the control rail
    * ------------------------------------------------------------------ */
-
-  function buildPlate() {
-    plate = document.createElement('div');
-    plate.className = 'plate';
-    plate.title = 'Drag to reposition';
-    plate.innerHTML = `
-      <span class="plate__mark"></span>
-      <span class="plate__name">Mobile Mirror</span>
-      <span class="plate__rule"></span>
-      <span class="plate__host" data-role="host"></span>
-      <span class="plate__rule"></span>
-      <span class="plate__scale" data-role="scale">55%</span>
-    `;
-    plateHost = plate.querySelector('[data-role="host"]');
-    plateScale = plate.querySelector('[data-role="scale"]');
-
-    bind(plate, 'pointerdown', startDrag);
-    stage.append(plate);
-  }
 
   function railButton({ name, icon, tip, className = '', onClick }) {
     const button = document.createElement('button');
@@ -268,7 +246,7 @@
     stage.append(ghost);
   }
 
-  /** Dismiss or restore the rail and the plate. */
+  /** Dismiss or restore the control rail. */
   function setBare(bare) {
     prefs.bare = bare;
     host.classList.toggle('smm-bare', bare);
@@ -304,15 +282,15 @@
   }
 
   function clampPosition(width, height) {
-    // The rail hangs off the right edge of the phone and the plate above its
-    // top edge; both have to stay on screen. The gutters are reserved even
-    // while the controls are hidden, so restoring them never shifts the phone.
+    // The rail hangs off the right edge of the phone, and toasts float above
+    // it. Both gutters are reserved even while the controls are hidden, so
+    // restoring them never shifts the phone.
     const railGutter = (rail?.offsetWidth || 44) + 12;
-    const plateGutter = (plate?.offsetHeight || 30) + 14;
+    const toastGutter = 44;
 
     const minRight = railGutter + 16;
     const maxRight = Math.max(minRight, window.innerWidth - width - 8);
-    const maxBottom = Math.max(8, window.innerHeight - height - plateGutter - 8);
+    const maxBottom = Math.max(8, window.innerHeight - height - toastGutter - 8);
 
     prefs.right = Math.min(Math.max(minRight, Math.round(prefs.right)), maxRight);
     prefs.bottom = Math.min(Math.max(8, Math.round(prefs.bottom)), maxBottom);
@@ -332,7 +310,6 @@
       top: 'auto'
     });
 
-    if (plateScale) plateScale.textContent = `${Math.round(prefs.scale * 100)}%`;
     host.classList.toggle('smm-light', prefs.light);
     host.classList.toggle('smm-bare', prefs.bare);
   }
@@ -351,6 +328,17 @@
     const next = Math.round((prefs.scale + direction * SMM.SCALE.step) * 100) / 100;
     prefs.scale = Math.min(SMM.SCALE.max, Math.max(SMM.SCALE.min, next));
     applyLayout();
+
+    // Without a header readout, the size is reported where it is asked for.
+    const percent = `${Math.round(prefs.scale * 100)}%`;
+    notify(percent);
+    for (const name of ['zoomIn', 'zoomOut']) {
+      const button = buttons[name];
+      if (!button) continue;
+      const label = name === 'zoomIn' ? 'Scale up' : 'Scale down';
+      button.dataset.tip = `${label} · ${percent}`;
+    }
+
     savePrefs();
   }
 
@@ -364,6 +352,15 @@
   /* ------------------------------------------------------------------ *
    * Dragging
    * ------------------------------------------------------------------ */
+
+  /**
+   * The phone's frame is a drag handle too — press the titanium, not the
+   * screen, which belongs to the site inside it.
+   */
+  function onFrameDrag(event) {
+    if (event.target.closest('.screen')) return;
+    startDrag(event);
+  }
 
   function startDrag(event) {
     if (event.button !== 0) return;
@@ -465,7 +462,7 @@
         frameStatus = 'live';
         hideFallback();
         SMM.dressFrame(SMM.frameDoc(device.iframe));
-        updatePlateHost();
+        updateAddress();
         if (prefs.autoSync) syncSection({ quiet: true });
       } else {
         showFallback(
@@ -477,12 +474,12 @@
     }, 80);
   }
 
-  function updatePlateHost() {
+  /** Show whatever the phone is currently on, the way a mobile browser does. */
+  function updateAddress() {
+    if (!device) return;
     const doc = SMM.frameDoc(device.iframe);
     const url = doc ? doc.location : location;
-    const path = url.pathname === '/' ? '' : url.pathname;
-    plateHost.textContent = `${url.hostname}${path}`;
-    plateHost.title = url.href;
+    device.urlText.textContent = url.hostname.replace(/^www\./, '');
   }
 
   const escapeHtml = (value) =>
@@ -606,8 +603,8 @@
       /* nothing left to clean up */
     }
 
-    host = shadow = stage = rail = plate = device = null;
-    plateHost = plateScale = toast = ghost = null;
+    host = shadow = stage = rail = device = null;
+    toast = ghost = null;
     buttons = {};
     isOpen = false;
     frameStatus = 'idle';
@@ -629,7 +626,6 @@
     device = SMM.buildDevice();
     stage.append(device.root);
 
-    buildPlate();
     buildRail();
     buildGhost();
     buildToast();
@@ -642,8 +638,9 @@
     applyLayout();
     isOpen = true;
 
-    plateHost.textContent = location.hostname;
+    updateAddress();
 
+    bind(device.root, 'pointerdown', onFrameDrag);
     bind(device.iframe, 'load', onFrameLoad);
     bind(device.retryBtn, 'click', () => loadFrame());
     bind(device.popoutBtn, 'click', openPopout);
@@ -698,8 +695,8 @@
     const outgoingHost = host;
     const outgoingStage = stage;
 
-    host = shadow = stage = rail = plate = device = null;
-    plateHost = plateScale = toast = ghost = null;
+    host = shadow = stage = rail = device = null;
+    toast = ghost = null;
     buttons = {};
     frameStatus = 'idle';
 
