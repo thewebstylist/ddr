@@ -267,8 +267,10 @@ ornament: brushed titanium band with a hairline edge highlight, black bezel, Dyn
 Island, home indicator, machined side buttons, and a three-layer shadow that grounds it
 against the page.
 
-The toolbar mark follows the same rules: a black squircle rimmed in a pink-to-blue neon
-gradient, lit from two corners, with a white iPhone at the centre carrying a pink Dynamic
-Island and a blue home indicator. It is generated, not drawn by hand — `node
-tools/make-icons.mjs` re-renders all four sizes from the shape maths in that file, so the
-mark stays crisp at 16px.
+The toolbar mark belongs to the wider Sterling extension family rather than to the
+overlay's own palette: a squircle of light neon running pink at the top-left through
+violet to electric blue at the bottom-right, glossed from the top-left corner, carrying a
+solid white iPhone with the gradient showing through its screen. It is generated, not
+drawn by hand — `node tools/make-icons.mjs` re-renders all four sizes from the shape maths
+in that file, and the white frame around the screen has a pixel floor so the phone still
+reads at 16px.

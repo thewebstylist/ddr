@@ -14,11 +14,19 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, '..', 'icons');
 
-const INK = [6, 7, 11];
-const INK_TOP = [20, 22, 30];
+/**
+ * Palette — the mark sits on a light neon gradient running pink at the
+ * top-left through violet to electric blue at the bottom-right, matching the
+ * rest of the Sterling extension family. The glyph on top is pure white.
+ */
+const STOPS = [
+  [0.0, [255, 61, 166]], // neon pink
+  [0.34, [201, 74, 240]], // violet
+  [0.68, [86, 124, 255]], // blue
+  [1.0, [46, 212, 255]] // electric blue
+];
+
 const WHITE = [255, 255, 255];
-const PINK = [255, 46, 136];
-const BLUE = [46, 212, 255];
 
 /** Signed distance to a rounded rectangle (negative = inside). */
 function sdRoundRect(px, py, cx, cy, halfW, halfH, radius) {
@@ -36,50 +44,69 @@ const mix = (a, b, t) => [
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value));
 
+/** Sample the multi-stop gradient at 0..1 along the diagonal. */
+function gradient(t) {
+  const position = clamp01(t);
+  for (let i = 1; i < STOPS.length; i += 1) {
+    const [end, endColour] = STOPS[i];
+    const [start, startColour] = STOPS[i - 1];
+    if (position <= end) {
+      return mix(startColour, endColour, (position - start) / (end - start));
+    }
+  }
+  return STOPS[STOPS.length - 1][1];
+}
+
 /**
  * Colour of one sub-sample, or null where the icon is transparent.
  *
- * The mark: a black squircle rimmed in a neon pink-to-blue gradient, lit from
- * two corners, with a white iPhone at the centre — pink Dynamic Island, blue
- * home indicator.
+ * A squircle of pink-to-blue neon, glossed from the top-left, carrying a solid
+ * white iPhone: gradient shows through the screen, with the Dynamic Island and
+ * the home indicator picked out in white.
  */
 function sample(x, y, size) {
   const s = size;
   const tile = sdRoundRect(x, y, s / 2, s / 2, s / 2, s / 2, s * 0.225);
   if (tile > 0) return null;
 
-  // Black tile, lifted slightly at the top.
-  let colour = mix(INK_TOP, INK, y / s);
+  let colour = gradient((x / s + y / s) / 2);
 
-  // Ambient neon: pink from the top-left, blue from the bottom-right.
-  const pinkGlow = clamp01(1 - Math.hypot(x - s * 0.16, y - s * 0.14) / (s * 0.82));
-  const blueGlow = clamp01(1 - Math.hypot(x - s * 0.86, y - s * 0.9) / (s * 0.82));
-  colour = mix(colour, PINK, pinkGlow ** 2 * 0.2);
-  colour = mix(colour, BLUE, blueGlow ** 2 * 0.2);
+  // Gloss: a soft light from the top-left corner, as on the sibling icon.
+  const gloss = clamp01(1 - Math.hypot(x - s * 0.2, y - s * 0.12) / (s * 0.78));
+  colour = mix(colour, WHITE, gloss ** 2 * 0.22);
 
-  // Phone: a soft-lit screen inside a white outline.
-  const bodyHalfW = s * 0.205;
-  const bodyHalfH = s * 0.325;
-  const stroke = Math.max(s * 0.05, 1);
-  const body = sdRoundRect(x, y, s / 2, s / 2, bodyHalfW, bodyHalfH, s * 0.08);
+  // The phone: a solid white body with the gradient showing through its screen.
+  const bodyHalfW = s * 0.224;
+  const bodyHalfH = s * 0.345;
+  const body = sdRoundRect(x, y, s / 2, s / 2, bodyHalfW, bodyHalfH, s * 0.086);
+  if (body > 0) return colour;
 
-  if (body <= 0) colour = mix(colour, WHITE, 0.1);
-  if (body <= 0 && body >= -stroke) colour = WHITE;
+  colour = WHITE;
 
-  // Dynamic Island and home indicator carry the two brand accents.
-  const island = sdRoundRect(x, y, s / 2, s / 2 - bodyHalfH + s * 0.105, s * 0.072, s * 0.023, s * 0.023);
-  if (island <= 0) colour = PINK;
+  // Screen — never thinner than a pixel and a half of white around it.
+  const inset = Math.max(s * 0.058, 1.4);
+  const screen = sdRoundRect(
+    x, y, s / 2, s / 2,
+    bodyHalfW - inset, bodyHalfH - inset,
+    Math.max(s * 0.05, 1)
+  );
+  if (screen > 0) return colour;
 
-  const home = sdRoundRect(x, y, s / 2, s / 2 + bodyHalfH - s * 0.078, s * 0.062, s * 0.016, s * 0.016);
-  if (home <= 0) colour = BLUE;
+  colour = gradient((x / s + y / s) / 2);
+  colour = mix(colour, WHITE, gloss ** 2 * 0.22);
 
-  // Neon rim, pink at the top-left running to blue at the bottom-right.
-  const rim = Math.max(s * 0.03, 1);
-  if (tile >= -rim) {
-    const along = clamp01((x / s + y / s) / 2);
-    const fade = clamp01((tile + rim) / rim);
-    colour = mix(colour, mix(PINK, BLUE, along), 0.35 + 0.65 * fade);
-  }
+  // Dynamic Island and home indicator, in white on the live screen.
+  const island = sdRoundRect(
+    x, y, s / 2, s / 2 - bodyHalfH + inset + s * 0.052,
+    s * 0.072, s * 0.024, s * 0.024
+  );
+  if (island <= 0) return WHITE;
+
+  const home = sdRoundRect(
+    x, y, s / 2, s / 2 + bodyHalfH - inset - s * 0.04,
+    s * 0.064, s * 0.016, s * 0.016
+  );
+  if (home <= 0) return WHITE;
 
   return colour;
 }
