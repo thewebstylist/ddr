@@ -7,7 +7,7 @@
    export is assembled into a zip in memory.
    ========================================================================== */
 import { PROFESSIONS, PAIRINGS } from './lib/professions.js'
-import { extractFrames, importSequence, releaseFrames, totalBytes, FORMATS } from './lib/frames.js'
+import { extractFrames, importSequence, releaseFrames, totalBytes, FORMATS, encoderFor } from './lib/frames.js'
 import { samplePalette, buildTheme, buildGrade, contrast } from './lib/palette.js'
 import { makeZip, download } from './lib/zip.js'
 
@@ -434,7 +434,11 @@ function secFilm () {
       field('Frames', p.film, 'count', { type: 'number', min: 24, max: 400, hint: '120–200 is the sweet spot' }),
       field('Width (px)', p.film, 'width', { type: 'number', min: 640, max: 2560, step: 80 })))
     b.appendChild(row(
-      field('Format', p.film, 'format', { type: 'select', options: [['webp', 'WebP — smaller'], ['jpeg', 'JPEG — universal']] }),
+      field('Format', p.film, 'format', {
+        type: 'select',
+        options: [['webp', encoderFor('webp') === 'webp' ? 'WebP — smaller' : 'WebP — not available here'],
+                  ['jpeg', 'JPEG — universal']]
+      }),
       field('Quality', p.film, 'quality', { type: 'number', min: 0.4, max: 0.95, step: 0.02 })))
     b.appendChild(h('div', { class: 'f-hint' }, 'Re-cut the video after changing these.'))
 
@@ -571,6 +575,36 @@ function secPanels () {
         field('Align', pn, 'align', { type: 'select', options: [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']] }),
         field('Max width', pn, 'width', { type: 'number', placeholder: '660' })))
       card.appendChild(field('Stays visible to the end', pn, 'persist', { type: 'checkbox' }))
+      card.appendChild(field('Timing', pn, 'timing', {
+        type: 'select',
+        options: [['auto', 'Automatic — share the track evenly'], ['manual', 'Pin to the film']],
+        restructure: true,
+        hint: pn.timing === 'auto' ? null : 'Scroll progress, 0 to 1: fade in, fully on, hold until, gone.'
+      }))
+      if (pn.timing !== 'auto') {
+        if (!Array.isArray(pn.at)) {
+          const n = p.panels.length, sl = i / n, sp = 1 / n
+          pn.at = [+(sl + sp * 0.05).toFixed(2), +(sl + sp * 0.24).toFixed(2),
+                   +(sl + sp * 0.80).toFixed(2), +(sl + sp * 0.97).toFixed(2)]
+        }
+        card.appendChild(h('div', { class: 'row' }, ['in', 'full', 'hold to', 'out'].map((lab, k) =>
+          h('div', { class: 'f' },
+            h('label', { class: 'f-label' }, lab),
+            h('input', {
+              class: 'in', type: 'number', min: -0.05, max: 1.05, step: 0.01, value: pn.at[k],
+              oninput: (e) => { pn.at[k] = +e.target.value; touch() }
+            })))))
+        card.appendChild(h('button', {
+          class: 'btn btn-mini',
+          onclick: () => {
+            /* Read the moment straight off the preview, so a panel can be pinned
+               to the frame it is actually about. */
+            const frac = document.getElementById('scrub').value / 1000
+            pn.at = [+(frac - 0.05).toFixed(3), +frac.toFixed(3), +(frac + 0.08).toFixed(3), +(frac + 0.13).toFixed(3)]
+            render()
+          }
+        }, 'Pin to where the preview is now'))
+      }
       b.appendChild(card)
     })
     b.appendChild(h('button', {
@@ -682,12 +716,15 @@ async function cutVideo (file) {
   const p = state.project
   showBusy('Cutting frames', 'reading the file')
   try {
-    const { frames } = await extractFrames(file, {
+    const { frames, format } = await extractFrames(file, {
       count: p.film.count, width: p.film.width, format: p.film.format, quality: p.film.quality,
       onProgress: (f, i, n) => setBusy(f, `frame ${i} of ${n}`)
     })
     clearFrames(false)
     state.assets.frames = frames
+    /* If the browser could not encode what was asked for, the files really are
+       the other format — record that so the export names them correctly. */
+    p.film.format = format
     p.film.sourceName = file.name
     await saveAssets()
     render()

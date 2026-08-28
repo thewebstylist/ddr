@@ -33,7 +33,7 @@ takes their logo and their footage, and hands back a folder you can upload.
 | **Film** | drop a video and it is cut into frames *on your machine*, or drop a sequence you already have |
 | **Instrument** | the readout's units and range, the rail, the cue, the corner blocks — including live cells that read the value, the percentage or the zone |
 | **Journey** | how scroll position maps to the number, zone by zone |
-| **Panels** | eyebrow, heading, body, spec grid, big lines, button, fine print |
+| **Panels** | eyebrow, heading, body, spec grid, big lines, button, fine print — timed automatically, or pinned to the exact moment the preview is sitting on |
 
 The preview beside the form is the real engine on the real config, re-mounted on every edit
 and holding its scroll position, with a scrubber so you can sit at 60% while you write the

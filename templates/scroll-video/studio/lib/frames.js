@@ -7,6 +7,17 @@ export const FORMATS = {
   jpeg: { mime: 'image/jpeg', ext: 'jpg' }
 }
 
+/* canvas.toBlob is specified to fall back to PNG when it cannot encode the type
+   you asked for — silently. Naming that PNG ".webp" would ship files whose
+   extension, MIME type and actual bytes all disagree, so probe first. */
+export function encoderFor (format) {
+  const want = (FORMATS[format] || FORMATS.webp).mime
+  const c = document.createElement('canvas')
+  c.width = c.height = 1
+  const got = c.toDataURL(want)
+  return got.startsWith('data:' + want) ? format : 'jpeg'
+}
+
 export function readVideo (file) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file)
@@ -37,6 +48,7 @@ const seekTo = (v, t) => new Promise((resolve) => {
  */
 export async function extractFrames (file, opts = {}) {
   const { count = 160, width = 1440, format = 'webp', quality = 0.78, onProgress } = opts
+  const useFormat = encoderFor(format)
   const { video, url, duration, width: vw, height: vh } = await readVideo(file)
   if (!vw || !vh) { URL.revokeObjectURL(url); throw new Error('That file reports no picture size.') }
 
@@ -46,7 +58,7 @@ export async function extractFrames (file, opts = {}) {
   canvas.width = w
   canvas.height = h
   const ctx = canvas.getContext('2d', { alpha: false })
-  const mime = (FORMATS[format] || FORMATS.webp).mime
+  const mime = FORMATS[useFormat].mime
 
   const frames = []
   try {
@@ -64,7 +76,7 @@ export async function extractFrames (file, opts = {}) {
     URL.revokeObjectURL(url)
     video.src = ''
   }
-  return { frames, width: w, height: h, duration }
+  return { frames, width: w, height: h, duration, format: useFormat }
 }
 
 /* An image sequence the user already has — exported from After Effects, Blender,
