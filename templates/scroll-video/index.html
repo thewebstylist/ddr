@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Preview harness. The tags below describe the default preset; `build.mjs`
+     bakes the right ones into each single-file build. -->
+<title>ABYSSAL — How deep will you go?</title>
+<meta name="description" content="ABYSSAL takes eight civilians per year to the ocean floor aboard the submersible EREBUS. 3,800 meters. March 2027.">
+
+<link rel="stylesheet" href="template.css">
+</head>
+<body>
+
+<noscript>
+  <div style="padding:14vh 8vw;font:300 18px/1.7 system-ui,sans-serif;color:#e9f3f6;background:#000">
+    This page is a scroll-driven film. It needs JavaScript to run.
+  </div>
+</noscript>
+
+<script>
+/* Load a preset, then the engine. `?preset=meridian` swaps the whole site —
+   copy, colours, fonts, footage, units on the readout. */
+(function () {
+  var name = (new URLSearchParams(location.search).get('preset') || 'abyssal')
+    .replace(/[^a-z0-9_-]/gi, '')
+  var preset = document.createElement('script')
+  preset.src = 'presets/' + name + '.js'
+  preset.onload = function () {
+    var engine = document.createElement('script')
+    engine.src = 'template.js'
+    document.head.appendChild(engine)
+  }
+  preset.onerror = function () {
+    document.body.innerHTML =
+      '<pre style="padding:6vh 8vw;font:400 14px/1.8 ui-monospace,monospace">' +
+      'No preset named "' + name + '" in ./presets/.</pre>'
+  }
+  document.head.appendChild(preset)
+})()
+</script>
+</body>
+</html>

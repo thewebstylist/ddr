@@ -114,3 +114,8 @@ written out rather than configured.
 
 The backend sits behind one interface (`src/auth/types.ts`) with two implementations, so swapping
 Supabase for something else is one file, not a rewrite.
+
+## Templates
+
+`templates/` holds standalone web design templates that ship separately from the app — static,
+dependency-free, and meant to be copied out. See [templates/README.md](./templates/README.md).
