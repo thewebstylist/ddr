@@ -179,8 +179,19 @@
     },
 
     media: {
-      /* Ordered fallbacks. The first tier that decodes wins. A tier is one URL
-         (a single stitched film) or an array of clips played back to back. */
+      /* THE PREFERRED SOURCE. A frame sequence scrubs perfectly: no seeking, no
+         codec to negotiate, no autoplay policy, and the same behaviour in every
+         browser. Either an explicit list of URLs, or a pattern:
+             frames: { pattern: 'frames/f-{i}.webp', count: 180, pad: 4 }
+         Frames are fetched coarse-to-fine, so the scrub works long before the
+         last one lands. When this is set, `tiers` is never touched. */
+      frames: null,
+
+      /* Fallback for when you only have a video. The first tier that decodes
+         wins. A tier is one URL (a single stitched film) or an array of clips
+         played back to back. A single-URL tier gets baked to frames at runtime
+         — which is this doing at load time, badly, what `frames` does properly
+         at build time. */
       tiers: [],
       /* Boundary stills, crossfaded when no tier decodes — and shown
          immediately while the film downloads. Clip N runs still N -> N+1. */
@@ -378,6 +389,17 @@
     applyTheme(cfg.theme)
     document.body.classList.add('sv-body')
 
+    /* Everything this mount creates is tracked, so destroy() can put the page
+       back exactly as it found it — the studio preview remounts in place on
+       every edit and must not leak a HUD per keystroke. */
+    const owned = []
+    const listeners = []
+    const add = (node) => { owned.push(node); document.body.appendChild(node); return node }
+    const on = (target, type, fn, opts) => {
+      target.addEventListener(type, fn, opts)
+      listeners.push([target, type, fn, opts])
+    }
+
     /* ---- stage ---- */
     const stage = el('div', 'sv-stage')
     stage.setAttribute('aria-hidden', 'true')
@@ -387,13 +409,13 @@
     stage.appendChild(canvas)
     stage.appendChild(grade)
     if (cfg.stage.vignette) stage.appendChild(el('div', 'sv-vignette'))
-    document.body.appendChild(stage)
+    add(stage)
     const ctx = canvas.getContext('2d')
 
     /* ---- HUD ---- */
     if (cfg.corners) {
       ;['tl', 'tr', 'bl', 'br'].forEach((c) =>
-        document.body.appendChild(el('div', 'sv-hud sv-corner sv-corner-' + c)))
+        add(el('div', 'sv-hud sv-corner sv-corner-' + c)))
     }
 
     if (cfg.brand.show && (cfg.brand.word || cfg.brand.logo)) {
@@ -417,11 +439,11 @@
         b.appendChild(mark)
       }
       if (cfg.brand.tagline) b.appendChild(el('span', 'sv-brand-tagline', fmt(cfg.brand.tagline)))
-      document.body.appendChild(b)
+      add(b)
     }
 
     if (cfg.mission && cfg.mission.length) {
-      document.body.appendChild(el('div', 'sv-hud sv-mission', cfg.mission.map(fmt).join('<br>')))
+      add(el('div', 'sv-hud sv-mission', cfg.mission.map(fmt).join('<br>')))
     }
 
     /* Status rows keep a handle on every <b> so live values only touch text. */
@@ -440,7 +462,7 @@
         })
         box.appendChild(line)
       })
-      document.body.appendChild(box)
+      add(box)
     }
 
     let readoutValue = null, readoutZone = null
@@ -452,7 +474,7 @@
         readoutZone = el('div', 'sv-readout-zone')
         box.appendChild(readoutZone)
       }
-      document.body.appendChild(box)
+      add(box)
     }
 
     const railMin = cfg.rail.min == null ? cfg.readout.from : cfg.rail.min
@@ -479,20 +501,20 @@
       })
       rail.appendChild(railFill)
       rail.appendChild(railDot)
-      document.body.appendChild(rail)
+      add(rail)
     }
 
     let cue = null
     if (cfg.cue.show) {
       cue = el('div', 'sv-hud sv-cue', fmt(cfg.cue.text))
       cue.appendChild(el('div', 'sv-cue-line'))
-      document.body.appendChild(cue)
+      add(cue)
     }
 
     /* ---- panels ---- */
     const panelEls = cfg.panels.map((p, i) => {
       const node = buildPanel(p, i)
-      document.body.appendChild(node)
+      add(node)
       return node
     })
     const panelAt = timings(cfg.panels)
@@ -501,7 +523,7 @@
     /* ---- scroll track ---- */
     const track = el('div', 'sv-track')
     track.style.height = cfg.scroll.length
-    document.body.appendChild(track)
+    add(track)
 
     /* ---- loader ---- */
     let loader = null, loadbar = null, loadmsg = null
@@ -523,7 +545,7 @@
       loader.appendChild(loadbar)
       loadmsg = el('div', 'sv-loadmsg', cfg.loader.message + ' — 0%')
       loader.appendChild(loadmsg)
-      document.body.appendChild(loader)
+      add(loader)
     }
     const loadbarI = loadbar && loadbar.querySelector('i')
     function setLoad (p, msg) {
@@ -558,13 +580,84 @@
        there are stills. With no clips at all, span the whole set. */
     const stillSpans = Math.max(1, stills.length - 1)
 
+    /* --- frame sequence: the good path ---------------------------------- */
+    const seq = { urls: [], imgs: [], loaded: 0, ready: false }
+    if (cfg.media.frames) {
+      const f = cfg.media.frames
+      if (Array.isArray(f)) seq.urls = f.slice()
+      else if (Array.isArray(f.urls)) seq.urls = f.urls.slice()
+      else if (f.pattern && f.count) {
+        const from = f.from == null ? 0 : f.from
+        for (let i = 0; i < f.count; i++) {
+          seq.urls.push(f.pattern.replace('{i}', String(from + i).padStart(f.pad || 0, '0')))
+        }
+      }
+      seq.imgs = new Array(seq.urls.length)
+    }
+
+    /* Coarse to fine: every 16th frame, then every 8th, and so on. The scrub is
+       usable after the first pass and simply sharpens from there — far better
+       than a progress bar that holds the whole page hostage. */
+    function loadSequence () {
+      const n = seq.urls.length
+      if (!n) return
+      const order = []
+      const seen = new Set()
+      for (let stride = Math.max(1, 1 << Math.floor(Math.log2(Math.max(2, n / 8)))); stride >= 1; stride >>= 1) {
+        for (let i = 0; i < n; i += stride) if (!seen.has(i)) { seen.add(i); order.push(i) }
+      }
+      for (let i = 0; i < n; i++) if (!seen.has(i)) { seen.add(i); order.push(i) }
+
+      let cursor = 0, inFlight = 0
+      const CONCURRENCY = 6
+      function pump () {
+        while (inFlight < CONCURRENCY && cursor < order.length) {
+          const i = order[cursor++]
+          inFlight++
+          const im = new Image()
+          im.decoding = 'async'
+          if (cfg.media.crossOrigin) im.crossOrigin = cfg.media.crossOrigin
+          const done = () => {
+            inFlight--
+            seq.loaded++
+            if (!seq.ready && seq.loaded >= Math.min(n, Math.ceil(n / 8) + 1)) {
+              seq.ready = true
+              finishLoader()
+            }
+            setLoad(seq.loaded / n, `${cfg.loader.message} — ${Math.round(seq.loaded / n * 100)}%`)
+            if (seq.loaded === n) finishLoader()
+            drawCurrent()
+            pump()
+          }
+          im.onload = () => { seq.imgs[i] = im; done() }
+          im.onerror = done
+          im.src = seq.urls[i]
+        }
+      }
+      pump()
+    }
+
+    /* Nearest frame that has actually arrived. During the coarse pass that may
+       be a few frames off; it is never a blank screen. */
+    function drawSequence (p) {
+      const n = seq.urls.length
+      if (!n) return false
+      const want = Math.round(clamp(p, 0, 1) * (n - 1))
+      for (let r = 0; r <= n; r++) {
+        const a = seq.imgs[want - r], b = seq.imgs[want + r]
+        if (a) return drawSrc(a)
+        if (b) return drawSrc(b)
+      }
+      return false
+    }
+
     function sizeCanvas () {
       const dpr = Math.min(devicePixelRatio || 1, 2)
       canvas.width = innerWidth * dpr
       canvas.height = innerHeight * dpr
     }
     sizeCanvas()
-    addEventListener('resize', () => { sizeCanvas(); drawCurrent() })
+    on(window, 'resize', () => { sizeCanvas(); drawCurrent() })
 
     function fitRect (sw, sh) {
       const cw = canvas.width, ch = canvas.height
@@ -604,7 +697,7 @@
           }
         } catch (e) {}
       })
-      document.body.appendChild(v)
+      add(v)
       v.load()
       slot.video = v
       return v
@@ -640,7 +733,7 @@
       console.warn('[scroll-video] no tier decoded. h264:', h264, '| hevc:', hevc, '| MediaError:', err)
       setLoad(1, 'Keyframe mode')
       if (stills.length) {
-        document.body.appendChild(el('div', 'sv-hud sv-fallback-note', 'VIDEO FEED UNAVAILABLE — KEYFRAME MODE'))
+        add(el('div', 'sv-hud sv-fallback-note', 'VIDEO FEED UNAVAILABLE — KEYFRAME MODE'))
       }
       setTimeout(finishLoader, 2000)
     }
@@ -655,7 +748,7 @@
          it the canvas is tainted and we quietly stay on seek-scrubbing. */
       if (cfg.media.crossOrigin) v.crossOrigin = cfg.media.crossOrigin
       v.src = url
-      document.body.appendChild(v)
+      add(v)
       const off = document.createElement('canvas')
       const octx = off.getContext('2d')
       const step = 1 / Math.max(0.5, cfg.media.bakeFps)
@@ -746,6 +839,7 @@
       }
     }
     function drawCurrent () {
+      if (seq.urls.length) { if (drawSequence(lastP)) return }
       if (frames.done && drawFrames(lastP)) return
       const slot = clips[activeClip]
       if (slot && slot.ready && (slot.video.readyState >= 2 || slot.everReady)) {
@@ -760,7 +854,10 @@
       poster.onload = () => { if (!anyReady && !frames.done) drawSrc(poster) }
     }
 
-    if (TIERS.length) {
+    if (seq.urls.length) {
+      loadSequence()
+      setTimeout(finishLoader, cfg.loader.timeout)
+    } else if (TIERS.length) {
       startTier(TIERS[0])
       setTimeout(finishLoader, cfg.loader.timeout)
     } else {
@@ -858,17 +955,19 @@
       return max > 0 ? clamp(scrollY / max, 0, 1) : 0
     }
     let targetP = scrollP(), curP = targetP
-    addEventListener('scroll', () => { targetP = scrollP() }, { passive: true })
-    addEventListener('resize', () => { targetP = scrollP() })
+    on(window, 'scroll', () => { targetP = scrollP() }, { passive: true })
+    on(window, 'resize', () => { targetP = scrollP() })
 
     const ease = reduced ? 1 : clamp(cfg.scroll.smoothing, 0.01, 1)
 
+    let raf = 0, dead = false
     function tick () {
-      requestAnimationFrame(tick)
+      if (dead) return
+      raf = requestAnimationFrame(tick)
       curP += (targetP - curP) * ease
       lastP = curP
 
-      if (!frames.done && nClips) {
+      if (!seq.urls.length && !frames.done && nClips) {
         const f = clamp(curP, 0, 0.999999) * nClips
         const idx = Math.floor(f)
         activeClip = idx
@@ -901,9 +1000,21 @@
     hud(0)
     panels(0)
     drawCurrent()
-    requestAnimationFrame(tick)
+    raf = requestAnimationFrame(tick)
 
-    return { config: cfg, redraw: drawCurrent, progress: () => curP }
+    function destroy () {
+      dead = true
+      cancelAnimationFrame(raf)
+      listeners.forEach(([t, type, fn, opts]) => t.removeEventListener(type, fn, opts))
+      listeners.length = 0
+      owned.forEach((n) => n.remove())
+      owned.length = 0
+      frameCache.forEach((v) => { if (v && v.close) v.close() })
+      frameCache.clear()
+      document.body.classList.remove('sv-body')
+    }
+
+    return { config: cfg, redraw: drawCurrent, progress: () => curP, destroy }
   }
 
   global.ScrollVideo = { mount, DEFAULTS, format: fmt }

@@ -5,7 +5,7 @@ step required to look at it, and a script that flattens it into a single droppab
 
 | | |
 |---|---|
-| [`scroll-video/`](./scroll-video) | A scroll-scrubbed film behind pinned type, with an instrument HUD. Brand, copy, colours, fonts, footage and the units on the readout all come from one config file. |
+| [`scroll-video/`](./scroll-video) | A scroll-scrubbed film behind pinned type, with an instrument HUD. Brand, copy, colours, fonts, footage and the units on the readout all come from one config file — written by hand, or built in [`scroll-video/studio/`](./scroll-video/studio), which asks a client the questions, cuts their video into frames in the browser, and exports a folder you can upload. |
 
 They share nothing with the Loft app in `src/` — they are static, dependency-free, and meant
 to be copied out.

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll Video Studio</title>
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-left">
+    <span class="mark">◐</span>
+    <input id="project-name" class="name" spellcheck="false" aria-label="Project name">
+  </div>
+  <div class="bar-right">
+    <span id="saved" class="saved"></span>
+    <button id="btn-new" class="btn">New</button>
+    <button id="btn-open" class="btn">Open…</button>
+    <button id="btn-save" class="btn">Save file</button>
+    <button id="btn-export" class="btn btn-go">Export site</button>
+  </div>
+</header>
+
+<main class="split">
+  <section id="form" class="form" aria-label="Site settings"></section>
+
+  <section class="stage">
+    <div class="stage-bar">
+      <div class="seg" role="group" aria-label="Preview size">
+        <button class="seg-b is-on" data-device="desktop">Desktop</button>
+        <button class="seg-b" data-device="phone">Phone</button>
+      </div>
+      <label class="scrub">
+        <span>Scroll</span>
+        <input id="scrub" type="range" min="0" max="1000" value="0">
+        <output id="scrub-out">0%</output>
+      </label>
+      <button id="btn-reload" class="btn btn-quiet" title="Rebuild the preview">Reload</button>
+    </div>
+    <div id="frame-wrap" class="frame-wrap">
+      <iframe id="preview" src="preview.html" title="Live preview"></iframe>
+    </div>
+  </section>
+</main>
+
+<input type="file" id="file-open" accept="application/json,.json" hidden>
+
+<div id="busy" class="busy" hidden>
+  <div class="busy-card">
+    <div id="busy-title">Working</div>
+    <div class="busy-bar"><i id="busy-fill"></i></div>
+    <div id="busy-note" class="busy-note"></div>
+  </div>
+</div>
+
+<script type="module" src="studio.js"></script>
+</body>
+</html>

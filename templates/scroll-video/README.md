@@ -13,11 +13,41 @@ Two presets ship with it, both running the same engine:
 
 ```bash
 python3 -m http.server 8080      # then open localhost:8080/templates/scroll-video/
+                                 #      and    …/templates/scroll-video/studio/
 node build.mjs                   # one self-contained .html per preset, into dist/
 node build.mjs abyssal           # just one
 ```
 
-The template needs a server — `file://` blocks the video reads the frame baker depends on.
+Both the template and the studio need a server — `file://` blocks the media reads they depend on.
+
+## Studio — building a site without editing a file
+
+`studio/` is a browser app for making one of these for a client. It asks what they do,
+takes their logo and their footage, and hands back a folder you can upload.
+
+| | |
+|---|---|
+| **Trade** | picks a scheme, a type pairing, the units on the readout and a story skeleton |
+| **Brand** | name, tagline, logo, page title and social tags |
+| **Colour** | five wells, or pull the palette straight out of the logo or a frame of the film — with live contrast ratios |
+| **Film** | drop a video and it is cut into frames *on your machine*, or drop a sequence you already have |
+| **Instrument** | the readout's units and range, the rail, the cue, the corner blocks — including live cells that read the value, the percentage or the zone |
+| **Journey** | how scroll position maps to the number, zone by zone |
+| **Panels** | eyebrow, heading, body, spec grid, big lines, button, fine print |
+
+The preview beside the form is the real engine on the real config, re-mounted on every edit
+and holding its scroll position, with a scrubber so you can sit at 60% while you write the
+copy for it.
+
+**Export** gives you a zip: one `index.html` with the styles, the engine and the config
+inlined, and `frames/` beside it. Upload the folder anywhere static. Or export the config
+alone and drop it into `presets/` to run against a shared copy of the engine — the right
+choice once you are running several client sites off one template.
+
+Nothing is uploaded anywhere. The video becomes an object URL, the frames are cut with a
+canvas, and the zip is assembled in memory. Your work in progress is kept in `localStorage`
+and the frames in IndexedDB, so a reload does not cost you a re-cut — but **Save file** is
+what makes a project portable.
 
 ## The three files
 
@@ -53,13 +83,33 @@ number from 0 to 1. That number drives four things at once:
 Scroll position is eased toward (`scroll.smoothing`), so a flick of the wheel glides instead
 of snapping. `prefers-reduced-motion` turns the easing off and stops the cue animation.
 
-### Sources degrade rather than fail
+### Frames, not video
+
+**A frame sequence is the right source, and video is the fallback.** Given
+`media.frames`, the engine draws still images and nothing else: no seeking, no codec to
+negotiate, no autoplay policy, no `playsinline` quirk, and identical behaviour in every
+browser. Scrubbing a video element instead means asking it to seek sixty times a second,
+which no browser does well — which is why the video path *bakes the film to frames at load
+time anyway*. `media.frames` is that same work, done properly at build time.
+
+The trade is bytes: frames have no interframe compression, so 150 WebP frames at 1440px run
+roughly 6–14 MB against 3–6 MB for the equivalent MP4. That is the price of a scrub that
+actually tracks the scroll. Keep the count near 150 and the width at 1440 and it stays
+comfortable; the studio shows you the weight as you go.
+
+Frames load **coarse to fine** — every 16th, then every 8th, and so on — so the page is
+scrubbable within a second or two and simply sharpens from there, rather than holding
+everything behind one progress bar. The engine draws the nearest frame that has arrived, so
+there is no state in which the screen is blank.
+
+### The video path, when you only have a video
 
 `media.tiers` is an ordered list of fallbacks and the first one that **decodes** wins — not
 the first that downloads. A tier is either one URL (a stitched film) or an array of clips
-whose end and start frames match, so the hand-off between them is invisible. If every tier
-fails — an old browser, no H.264 — the page runs on crossfaded `media.keyframes` and stays
-fully scroll-driven. There is no state in which the page is blank.
+whose end and start frames match, so the hand-off between them is invisible. A single-URL
+tier is played through once offscreen at 4× and captured to frames, after which it scrubs
+like a sequence. If every tier fails — an old browser, no H.264 — the page runs on
+crossfaded `media.keyframes` and stays fully scroll-driven.
 
 ## Config reference
 
@@ -142,7 +192,8 @@ and `grade` — `[[progress, colour], …]` stops interpolated as you travel.
 
 | key | |
 |---|---|
-| `tiers` | ordered fallbacks; each is a URL or an array of clip URLs |
+| `frames` | **the preferred source.** An array of URLs, or `{ pattern: 'frames/f-{i}.webp', count: 180, pad: 4, from: 1 }`. When set, `tiers` is never touched |
+| `tiers` | fallback for when you only have a video; ordered, each a URL or an array of clip URLs |
 | `keyframes` | boundary stills, shown while the film loads and crossfaded if none decodes |
 | `poster` | first frame, painted immediately |
 | `bake` `bakeFps` `bakeWidth` `bakeQuality` | the background frame bake |
@@ -186,10 +237,12 @@ prevents the default navigation.
 
 ## Notes for authoring the film
 
-- **One stitched file beats several.** The bake only runs on a single-URL tier, and the bake
-  is what makes the scrub smooth.
+- **Ship frames.** Cut them in the studio, or with ffmpeg:
+  `ffmpeg -i film.mp4 -vf "fps=12,scale=1440:-2" -q:v 5 frames/f-%04d.webp`
 - **Shoot for the scroll, not for playback.** Continuous motion in one direction; no cuts,
   no camera moves that reverse. The viewer controls the speed and will run it backwards.
+- **Around 150 frames.** Below about 90 the motion steps; above 220 you are paying real
+  bytes for motion nobody can see at scroll speed.
 - **Keyframes are the film's own boundary frames**, not separate art — that is what makes
-  the fallback look deliberate rather than broken.
-- Keep it under about 25 MB. It is downloaded before anything moves.
+  the video fallback look deliberate rather than broken.
+- Watch the total weight. It downloads before anything moves.

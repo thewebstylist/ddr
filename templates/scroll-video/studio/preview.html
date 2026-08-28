@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview</title>
+<link rel="stylesheet" href="../template.css">
+</head>
+<body>
+<script src="../template.js"></script>
+<script>
+/* The studio sends config as JavaScript source rather than a structured clone,
+   because a config may legitimately contain functions — a live HUD reading is
+   one. The same serialiser writes the exported preset, so what you see here is
+   literally the file that ships. */
+let handle = null
+
+addEventListener('message', (e) => {
+  const msg = e.data || {}
+  if (msg.type === 'config') {
+    const max0 = document.documentElement.scrollHeight - innerHeight
+    const frac = max0 > 0 ? scrollY / max0 : 0
+    let cfg
+    try {
+      cfg = new Function('return (' + msg.source + ')')()
+    } catch (err) {
+      parent.postMessage({ type: 'preview-error', message: String(err) }, '*')
+      return
+    }
+    if (handle) handle.destroy()
+    handle = ScrollVideo.mount(cfg)
+    requestAnimationFrame(() => {
+      const max = document.documentElement.scrollHeight - innerHeight
+      scrollTo(0, max * (msg.keepScroll === false ? 0 : frac))
+      parent.postMessage({ type: 'preview-mounted' }, '*')
+    })
+  }
+  if (msg.type === 'scrollTo') {
+    const max = document.documentElement.scrollHeight - innerHeight
+    scrollTo(0, max * msg.frac)
+  }
+})
+
+addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - innerHeight
+  parent.postMessage({ type: 'preview-scroll', frac: max > 0 ? scrollY / max : 0 }, '*')
+}, { passive: true })
+
+parent.postMessage({ type: 'preview-ready' }, '*')
+</script>
+</body>
+</html>
