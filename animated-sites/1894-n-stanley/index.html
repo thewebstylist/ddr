@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1894 N Stanley Avenue — Above the Sunset Strip</title>
+<meta name="description" content="A private film of 1894 N Stanley Avenue. Five rooms, one ridgeline, and the whole of Los Angeles below.">
+<meta property="og:title" content="1894 N Stanley Avenue">
+<meta property="og:description" content="Above the Sunset Strip. A private film.">
+<meta name="theme-color" content="#0a0908">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0908'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23c86a34' text-anchor='middle'%3E1%3C/text%3E%3C/svg%3E">
+<style>
+@property --sc{syntax:'<number>';inherits:false;initial-value:1.14}
+@property --py{syntax:'<length>';inherits:false;initial-value:0px}
+:root{
+  --ink:#0a0908;
+  --ink-lift:#131110;
+  --charcoal:#1a1715;
+  --warm-white:#f2ede4;
+  --warm-white-dim:#c9c1b4;
+  --concrete:#a49b8e;
+  --concrete-dim:#7d7468;
+  --stone:#514639;
+  --copper:#c86a34;
+  --copper-bright:#e08542;
+  --copper-glow:rgba(200,106,52,.42);
+  --copper-soft:rgba(200,106,52,.09);
+  --dusk:#2c4a72;
+  --heading:'Cormorant Garamond','Playfair Display',Georgia,serif;
+  --body:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ink);color:var(--warm-white);
+  font-family:var(--body);font-weight:300;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+
+/* ---------- shared type ---------- */
+.overline{
+  font-family:var(--body);font-size:9px;font-weight:500;
+  letter-spacing:.34em;text-transform:uppercase;color:var(--copper);
+  margin:0 0 18px;
+}
+.numeral{
+  font-family:var(--body);font-size:10px;font-weight:500;
+  letter-spacing:.42em;text-transform:uppercase;color:var(--copper);
+  margin:0 0 14px;
+}
+.display{
+  font-family:var(--heading);font-weight:300;line-height:.98;
+  letter-spacing:-.005em;margin:0;color:var(--warm-white);
+  font-size:clamp(44px,6.2vw,92px);
+}
+.display .it{font-style:italic;display:block;color:var(--warm-white-dim)}
+.subcap{
+  font-size:9.5px;font-weight:400;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--concrete);margin:20px 0 0;
+}
+.lede{
+  font-size:15px;line-height:1.75;color:var(--warm-white-dim);
+  max-width:42ch;margin:20px 0 0;font-weight:300;
+}
+
+/* ---------- ambient layers ---------- */
+.grain{
+  position:fixed;inset:-50%;z-index:100;pointer-events:none;opacity:.038;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='256' height='256' filter='url(%23n)'/></svg>");
+  animation:grainshift 7s steps(6) infinite;
+}
+@keyframes grainshift{
+  0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}
+  60%{transform:translate(-2%,-2%)}80%{transform:translate(3%,1%)}100%{transform:translate(0,0)}
+}
+.vignette{
+  position:fixed;inset:0;z-index:99;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%,transparent 42%,rgba(10,9,8,.30) 74%,rgba(10,9,8,.62) 100%);
+}
+#particles{position:fixed;inset:0;z-index:15;pointer-events:none;opacity:.42}
+
+/* ---------- cursor ---------- */
+#cursor-dot,#cursor-ring{position:fixed;top:0;left:0;pointer-events:none;border-radius:50%;
+  transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+#cursor-dot{width:5px;height:5px;background:#fff;z-index:9998;mix-blend-mode:difference}
+#cursor-ring{width:34px;height:34px;border:1px solid rgba(242,237,228,.32);z-index:9997;
+  transition:width .32s var(--ease),height .32s var(--ease),border-color .32s,box-shadow .32s,opacity .3s}
+#cursor-ring.hot{width:54px;height:54px;border-color:var(--copper);box-shadow:0 0 22px var(--copper-glow)}
+@media(hover:none),(max-width:900px){#cursor-dot,#cursor-ring{display:none}}
+
+/* ---------- loader ---------- */
+#loader{
+  position:fixed;inset:0;z-index:9999;background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 1.1s var(--ease),filter 1.1s var(--ease);
+}
+#loader.done{opacity:0;filter:blur(9px);pointer-events:none}
+.ld-rule{width:1px;height:52px;background:linear-gradient(var(--stone),transparent)}
+.ld-rule.btm{background:linear-gradient(transparent,var(--stone))}
+.ld-mark{
+  font-family:var(--heading);font-size:19px;font-weight:300;letter-spacing:.52em;
+  text-transform:uppercase;color:var(--warm-white);margin:26px 0;padding-left:.52em;
+}
+.ld-bar{width:140px;height:1px;background:rgba(242,237,228,.10);margin:30px 0 14px;overflow:hidden}
+.ld-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--copper),var(--copper-bright));
+  transition:width .35s var(--ease)}
+.ld-pct{font-size:9px;letter-spacing:.34em;color:var(--concrete-dim)}
+
+/* ---------- top bar ---------- */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  background:linear-gradient(to bottom,rgba(10,9,8,.78) 0%,rgba(10,9,8,.42) 55%,transparent 100%);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:26px clamp(22px,4vw,56px);
+  opacity:0;transform:translateY(-10px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease);
+  pointer-events:none;
+}
+#topbar.show{opacity:1;transform:none;pointer-events:auto}
+.tb-mark{font-family:var(--heading);font-size:13px;letter-spacing:.44em;text-transform:uppercase;
+  color:var(--warm-white);padding-left:.44em}
+.tb-cta{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--concrete);
+  border:1px solid rgba(242,237,228,.14);padding:10px 18px;transition:.4s var(--ease);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tb-cta:hover{color:var(--warm-white);border-color:var(--copper);background:var(--copper-soft)}
+
+/* ---------- animation stage ---------- */
+#stage{position:relative;height:720vh}
+.sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+#frames{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;background:var(--ink)}
+.ov{position:absolute;inset:0;z-index:1;pointer-events:none}
+.ov.left{background:linear-gradient(100deg,rgba(10,9,8,.86) 0%,rgba(10,9,8,.55) 26%,rgba(10,9,8,.10) 52%,transparent 72%)}
+.ov.btm{background:linear-gradient(to top,rgba(10,9,8,.88) 0%,rgba(10,9,8,.40) 22%,transparent 46%)}
+.ov.top{background:linear-gradient(to bottom,rgba(10,9,8,.55) 0%,transparent 22%)}
+.ov.cta{z-index:6;opacity:0;transition:opacity .9s var(--ease);background:radial-gradient(ellipse at 50% 48%,rgba(10,9,8,.84) 0%,rgba(10,9,8,.74) 46%,rgba(10,9,8,.52) 100%)}
+.ov.cta.on{opacity:1}
+.ov.left{transition:opacity .9s var(--ease)}
+.ov.left.off{opacity:0}
+#tint{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:.07;mix-blend-mode:screen;
+  transition:background 1.2s linear}
+
+/* ---------- scroll text ---------- */
+.st{
+  position:fixed;z-index:10;pointer-events:none;
+  left:clamp(22px,6vw,84px);bottom:clamp(84px,13vh,132px);
+  max-width:min(560px,80vw);
+  opacity:0;transform:translateX(-22px);filter:blur(7px);
+  transition:opacity .95s var(--ease),transform .95s var(--ease),filter .95s var(--ease);
+}
+.st.visible{opacity:1;transform:none;filter:blur(0)}
+.st.center{
+  left:50%;right:auto;bottom:auto;top:50%;
+  transform:translate(-50%,-46%);text-align:center;max-width:min(760px,86vw);
+}
+.st.center.visible{transform:translate(-50%,-50%)}
+.st.visible a,.st.visible button{pointer-events:auto}
+
+/* hero */
+.hero-eyebrow{
+  font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:var(--copper);margin:0 0 26px;
+}
+.split span{display:inline-block;opacity:0;transform:translateY(26px);
+  transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.split.go span{opacity:1;transform:none}
+
+/* stat bar */
+.stats{
+  display:flex;gap:0;margin-top:34px;flex-wrap:wrap;
+  background:rgba(242,237,228,.03);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(242,237,228,.07);
+}
+.stat{padding:16px 24px;border-right:1px solid rgba(242,237,228,.07);min-width:92px}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-family:var(--heading);font-size:26px;font-weight:300;
+  color:var(--warm-white);line-height:1}
+.stat i{display:block;font-style:normal;font-size:8px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--concrete-dim);margin-top:8px}
+
+/* vision */
+.quote-mark{font-family:var(--heading);font-size:96px;line-height:.4;color:var(--stone);
+  display:block;margin-bottom:8px}
+.quote{font-family:var(--heading);font-style:italic;font-weight:300;
+  font-size:clamp(24px,3vw,40px);line-height:1.32;color:var(--warm-white);margin:0}
+.q-rule{width:56px;height:1px;background:var(--copper);margin:28px 0 16px}
+.q-attr{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--concrete-dim)}
+
+/* feature list */
+.flist{list-style:none;padding:0;margin:26px 0 0}
+.flist li{display:flex;align-items:baseline;gap:14px;padding:11px 0;
+  border-bottom:1px solid rgba(242,237,228,.07);font-size:13.5px;color:var(--warm-white-dim)}
+.flist li:last-child{border-bottom:0}
+.flist svg{flex:0 0 auto;width:16px;height:16px;stroke:var(--copper);fill:none;
+  stroke-width:1.6;transform:translateY(2px)}
+
+/* amenity grid */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:26px;
+  background:rgba(242,237,228,.07);border:1px solid rgba(242,237,228,.07)}
+.acell{background:rgba(20,18,16,.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  padding:18px 20px;transition:background .4s var(--ease)}
+.acell:hover{background:rgba(200,106,52,.10)}
+.acell h4{margin:0 0 6px;font-family:var(--body);font-size:11px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--warm-white)}
+.acell p{margin:0;font-size:12px;line-height:1.55;color:var(--concrete)}
+
+/* context list */
+.dlist{list-style:none;padding:0;margin:24px 0 0}
+.dlist li{display:flex;align-items:baseline;gap:10px;padding:9px 0;font-size:13px;color:var(--warm-white-dim)}
+.dlist .dot{flex:1;border-bottom:1px dotted rgba(242,237,228,.20);transform:translateY(-4px)}
+.dlist .val{color:var(--concrete);font-size:11.5px;letter-spacing:.1em}
+
+/* cta */
+.btns{display:flex;gap:14px;justify-content:center;margin-top:34px;flex-wrap:wrap}
+.btn{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;padding:15px 34px;
+  border:1px solid var(--copper);transition:.42s var(--ease);cursor:pointer;
+  font-family:var(--body);font-weight:400}
+.btn.solid{background:var(--copper);color:#120c07}
+.btn.solid:hover{background:var(--copper-bright);border-color:var(--copper-bright);
+  box-shadow:0 0 34px var(--copper-glow)}
+.btn.ghost{background:transparent;color:var(--warm-white);border-color:rgba(242,237,228,.22)}
+.btn.ghost:hover{border-color:var(--copper);color:var(--copper-bright);background:var(--copper-soft)}
+.agent{margin-top:38px;padding-top:26px;border-top:1px solid rgba(242,237,228,.09);
+  font-size:11px;letter-spacing:.14em;color:var(--concrete-dim);line-height:2}
+.agent b{display:block;font-family:var(--heading);font-size:17px;font-weight:400;
+  letter-spacing:.04em;color:var(--warm-white);margin-bottom:4px}
+
+/* ---------- chapter progress (bottom right) ---------- */
+#chapters{
+  position:fixed;right:clamp(22px,4vw,56px);bottom:clamp(30px,5vh,46px);z-index:50;
+  display:flex;align-items:center;gap:9px;opacity:0;transition:opacity .8s var(--ease)
+}
+#chapters.show{opacity:1}
+.seg{position:relative;width:clamp(22px,3vw,42px);height:1px;background:rgba(242,237,228,.17)}
+.seg .fill{position:absolute;inset:0;width:0%;background:var(--copper);
+  box-shadow:0 0 9px var(--copper-glow)}
+.seg .lbl{position:absolute;bottom:14px;right:0;font-size:8px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--concrete-dim);white-space:nowrap;opacity:0;
+  transition:opacity .4s}
+.seg.active .lbl{opacity:1;color:var(--copper)}
+
+/* scroll hint */
+#hint{
+  pointer-events:none;
+  position:fixed;left:50%;transform:translateX(-50%);bottom:clamp(28px,4.5vh,42px);z-index:50;
+  font-size:8.5px;letter-spacing:.42em;text-transform:uppercase;color:var(--concrete-dim);
+  transition:opacity .6s;padding-left:.42em
+}
+#hint.hide{opacity:0}
+#hint::after{content:'';display:block;width:1px;height:0;background:var(--copper);
+  margin:9px auto 0;animation:drip 2.3s var(--ease) infinite}
+@keyframes drip{0%{height:0;opacity:0}35%{height:16px;opacity:1}100%{height:16px;opacity:0}}
+
+/* ---------- gallery ---------- */
+#gallery{position:relative;z-index:20;background:var(--ink);
+  padding:clamp(80px,12vh,150px) clamp(22px,5vw,72px) clamp(60px,9vh,110px)}
+.g-head{max-width:640px;margin:0 0 clamp(38px,6vh,66px)}
+.g-head h2{font-family:var(--heading);font-weight:300;font-size:clamp(32px,4.4vw,60px);
+  margin:0;line-height:1.05}
+.g-head h2 em{font-style:italic;color:var(--warm-white-dim)}
+.g-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.1vw,16px);
+  grid-auto-rows:clamp(120px,17vh,190px)}
+.g-item{position:relative;overflow:hidden;background:var(--charcoal);
+  opacity:0;transform:translateY(34px);
+  transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.g-item.in{opacity:1;transform:none}
+.g-item.tall{grid-row:span 2}
+.g-item img{width:100%;height:100%;object-fit:cover;will-change:transform;
+  transform:translate3d(0,var(--py,0px),0) scale(var(--sc,1.14));
+  transition:--sc 1.1s var(--ease)}
+.g-item:hover img{--sc:1.20}
+.g-cap{position:absolute;left:0;bottom:0;right:0;padding:16px 18px;
+  background:linear-gradient(to top,rgba(10,9,8,.82),transparent);
+  font-size:8.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--warm-white-dim)}
+
+/* ---------- footer ---------- */
+footer{background:var(--ink-lift);padding:clamp(52px,8vh,84px) clamp(22px,5vw,72px);
+  position:relative;z-index:20;border-top:1px solid rgba(242,237,228,.06)}
+.f-row{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+.f-mark{font-family:var(--heading);font-size:22px;font-weight:300;letter-spacing:.30em;
+  text-transform:uppercase;color:var(--warm-white);padding-left:.30em}
+.f-legal{font-size:10px;line-height:2;color:var(--concrete-dim);max-width:52ch}
+.f-legal a:hover{color:var(--copper)}
+
+/* ---------- responsive ---------- */
+@media(max-width:900px){
+  #stage{height:620vh}
+  .ov.left{background:linear-gradient(to top,rgba(10,9,8,.90) 0%,rgba(10,9,8,.42) 38%,transparent 66%)}
+  .st{bottom:clamp(70px,11vh,100px);max-width:none;right:clamp(22px,6vw,84px)}
+  .stats{flex-wrap:wrap}
+  .stat{flex:1 1 40%;border-right:0;border-top:1px solid rgba(242,237,228,.07);padding:13px 16px}
+  .stat:nth-child(-n+2){border-top:0}
+  .agrid{grid-template-columns:1fr}
+  .g-grid{grid-template-columns:repeat(2,1fr)}
+  .seg{width:16px}
+  .seg .lbl{display:none}
+}
+@media(max-width:560px){
+  #topbar{padding:18px 20px}
+  .tb-mark{font-size:10.5px;letter-spacing:.26em;padding-left:.26em}
+  .tb-cta{font-size:8px;letter-spacing:.2em;padding:9px 12px}
+
+  .g-grid{grid-template-columns:1fr;grid-auto-rows:clamp(160px,26vh,230px)}
+  .g-item.tall{grid-row:span 1}
+  .btns{flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;transition-duration:.001ms!important}
+  #particles,.grain{display:none}
+}
+html.rm #stage{height:auto}
+html.rm .sticky{position:relative;height:72vh}
+html.rm .ov,html.rm #tint,html.rm #chapters,html.rm #hint{display:none}
+html.rm .st{position:relative;left:auto;right:auto;top:auto;bottom:auto;
+  transform:none;filter:none;opacity:1;max-width:none;pointer-events:auto;
+  padding:clamp(38px,7vh,76px) clamp(22px,6vw,84px);background:var(--ink)}
+html.rm .st.center,html.rm .st.center.visible{left:auto;transform:none;text-align:left;max-width:none}
+html.rm .st.center .lede{margin-left:0;text-align:left}
+html.rm .st.center .btns{justify-content:flex-start}
+html.rm .split span{opacity:1;transform:none}
+html.rm .stats,html.rm .flist,html.rm .agrid,html.rm .dlist{max-width:620px}
+
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<canvas id="particles" aria-hidden="true"></canvas>
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+
+<div id="loader">
+  <div class="ld-rule"></div>
+  <div class="ld-mark">1894 N Stanley</div>
+  <div class="ld-rule btm"></div>
+  <div class="ld-bar"><div class="ld-fill" id="ld-fill"></div></div>
+  <div class="ld-pct"><span id="ld-pct">0</span>%</div>
+</div>
+
+<header id="topbar">
+  <div class="tb-mark">1894 N Stanley</div>
+  <a class="tb-cta" href="#inquire">Private Showing</a>
+</header>
+
+<nav id="chapters" aria-label="Chapters"></nav>
+<div id="hint">Scroll</div>
+
+<section id="stage">
+  <div class="sticky">
+    <canvas id="frames"></canvas>
+    <div class="ov top" aria-hidden="true"></div>
+    <div class="ov left" aria-hidden="true"></div>
+    <div class="ov btm" aria-hidden="true"></div>
+    <div class="ov cta" id="cta-scrim" aria-hidden="true"></div>
+    <div id="tint" aria-hidden="true"></div>
+  </div>
+
+  <!-- I — HERO -->
+  <div class="st" id="st-1" data-show="0.00" data-hide="0.132">
+    <p class="hero-eyebrow">A Private Film &middot; Scroll to Move</p>
+    <h1 class="display split" data-split>1894 N Stanley<span class="it" data-split-it>Avenue</span></h1>
+    <div class="stats">
+      <div class="stat"><b data-count="5">0</b><i>Bedrooms</i></div>
+      <div class="stat"><b data-count="7">0</b><i>Baths</i></div>
+      <div class="stat"><b data-count="9000" data-fmt="comma">0</b><i>Sq Ft</i></div>
+      <div class="stat"><b data-count="180" data-suffix="&deg;">0</b><i>City View</i></div>
+    </div>
+  </div>
+
+  <!-- II — ARRIVAL -->
+  <div class="st" id="st-2" data-show="0.225" data-hide="0.358">
+    <p class="numeral">II</p>
+    <h2 class="display">Arrival</h2>
+    <p class="subcap">The Night Motor Court</p>
+    <p class="lede">A cantilevered ceiling of warm slatted cedar folds down over the drive.
+      Headlights sweep the pavers, the gate closes, and the city noise stops at the wall.</p>
+  </div>
+
+  <!-- III — THE GREAT ROOM -->
+  <div class="st" id="st-3" data-show="0.435" data-hide="0.548">
+    <p class="numeral">III</p>
+    <h2 class="display">The Great Room</h2>
+    <p class="subcap">Where the House Opens</p>
+    <ul class="flist">
+      <li><svg viewBox="0 0 24 24"><path d="M3 20h18M6 20V9l6-5 6 5v11"/></svg><span>Glass walls that pocket away entirely</span></li>
+      <li><svg viewBox="0 0 24 24"><path d="M4 3h11v18H4zM15 12h5"/></svg><span>Walnut ceilings over travertine floors</span></li>
+      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Indoor and outdoor on a single plane</span></li>
+    </ul>
+  </div>
+
+  <!-- IV — THE HEARTH -->
+  <div class="st" id="st-4" data-show="0.585" data-hide="0.686">
+    <p class="numeral">IV</p>
+    <h2 class="display">The Hearth</h2>
+    <p class="subcap">Dining Beside the Fire</p>
+    <div class="agrid">
+      <div class="acell"><h4>Floating Fire</h4><p>A double-sided hearth set into stone, open to both rooms.</p></div>
+      <div class="acell"><h4>Skyline Frontage</h4><p>Downtown to the ocean across an uninterrupted span.</p></div>
+      <div class="acell"><h4>Seated for Twelve</h4><p>A dining run held between the fire and the glass.</p></div>
+      <div class="acell"><h4>Warm Materials</h4><p>Walnut, travertine, bronze and bookmatched stone.</p></div>
+    </div>
+  </div>
+
+  <!-- V — THE KITCHEN -->
+  <div class="st" id="st-5" data-show="0.722" data-hide="0.858">
+    <p class="numeral">V</p>
+    <h2 class="display">The Kitchen</h2>
+    <p class="subcap">Twin Islands at Last Light</p>
+    <p class="lede">Two full islands in bookmatched stone, a chef's run behind, and a bar
+      that looks straight down the boulevard as the sun goes.</p>
+    <ul class="dlist">
+      <li><span>Sunset Strip</span><span class="dot"></span><span class="val">2 min</span></li>
+      <li><span>Chateau Marmont</span><span class="dot"></span><span class="val">4 min</span></li>
+      <li><span>Beverly Hills</span><span class="dot"></span><span class="val">11 min</span></li>
+      <li><span>Downtown LA</span><span class="dot"></span><span class="val">18 min</span></li>
+    </ul>
+  </div>
+
+  <!-- VI — CTA -->
+  <div class="st center" id="st-6" data-show="0.905" data-hide="1.02">
+    <p class="numeral">VI</p>
+    <h2 class="display">See It <span class="it">After Dark</span></h2>
+    <p class="lede" style="margin-left:auto;margin-right:auto;text-align:center">
+      The film was shot at dusk for a reason. Private showings are arranged by
+      appointment, and the house is best seen at the hour you just watched.</p>
+    <div class="btns">
+      <a class="btn solid" href="#inquire" id="inquire">Request a Showing</a>
+      <a class="btn ghost" href="#gallery">View the Stills</a>
+    </div>
+    <div class="agent">
+      <b>Your Name Here</b>
+      DRE #00000000 &middot; Brokerage Name<br>
+      hello@example.com &middot; (310) 555&ndash;0100
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="g-head">
+    <p class="overline">The Stills</p>
+    <h2>Five rooms, one ridgeline,<br><em>and the whole city below.</em></h2>
+  </div>
+  <div class="g-grid">
+    <div class="g-item tall" data-parallax="-12"><img loading="lazy" src="frames/desktop/frame-0006.webp" alt="The house cantilevered above the infinity pool with the downtown skyline beyond"><div class="g-cap">I &middot; The Outlook</div></div>
+    <div class="g-item" data-parallax="10"><img loading="lazy" src="frames/desktop/frame-0017.webp" alt="Night exterior of the pool deck and lit terraces"><div class="g-cap">The Pool Deck</div></div>
+    <div class="g-item" data-parallax="-9"><img loading="lazy" src="frames/desktop/frame-0037.webp" alt="The slatted cedar volume above the motor court"><div class="g-cap">II &middot; Arrival</div></div>
+    <div class="g-item" data-parallax="11"><img loading="lazy" src="frames/desktop/frame-0056.webp" alt="The motor court and open garage at night"><div class="g-cap">The Motor Court</div></div>
+    <div class="g-item tall" data-parallax="-12"><img loading="lazy" src="frames/desktop/frame-0078.webp" alt="The great room with fire feature open to the city"><div class="g-cap">III &middot; The Great Room</div></div>
+    <div class="g-item" data-parallax="9"><img loading="lazy" src="frames/desktop/frame-0108.webp" alt="Twin stone kitchen islands against the sunset horizon"><div class="g-cap">V &middot; The Kitchen</div></div>
+    <div class="g-item" data-parallax="-10"><img loading="lazy" src="frames/desktop/frame-0134.webp" alt="Dining area beside the fire element at dusk"><div class="g-cap">IV &middot; The Hearth</div></div>
+    <div class="g-item" data-parallax="11"><img loading="lazy" src="frames/desktop/frame-0147.webp" alt="Primary bedroom opening onto the city view"><div class="g-cap">The Primary Suite</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-row">
+    <div class="f-mark">1894 N Stanley</div>
+    <div class="f-legal">
+      Above the Sunset Strip, Los Angeles, California.<br>
+      Film by Sterling Creations. Specifications, dimensions and figures shown are
+      approximate and provided for illustration only &mdash; verify all details independently.
+      Offered in compliance with the Fair Housing Act. Equal Housing Opportunity.
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var MOB = window.matchMedia('(max-width: 900px)').matches;
+var FRAME_COUNT = 150;
+var DIR = MOB ? 'frames/mobile/' : 'frames/desktop/';
+var LERP = 0.085;
+
+/* ---------- custom cursor ---------- */
+if (!MOB && !RM) {
+  var dot = document.getElementById('cursor-dot'), ring = document.getElementById('cursor-ring');
+  var rx = 0, ry = 0, mx = 0, my = 0;
+  window.addEventListener('mousemove', function(e){
+    mx = e.clientX; my = e.clientY;
+    dot.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
+    dot.style.opacity = ring.style.opacity = 1;
+  }, {passive:true});
+  (function ringLoop(){
+    rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
+    ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+    requestAnimationFrame(ringLoop);
+  })();
+  document.addEventListener('mouseover', function(e){
+    ring.classList.toggle('hot', !!e.target.closest('a,button,.acell,.g-item'));
+  });
+}
+
+/* ---------- ambient particles ---------- */
+if (!RM) {
+  var pc = document.getElementById('particles'), px = pc.getContext('2d'), parts = [], pw, ph;
+  function pResize(){
+    pw = pc.width = window.innerWidth; ph = pc.height = window.innerHeight;
+  }
+  pResize(); window.addEventListener('resize', pResize);
+  for (var i = 0; i < 40; i++) parts.push({
+    x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight,
+    r: 0.3 + Math.random()*1.5,
+    vx: (Math.random()-0.5)*0.16, vy: (Math.random()-0.5)*0.16,
+    a: 0.05 + Math.random()*0.30
+  });
+  (function pLoop(){
+    px.clearRect(0,0,pw,ph);
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = pw; if (p.x > pw) p.x = 0;
+      if (p.y < 0) p.y = ph; if (p.y > ph) p.y = 0;
+      px.beginPath(); px.arc(p.x, p.y, p.r, 0, 6.2832);
+      px.fillStyle = 'rgba(242,237,228,' + p.a + ')'; px.fill();
+    }
+    requestAnimationFrame(pLoop);
+  })();
+}
+
+/* ---------- letter split ---------- */
+var splitEl = document.querySelector('[data-split]');
+if (splitEl) {
+  var itEl = splitEl.querySelector('[data-split-it]');
+  var itText = itEl ? itEl.textContent : '';
+  var mainText = splitEl.childNodes[0].textContent;
+  splitEl.innerHTML = '';
+  function pushChars(target, text){
+    for (var i = 0; i < text.length; i++) {
+      var s = document.createElement('span');
+      s.textContent = text[i] === ' ' ? ' ' : text[i];
+      s.style.transitionDelay = (target.__d = (target.__d || 0) + 1) * 0 + 'ms';
+      target.appendChild(s);
+    }
+  }
+  pushChars(splitEl, mainText);
+  if (itText) {
+    var itWrap = document.createElement('span');
+    itWrap.className = 'it';
+    pushChars(itWrap, itText);
+    splitEl.appendChild(itWrap);
+  }
+  var chars = splitEl.querySelectorAll('span:not(.it)');
+  Array.prototype.forEach.call(chars, function(s, i){
+    s.style.transitionDelay = (i * 32) + 'ms';
+  });
+}
+
+/* ---------- scroll dwell engine ---------- */
+var CENTERS = [0.054, 0.291, 0.503, 0.622, 0.780, 0.957];
+var DWELL_WIDTH = 0.040, DWELL_PEAK = 3.4, REMAP_N = 2000;
+var fwd = new Float32Array(REMAP_N + 1), inv = new Float32Array(REMAP_N + 1);
+(function buildLUT(){
+  var acc = 0, i, j;
+  for (i = 0; i <= REMAP_N; i++) {
+    var x = i / REMAP_N, d = 1;
+    for (j = 0; j < CENTERS.length; j++) {
+      var t = (x - CENTERS[j]) / DWELL_WIDTH;
+      d += DWELL_PEAK * Math.exp(-0.5 * t * t);
+    }
+    acc += d; fwd[i] = acc;
+  }
+  var total = fwd[REMAP_N];
+  for (i = 0; i <= REMAP_N; i++) fwd[i] /= total;
+  // invert: for each uniform scroll position, find effective progress
+  var k = 0;
+  for (i = 0; i <= REMAP_N; i++) {
+    var target = i / REMAP_N;
+    while (k < REMAP_N && fwd[k] < target) k++;
+    inv[i] = k / REMAP_N;
+  }
+})();
+function remap(p){
+  if (p <= 0) return 0; if (p >= 1) return 1;
+  var f = p * REMAP_N, i = Math.floor(f), frac = f - i;
+  var a = inv[i], b = inv[Math.min(REMAP_N, i + 1)];
+  return a + (b - a) * frac;
+}
+
+/* ---------- frame loading ---------- */
+var images = new Array(FRAME_COUNT), loaded = 0, ready = false;
+var fill = document.getElementById('ld-fill'), pct = document.getElementById('ld-pct');
+function src(i){ return DIR + 'frame-' + String(i + 1).padStart(4, '0') + '.webp'; }
+function load(i){
+  return new Promise(function(res){
+    var img = new Image();
+    img.decoding = 'async';
+    img.onload = function(){
+      images[i] = img; loaded++;
+      var p = Math.round(loaded / FRAME_COUNT * 100);
+      fill.style.width = p + '%'; pct.textContent = p;
+      res();
+    };
+    img.onerror = function(){ loaded++; res(); };
+    img.src = src(i);
+  });
+}
+function nearest(i){
+  if (images[i]) return images[i];
+  for (var d = 1; d < FRAME_COUNT; d++) {
+    if (images[i-d]) return images[i-d];
+    if (images[i+d]) return images[i+d];
+  }
+  return null;
+}
+
+/* ---------- canvas ---------- */
+var cv = document.getElementById('frames'), ctx = cv.getContext('2d', {alpha:false});
+var cw, ch;
+function resize(){
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cw = window.innerWidth; ch = window.innerHeight;
+  cv.width = cw * dpr; cv.height = ch * dpr;
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw(Math.round(cur));
+}
+function draw(i){
+  var img = nearest(i);
+  if (!img) return;
+  var ir = img.width / img.height, cr = cw / ch, dw, dh, dx, dy;
+  if (cr > ir) { dw = cw; dh = cw / ir; dx = 0; dy = (ch - dh) / 2; }
+  else { dh = ch; dw = ch * ir; dy = 0; dx = (cw - dw) / 2; }
+  ctx.drawImage(img, dx, dy, dw, dh);
+}
+window.addEventListener('resize', resize);
+
+/* ---------- chapter markers ---------- */
+var texts = Array.prototype.slice.call(document.querySelectorAll('.st'));
+var LABELS = ['The Outlook','Arrival','The Great Room','The Hearth','The Kitchen','Inquire'];
+var chapEl = document.getElementById('chapters');
+LABELS.forEach(function(l){
+  var s = document.createElement('div');
+  s.className = 'seg';
+  s.innerHTML = '<div class="fill"></div><div class="lbl">' + l + '</div>';
+  chapEl.appendChild(s);
+});
+var segs = Array.prototype.slice.call(chapEl.children);
+var TINTS = [
+  'linear-gradient(120deg,rgba(44,74,114,.9),rgba(200,106,52,.28))',
+  'linear-gradient(120deg,rgba(200,106,52,.55),rgba(44,74,114,.7))',
+  'linear-gradient(120deg,rgba(60,50,40,.8),rgba(200,106,52,.35))',
+  'linear-gradient(120deg,rgba(200,106,52,.42),rgba(90,70,55,.7))',
+  'linear-gradient(120deg,rgba(224,133,66,.55),rgba(44,74,114,.55))',
+  'linear-gradient(120deg,rgba(44,74,114,.8),rgba(200,106,52,.30))'
+];
+var tintEl = document.getElementById('tint'), lastTint = -1;
+
+/* ---------- main loop ---------- */
+var stage = document.getElementById('stage');
+var ctaScrim = document.getElementById('cta-scrim');
+var leftWash = document.querySelector('.ov.left');
+var cur = 0, hint = document.getElementById('hint'), topbar = document.getElementById('topbar');
+function progress(){
+  var r = stage.getBoundingClientRect();
+  var span = r.height - window.innerHeight;
+  if (span <= 0) return 0;
+  return Math.max(0, Math.min(1, -r.top / span));
+}
+function tick(){
+  var raw = progress(), p = remap(raw);
+  var target = p * (FRAME_COUNT - 1);
+  cur += (target - cur) * LERP;
+  if (Math.abs(target - cur) < 0.01) cur = target;
+  draw(Math.round(cur));
+
+  for (var i = 0; i < texts.length; i++) {
+    var el = texts[i];
+    var show = parseFloat(el.dataset.show), hide = parseFloat(el.dataset.hide);
+    var on = p >= show && p < hide;
+    if (on !== el.classList.contains('visible')) {
+      el.classList.toggle('visible', on);
+      if (on && i === 0) {
+        var sp = el.querySelector('.split');
+        if (sp) sp.classList.add('go');
+        countUp(el);
+      }
+    }
+  }
+
+  var ctaOn = texts[5].classList.contains('visible');
+  ctaScrim.classList.toggle('on', ctaOn);
+  leftWash.classList.toggle('off', ctaOn);
+
+  var active = 0;
+  for (var j = 0; j < CENTERS.length; j++) if (p >= (j === 0 ? 0 : (CENTERS[j-1] + CENTERS[j]) / 2)) active = j;
+  for (var k = 0; k < segs.length; k++) {
+    var lo = k === 0 ? 0 : (CENTERS[k-1] + CENTERS[k]) / 2;
+    var hi = k === segs.length - 1 ? 1 : (CENTERS[k] + CENTERS[k+1]) / 2;
+    var f = Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
+    segs[k].firstChild.style.width = (f * 100) + '%';
+    segs[k].classList.toggle('active', k === active);
+  }
+  if (active !== lastTint) { tintEl.style.background = TINTS[active]; lastTint = active; }
+
+  hint.classList.toggle('hide', raw > 0.02);
+  chapEl.classList.toggle('show', raw > 0.015 && raw < 0.995);
+  topbar.classList.toggle('show', raw > 0.08);
+
+  requestAnimationFrame(tick);
+}
+
+/* ---------- stat counters ---------- */
+function countUp(scope){
+  var els = scope.querySelectorAll('[data-count]');
+  Array.prototype.forEach.call(els, function(el){
+    if (el.__done) return; el.__done = true;
+    var to = parseFloat(el.dataset.count), sfx = el.dataset.suffix || '';
+    var comma = el.dataset.fmt === 'comma', t0 = performance.now(), dur = 1500;
+    (function step(now){
+      var e = Math.min(1, (now - t0) / dur);
+      var v = Math.round(to * (1 - Math.pow(1 - e, 3)));
+      el.innerHTML = (comma ? v.toLocaleString('en-US') : v) + sfx;
+      if (e < 1) requestAnimationFrame(step);
+    })(t0);
+  });
+}
+
+/* ---------- gallery ---------- */
+var items = Array.prototype.slice.call(document.querySelectorAll('.g-item'));
+if ('IntersectionObserver' in window) {
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+  items.forEach(function(el){ io.observe(el); });
+} else items.forEach(function(el){ el.classList.add('in'); });
+
+if (!RM) {
+  var ptick = false;
+  window.addEventListener('scroll', function(){
+    if (ptick) return; ptick = true;
+    requestAnimationFrame(function(){
+      var vh = window.innerHeight;
+      items.forEach(function(el){
+        var r = el.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > vh + 200) return;
+        var mid = (r.top + r.height / 2 - vh / 2) / vh;
+        var amt = parseFloat(el.dataset.parallax || 0);
+        el.firstElementChild.style.setProperty('--py', (mid * amt).toFixed(2) + 'px');
+      });
+      ptick = false;
+    });
+  }, {passive:true});
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  resize();
+  if (RM) {
+    document.documentElement.classList.add('rm');
+    texts.forEach(function(t){ t.classList.add('visible'); });
+    countUp(texts[0]);
+    load(0).then(function(){
+      resize(); draw(0);
+      document.getElementById('loader').classList.add('done');
+    });
+    return;
+  }
+  // critical frames first (evenly spaced) so the timeline is never blank
+  var critical = [];
+  for (var i = 0; i < FRAME_COUNT; i += 8) critical.push(i);
+  if (critical[critical.length - 1] !== FRAME_COUNT - 1) critical.push(FRAME_COUNT - 1);
+
+  Promise.all(critical.map(load)).then(function(){
+    draw(0);
+    var rest = [];
+    for (var i = 0; i < FRAME_COUNT; i++) if (!images[i]) rest.push(i);
+    // load the remainder in batches so decode never blocks the first paint
+    (function batch(n){
+      if (n >= rest.length) return;
+      Promise.all(rest.slice(n, n + 12).map(load)).then(function(){ batch(n + 12); });
+    })(0);
+    setTimeout(function(){
+      document.getElementById('loader').classList.add('done');
+      ready = true;
+      tick();
+    }, 380);
+  });
+}
+if (document.readyState === 'complete') boot();
+else window.addEventListener('load', boot);
+})();
+</script>
+</body>
+</html>
