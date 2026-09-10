@@ -36,10 +36,12 @@
       '<ellipse cx="100" cy="27" rx="58" ry="9" fill="var(--can-body-deep)"/>' +
       '<rect x="88" y="20" width="24" height="9" rx="4" fill="#dfe6f2"/>' +
       '<text x="100" y="72" text-anchor="middle" font-family="Space Grotesk, system-ui, sans-serif" font-weight="700" font-size="12" fill="var(--can-flavor)">' + name + '</text>' +
-      '<text x="42" y="132" font-family="Archivo, Archivo Black, system-ui, sans-serif" font-weight="900" font-size="46" letter-spacing="-1" fill="var(--can-title)">NEON</text>' +
-      '<text x="42" y="180" font-family="Archivo, Archivo Black, system-ui, sans-serif" font-weight="900" font-size="46" letter-spacing="-1" fill="var(--can-title)">FUEL</text>' +
-      '<circle cx="152" cy="165" r="15" fill="none" stroke="var(--can-title)" stroke-width="3"/>' +
-      '<path d="M156 154 146 168h7l-2 10 10-14h-7z" fill="var(--can-title)"/>' +
+      '<text x="41" y="130" font-family="Archivo, Archivo Black, system-ui, sans-serif" font-weight="900" font-size="40" letter-spacing="-1" fill="var(--can-title)">NEON</text>' +
+      '<text x="41" y="176" font-family="Archivo, Archivo Black, system-ui, sans-serif" font-weight="900" font-size="40" letter-spacing="-1" fill="var(--can-title)">FUEL</text>' +
+      // Badge sits beside the wordmark. At the previous size the circle cut
+      // straight through the L of FUEL.
+      '<circle cx="149" cy="163" r="12" fill="var(--can-flavor)" stroke="var(--can-body)" stroke-width="3"/>' +
+      '<path d="M152 155 144 164h5l-2 8 8-11h-5z" fill="var(--can-body)"/>' +
       '<text x="100" y="212" text-anchor="middle" font-family="Space Grotesk, system-ui, sans-serif" font-weight="700" font-size="15" fill="var(--can-tag)">Fuel What’s Next</text>' +
       fruit +
       '<text x="100" y="326" text-anchor="middle" font-family="Space Grotesk, system-ui, sans-serif" font-weight="500" font-size="8.5" fill="rgba(255,255,255,.85)">Powered by SterlingCreations.AI</text>' +
@@ -276,24 +278,29 @@
     });
   });
 
-  /* ---------- 3 · manifesto cross-fade ---------- */
+  /* ---------- 3 · manifesto reel ---------- */
+  // Each statement gets its own full-height panel and the reel moves by exactly
+  // one panel per beat. Cross-fading them in a shared cell was unreadable: a
+  // headline that wraps to two lines lands directly on top of the next one.
   var lines = $$("[data-line]");
+  var reel = $("[data-reel]");
+  var panelH = function () { return $(".manifesto__stage").offsetHeight; };
   var manTL = gsap.timeline({
-    scrollTrigger: { trigger: ".manifesto", start: "top top", end: "bottom bottom", scrub: 0.6 }
-  });
-  var seg = 1 / lines.length;
-  lines.forEach(function (line, i) {
-    var at = i * seg;
-    if (i === 0) {
-      manTL.set(line, { opacity: 1, y: 0, scale: 1 }, 0);
-    } else {
-      manTL.fromTo(line, { opacity: 0, y: 40, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: seg * 0.45, ease: "power2.out" }, at);
-    }
-    if (i < lines.length - 1) {
-      manTL.to(line, { opacity: 0, y: -40, scale: 1.02, duration: seg * 0.35, ease: "power2.in" }, at + seg * 0.65);
+    scrollTrigger: {
+      trigger: ".manifesto", start: "top top", end: "bottom bottom",
+      scrub: 0.6, invalidateOnRefresh: true
     }
   });
-  manTL.to("[data-manifesto-bolt]", { rotate: 12, scale: 1.25, ease: "none", duration: 1 }, 0);
+  for (var mi = 0; mi < lines.length - 1; mi++) {
+    (function (step) {
+      manTL.to(reel, {
+        y: function () { return -step * panelH(); },
+        duration: 0.55, ease: "power2.inOut"
+      });
+      manTL.to({}, { duration: 0.45 });        // dwell on the statement
+    })(mi + 1);
+  }
+  manTL.to("[data-manifesto-bolt]", { rotate: 12, scale: 1.25, ease: "none", duration: manTL.duration() || 1 }, 0);
 
   /* ---------- 4 · flavor rail ---------- */
   var rail = $("[data-rail]");
@@ -304,7 +311,12 @@
       onEnter: function () { revealSplit($(".rail__intro [data-split]")); }
     }
   });
-  railTL.to(rail, { x: function () { return -(rail.scrollWidth - window.innerWidth + parseFloat(getComputedStyle(rail).paddingRight)); }, ease: "none" });
+  // The pan waits before it moves. Without the hold the intro heading slides
+  // out of frame before the reader has finished the first line of it.
+  railTL.to(rail, {
+    x: function () { return -(rail.scrollWidth - window.innerWidth + parseFloat(getComputedStyle(rail).paddingRight)); },
+    ease: "none", duration: 0.86
+  }, 0.14);
   $$(".rail__item", rail).forEach(function (item, i) {
     if (i === 0) return;
     gsap.fromTo(item, { opacity: 0.55, y: 30 }, {
@@ -341,6 +353,7 @@
     scrollTrigger: { trigger: ".spot", start: "top top", end: "bottom bottom", scrub: 0.5 }
   })
     .fromTo(frame, { scale: 0.42, borderRadius: 32 }, { scale: 1, borderRadius: 0, ease: "power1.inOut", duration: 0.6 }, 0)
+    .fromTo("[data-spot-scrim]", { opacity: 0 }, { opacity: 1, ease: "power1.out", duration: 0.22 }, 0.36)
     .fromTo("[data-spot-copy]", { opacity: 0, y: 30 }, { opacity: 1, y: 0, ease: "power2.out", duration: 0.25 }, 0.55);
   ScrollTrigger.create({
     trigger: ".spot", start: "top 80%", end: "bottom 20%",

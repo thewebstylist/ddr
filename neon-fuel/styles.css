@@ -213,27 +213,32 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ---------- 3 · manifesto ---------- */
 .manifesto { position: relative; height: 280vh; background: var(--bg); }
-.manifesto__stage {
-  position: sticky; top: 0; height: 100svh; overflow: hidden;
-  display: grid; place-items: center; padding: 0 var(--gutter);
-}
+.manifesto__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.manifesto__reel { will-change: transform; }
 .manifesto__bolt {
   position: absolute; width: clamp(240px, 46vw, 640px); color: var(--blue);
   opacity: 0.16; transform: rotate(-8deg); pointer-events: none;
 }
 .manifesto__bolt svg { width: 100%; height: auto; fill: currentColor; }
 .manifesto__line {
-  grid-area: 1 / 1; margin: 0; text-align: center; max-width: 22ch;
+  height: 100svh; margin: 0 auto; padding: 0 var(--gutter);
+  display: grid; place-content: center; justify-items: center;
+  text-align: center; max-width: 22ch;
   font-family: var(--font-display); font-weight: 900; font-stretch: 125%;
   font-size: clamp(2rem, 6.4vw, 5.6rem); line-height: 0.98; letter-spacing: -0.025em; text-transform: uppercase;
   text-wrap: balance;
 }
 .manifesto__line em { font-style: normal; color: var(--lime); }
 .manifesto__line--hold em { color: var(--magenta); }
-.js .manifesto__line:not(:first-of-type) { opacity: 0; }
 
 /* ---------- 4 · flavors rail ---------- */
-.flavors { position: relative; height: 320vh; background: var(--bg-2); }
+.flavors {
+  position: relative; height: 230vh;
+  background:
+    radial-gradient(70rem 50rem at 78% 18%, rgba(30, 139, 232, 0.20), transparent 62%),
+    radial-gradient(46rem 40rem at 12% 88%, rgba(255, 47, 166, 0.12), transparent 66%),
+    var(--bg-2);
+}
 .flavors__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; align-items: center; }
 .rail { display: flex; align-items: stretch; gap: clamp(1rem, 3vw, 2.5rem); padding: 0 var(--gutter); will-change: transform; }
 .rail__item { flex: none; }
@@ -288,7 +293,12 @@ html.lenis, html.lenis body { height: auto; }
 .js .step.is-active { opacity: 1; }
 
 /* ---------- 6 · the spot ---------- */
-.spot { position: relative; height: 200vh; background: var(--bg-2); }
+.spot {
+  position: relative; height: 200vh;
+  background:
+    radial-gradient(60rem 46rem at 50% 40%, rgba(30, 139, 232, 0.16), transparent 64%),
+    var(--bg-2);
+}
 .spot__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; place-items: center; }
 .spot__frame {
   position: relative; width: 100vw; height: 100svh; overflow: hidden; border-radius: 0;
@@ -305,7 +315,12 @@ html.lenis, html.lenis body { height: auto; }
 }
 .spot__sound:hover { background: rgba(5, 8, 26, 0.8); }
 .spot__sound[aria-pressed="true"] { background: var(--lime); color: var(--lime-ink); border-color: var(--lime); }
-.spot__copy { position: absolute; left: var(--gutter); bottom: clamp(2rem, 8vh, 5rem); display: grid; gap: 0.8rem; max-width: 34rem; pointer-events: none; }
+.spot__scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0;
+  background: radial-gradient(122% 92% at 0% 100%,
+    rgba(5, 8, 26, 0.97) 0%, rgba(5, 8, 26, 0.88) 30%, rgba(5, 8, 26, 0.52) 54%, rgba(5, 8, 26, 0) 76%);
+}
+.spot__copy { position: absolute; z-index: 2; left: var(--gutter); bottom: clamp(2rem, 8vh, 5rem); display: grid; gap: 0.8rem; max-width: 34rem; pointer-events: none; }
 .spot__copy .body { color: var(--ink); }
 
 /* ---------- 7 · the brand ---------- */
@@ -338,7 +353,7 @@ html.lenis, html.lenis body { height: auto; }
   background: radial-gradient(38rem circle at var(--mx) var(--my), rgba(30, 139, 232, 0.28), transparent 60%), var(--bg-2);
 }
 .close__title {
-  position: relative; display: grid; text-align: center;
+  position: relative; display: grid; text-align: center; margin: 0;
   font-family: var(--font-display); font-weight: 900; font-stretch: 125%;
   font-size: clamp(3rem, 12.5vw, 12rem); line-height: 0.9; letter-spacing: -0.035em; text-transform: uppercase;
   max-width: 9ch; text-wrap: balance;
@@ -355,7 +370,7 @@ html.lenis, html.lenis body { height: auto; }
   font: 500 1rem var(--font-text); caret-color: var(--lime);
 }
 .signup input::placeholder { color: rgba(169, 176, 220, 0.7); }
-.signup input:focus { border-color: var(--lime); outline: none; }
+.signup input:focus-visible { border-color: var(--lime); outline: 2px solid var(--lime); outline-offset: 3px; }
 
 /* footer */
 .footer {
@@ -369,6 +384,12 @@ html.lenis, html.lenis body { height: auto; }
 .footer__legal { grid-column: 1 / -1; font-size: 0.8rem; }
 
 /* ---------- responsive ---------- */
+@media (max-width: 860px) {
+  .spot__scrim {
+    background: linear-gradient(to top, rgba(5, 8, 26, 0.97) 0%, rgba(5, 8, 26, 0.9) 22%, rgba(5, 8, 26, 0.5) 44%, rgba(5, 8, 26, 0) 66%);
+  }
+}
+
 @media (max-width: 900px) {
   .nav { grid-template-columns: 1fr auto; }
   .nav__links { display: none; }
@@ -395,10 +416,11 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   .grain { animation: none; }
   .js .intro { display: none; }
-  .js [data-split] .w > span, .js .hero__eyebrow, .js .hero__lede, .js .hero__actions, .js .hero__can, .js .close__actions, .js [data-in] > *, .js .manifesto__line { opacity: 1; transform: none; }
+  .js [data-split] .w > span, .js .hero__eyebrow, .js .hero__lede, .js .hero__actions, .js .hero__can, .js .close__actions, .js [data-in] > * { opacity: 1; transform: none; }
   .manifesto { height: auto; }
-  .manifesto__stage { height: auto; position: static; grid-auto-flow: row; gap: 2rem; padding: 6rem var(--gutter); }
-  .manifesto__line { grid-area: auto; }
+  .manifesto__stage { height: auto; position: static; overflow: visible; padding: 5rem 0; }
+  .manifesto__reel { transform: none !important; display: grid; gap: 2.5rem; }
+  .manifesto__line { height: auto; }
   .flavors { height: auto; }
   .flavors__stage { height: auto; position: static; }
   .rail { overflow-x: auto; scroll-snap-type: x proximity; padding-block: 4rem; }
@@ -406,10 +428,21 @@ html.lenis, html.lenis body { height: auto; }
   .spot { height: auto; }
   .spot__stage { position: static; height: auto; }
   .spot__frame { transform: none; width: 100%; height: 70svh; }
+  .spot__scrim { opacity: 1; }
   .brand__media { clip-path: none; }
   .close { height: auto; }
   .close__stage { position: static; padding: 6rem var(--gutter); }
   .close__fill { clip-path: none; }
   .js .step { opacity: 1; }
-  .product { transition: none; }
+
+  /* Without scroll to swap them, the three products would stack on one grid
+     cell and only the last would be visible. Lay them out side by side. */
+  .line__sticky { position: static; height: auto; padding: 3rem 0 1rem; }
+  .line__visual { width: 100%; aspect-ratio: auto; display: flex; align-items: flex-end; justify-content: center; gap: clamp(1rem, 4vw, 3rem); }
+  .line__visual::before { display: none; }
+  .product { position: static; grid-area: auto; width: auto; height: auto; flex: 1 1 0; max-width: 11rem; opacity: 1; transform: none; transition: none; }
+  .product .can, .pint, .popcorn { width: 100%; }
+  .line__head { min-height: 0; }
+  .step { min-height: 0; padding-block: 1.5rem; }
+  .manifesto__bolt { display: none; }
 }

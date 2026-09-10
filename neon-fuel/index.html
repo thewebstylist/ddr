@@ -111,10 +111,12 @@
   <section class="manifesto" id="manifesto">
     <div class="manifesto__stage">
       <div class="manifesto__bolt" data-manifesto-bolt aria-hidden="true"><svg><use href="#bolt"/></svg></div>
-      <p class="manifesto__line" data-line>Alright. New morning combo.</p>
-      <p class="manifesto__line" data-line>No iced tea today.</p>
-      <p class="manifesto__line" data-line>This hits cleaner. <em>Way</em> better.</p>
-      <p class="manifesto__line manifesto__line--hold" data-line>Drink it. Eat it. <em>Same flavor. Same energy.</em></p>
+      <div class="manifesto__reel" data-reel>
+        <p class="manifesto__line" data-line>Alright. New morning combo.</p>
+        <p class="manifesto__line" data-line>No iced tea today.</p>
+        <p class="manifesto__line" data-line>This hits cleaner. <em>Way</em> better.</p>
+        <p class="manifesto__line manifesto__line--hold" data-line>Drink it. Eat it. <em>Same flavor. Same energy.</em></p>
+      </div>
     </div>
   </section>
 
@@ -194,6 +196,7 @@
         </video>
         <button class="spot__sound" type="button" data-spot-sound aria-pressed="false">Sound on</button>
       </div>
+      <div class="spot__scrim" data-spot-scrim aria-hidden="true"></div>
       <div class="spot__copy" data-spot-copy>
         <h2 class="display display--xl">The Spot</h2>
         <p class="body">An eight second commercial for NEON FUEL, created end to end with AI by Sterling Creations.</p>
@@ -226,10 +229,11 @@
   <!-- 8 · CLOSE (pinned fill) -->
   <section class="close" id="fuel-up">
     <div class="close__stage" data-spotlight>
-      <div class="close__title" aria-label="Fuel What's Next">
+      <h2 class="close__title">
+        <span class="sr-only">Fuel What's Next</span>
         <span class="close__outline" aria-hidden="true">Fuel What's Next</span>
         <span class="close__fill" data-close-fill aria-hidden="true">Fuel What's Next</span>
-      </div>
+      </h2>
       <div class="close__actions" data-close-actions>
         <p class="body">Be first when the next flavor drops.</p>
         <form class="signup" action="mailto:hello@sterlingcreations.ai" method="post" enctype="text/plain">
