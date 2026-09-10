@@ -86,7 +86,7 @@
       </div>
 
       <figure class="hero__can" data-hero-can aria-hidden="true">
-        <div class="can can--ebr" data-can="ebr"></div>
+        <div class="can" data-can="ebr"></div>
       </figure>
     </div>
   </section>
@@ -125,25 +125,37 @@
     <div class="flavors__stage">
       <div class="rail" data-rail>
         <div class="rail__item rail__intro">
-          <h2 class="display display--lg" data-split="words">Two flavors. Built to glow.</h2>
-          <p class="body">Every NEON FUEL flavor comes as a drink, an ice cream and a popcorn. Pick a flavor, then pick a format.</p>
+          <h2 class="display display--lg" data-split="words">Three flavors. Built to glow.</h2>
+          <p class="body">Sixteen ounces of energy, focus and endurance. Every flavor also comes as an ice cream and a popcorn.</p>
         </div>
 
-        <article class="rail__item card card--ebr" data-tilt>
-          <div class="card__visual"><div class="can can--ebr" data-can="ebr"></div></div>
+        <article class="rail__item card" data-flavor="ebr" data-tilt>
+          <div class="card__wash" aria-hidden="true"></div>
+          <div class="card__visual"><div class="can" data-can="ebr"></div></div>
           <div class="card__copy">
             <h3>Electric Blue Raspberry</h3>
-            <p>Cold, sharp and bright. The original. Blue can, magenta raspberry, lime lettering.</p>
-            <ul class="chips"><li>Drink</li><li>Ice Cream</li><li>Popcorn</li></ul>
+            <p>Cold, sharp and bright. The original: lime lettering, a magenta raspberry, blue can.</p>
+            <ul class="chips"><li>Energy</li><li>Focus</li><li>Endurance</li></ul>
           </div>
         </article>
 
-        <article class="rail__item card card--lb" data-tilt>
-          <div class="card__visual"><div class="can can--lb" data-can="lb"></div></div>
+        <article class="rail__item card" data-flavor="lb" data-tilt>
+          <div class="card__wash" aria-hidden="true"></div>
+          <div class="card__visual"><div class="can" data-can="lb"></div></div>
           <div class="card__copy">
             <h3>Lemon Blueberry</h3>
-            <p>Citrus up front, blueberry underneath. Yellow can, indigo lettering, the same charge.</p>
-            <ul class="chips"><li>Drink</li><li>Ice Cream</li><li>Popcorn</li></ul>
+            <p>Citrus up front, blueberry underneath. Yellow lettering on the same blue can.</p>
+            <ul class="chips"><li>Energy</li><li>Focus</li><li>Endurance</li></ul>
+          </div>
+        </article>
+
+        <article class="rail__item card" data-flavor="bb" data-tilt>
+          <div class="card__wash" aria-hidden="true"></div>
+          <div class="card__visual"><div class="can" data-can="bb"></div></div>
+          <div class="card__copy">
+            <h3>Berry Blast</h3>
+            <p>Raspberry and blueberry together. The lime can, with magenta doing the shouting.</p>
+            <ul class="chips"><li>Energy</li><li>Focus</li><li>Endurance</li></ul>
           </div>
         </article>
 
@@ -159,7 +171,7 @@
   <section class="line" id="line">
     <div class="line__sticky">
       <div class="line__visual">
-        <div class="product product--drink is-active" data-product="drink"><div class="can can--ebr" data-can="ebr"></div></div>
+        <div class="product product--drink is-active" data-product="drink"><div class="can" data-can="ebr"></div></div>
         <div class="product product--pint" data-product="pint"><div class="pint" data-pint></div></div>
         <div class="product product--popcorn" data-product="popcorn"><div class="popcorn" data-popcorn></div></div>
       </div>

@@ -8,43 +8,122 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
-  /* ---------- product artwork (SVG) ---------- */
-  function canSVG(flavor) {
-    var isLB = flavor === "lb";
-    var name = isLB ? "Lemon Blueberry" : "Electric Blue Raspberry";
-    var fruit = isLB
-      ? '<g transform="translate(100 278)">' +
-          '<circle cx="-30" cy="6" r="15" fill="var(--can-fruit)" stroke="var(--can-fruit-line)" stroke-width="3"/>' +
-          '<circle cx="-4" cy="18" r="15" fill="var(--can-fruit)" stroke="var(--can-fruit-line)" stroke-width="3"/>' +
-          '<circle cx="-16" cy="-12" r="13" fill="var(--can-fruit)" stroke="var(--can-fruit-line)" stroke-width="3"/>' +
-          '<circle cx="30" cy="0" r="24" fill="#fff5b0" stroke="var(--can-fruit-line)" stroke-width="3"/>' +
-          '<g stroke="var(--can-fruit-line)" stroke-width="2.5"><line x1="30" y1="-24" x2="30" y2="24"/><line x1="6" y1="0" x2="54" y2="0"/><line x1="13" y1="-17" x2="47" y2="17"/><line x1="47" y1="-17" x2="13" y2="17"/></g>' +
-        '</g>'
-      : '<g transform="translate(100 278)" fill="var(--can-fruit)" stroke="var(--can-fruit-line)" stroke-width="3">' +
-          '<circle cx="0" cy="-26" r="11"/><circle cx="-16" cy="-12" r="11"/><circle cx="16" cy="-12" r="11"/>' +
-          '<circle cx="-24" cy="6" r="11"/><circle cx="0" cy="4" r="11"/><circle cx="24" cy="6" r="11"/>' +
-          '<circle cx="-14" cy="24" r="11"/><circle cx="14" cy="24" r="11"/>' +
-          '<path d="M-6 -42 Q0 -56 8 -44 Q2 -46 -6 -42Z" fill="var(--can-fruit-line)" stroke="none"/>' +
-          '<path d="M-70 40 q14 -14 28 0 q10 8 20 2" fill="none" stroke="var(--can-fruit)" stroke-width="7" stroke-linecap="round"/>' +
-        '</g>';
-    return '<svg viewBox="0 0 200 360" role="img" aria-label="NEON FUEL ' + name + ' can">' +
-      '<ellipse cx="100" cy="342" rx="66" ry="10" fill="rgba(0,0,0,.35)"/>' +
-      '<rect x="32" y="26" width="136" height="310" rx="26" fill="var(--can-body)"/>' +
-      '<rect x="32" y="306" width="136" height="30" rx="14" fill="var(--can-tag)"/>' +
-      '<rect x="32" y="26" width="136" height="310" rx="26" fill="url(#can-shade)"/>' +
-      '<ellipse cx="100" cy="28" rx="68" ry="13" fill="url(#can-rim)"/>' +
-      '<ellipse cx="100" cy="27" rx="58" ry="9" fill="var(--can-body-deep)"/>' +
-      '<rect x="88" y="20" width="24" height="9" rx="4" fill="#dfe6f2"/>' +
-      '<text x="100" y="72" text-anchor="middle" font-family="Space Grotesk, system-ui, sans-serif" font-weight="700" font-size="12" fill="var(--can-flavor)">' + name + '</text>' +
-      '<text x="41" y="130" font-family="Archivo, Archivo Black, system-ui, sans-serif" font-weight="900" font-size="40" letter-spacing="-1" fill="var(--can-title)">NEON</text>' +
-      '<text x="41" y="176" font-family="Archivo, Archivo Black, system-ui, sans-serif" font-weight="900" font-size="40" letter-spacing="-1" fill="var(--can-title)">FUEL</text>' +
-      // Badge sits beside the wordmark. At the previous size the circle cut
-      // straight through the L of FUEL.
-      '<circle cx="149" cy="163" r="12" fill="var(--can-flavor)" stroke="var(--can-body)" stroke-width="3"/>' +
-      '<path d="M152 155 144 164h5l-2 8 8-11h-5z" fill="var(--can-body)"/>' +
-      '<text x="100" y="212" text-anchor="middle" font-family="Space Grotesk, system-ui, sans-serif" font-weight="700" font-size="15" fill="var(--can-tag)">Fuel What’s Next</text>' +
-      fruit +
-      '<text x="100" y="326" text-anchor="middle" font-family="Space Grotesk, system-ui, sans-serif" font-weight="500" font-size="8.5" fill="rgba(255,255,255,.85)">Powered by SterlingCreations.AI</text>' +
+  /* ---------- product artwork ----------
+     Drawn from the NEON FUEL product photography: the blue and lime bodies,
+     the bolt badge closing the wordmark, the ENERGY DRINK bar, and the
+     ENERGY / FOCUS / ENDURANCE trio beneath it. */
+  var FLAVORS = {
+    ebr: {
+      short: "Electric Blue Raspberry",
+      body: "#1c6fd6", bodyDeep: "#0f4ba3", bodyLight: "#4a9bf0",
+      flavorInk: "#c8e82a", tagInk: "#f5178f",
+      barFill: "#c8e82a", barInk: "#0f4ba3",
+      fruit: "#f5178f", fruitLine: "#c8e82a", spark: "#c8e82a", ribbon: "#f5178f"
+    },
+    lb: {
+      short: "Lemon Blueberry",
+      body: "#1668d6", bodyDeep: "#0d47a0", bodyLight: "#4695f0",
+      flavorInk: "#ffe81c", tagInk: "#ffe81c",
+      barFill: "#ffe81c", barInk: "#0d47a0",
+      fruit: "#ffe81c", fruitLine: "#38c6f4", spark: "#ffe81c", ribbon: "#ffe81c"
+    },
+    bb: {
+      short: "Berry Blast",
+      body: "#c2de35", bodyDeep: "#9dc018", bodyLight: "#dcf065",
+      flavorInk: "#e8127e", tagInk: "#e8127e",
+      barFill: "#e8127e", barInk: "#dcf065",
+      fruit: "#e8127e", fruitLine: "#e8127e", spark: "#e8127e", ribbon: "#e8127e"
+    }
+  };
+
+  function sparks(f) {
+    return '<g fill="' + f.spark + '">' +
+      '<path d="M60 232 51 246h5l-2 10 9-14h-5z"/>' +
+      '<path d="M146 230 137 244h5l-2 10 9-14h-5z"/>' +
+      '<path d="M62 288 55 300h4l-2 8 7-12h-4z"/>' +
+      '<path d="M144 286 137 298h4l-2 8 7-12h-4z"/></g>';
+  }
+  function ribbons(f) {
+    return '<g fill="none" stroke="' + f.ribbon + '" stroke-width="6" stroke-linecap="round">' +
+      '<path d="M40 264q9-9 18 0t18 0"/><path d="M124 264q9-9 18 0t18 0"/></g>';
+  }
+  function berry(cx, cy, r, f) {
+    // a raspberry: clustered drupelets with a leaf
+    var o = '<g transform="translate(' + cx + ' ' + cy + ')">';
+    var rows = [[-1, 0, 1], [-1.5, -0.5, 0.5, 1.5], [-1, 0, 1], [-0.5, 0.5]];
+    for (var i = 0; i < rows.length; i++)
+      for (var j = 0; j < rows[i].length; j++)
+        o += '<circle cx="' + (rows[i][j] * r * 0.95).toFixed(1) + '" cy="' + ((i - 1.2) * r * 0.85).toFixed(1) + '" r="' + r * 0.52 + '"/>';
+    return o + '<path d="M' + (-r * 0.4) + ' ' + (-r * 2.0) + ' q' + r * 0.4 + ' -' + r * 0.8 + ' ' + r * 0.9 + ' -' + r * 0.1 + ' q-' + r * 0.5 + ' 0 -' + r * 0.9 + ' ' + r * 0.1 + 'Z"/></g>';
+  }
+  function fruitArt(key, f) {
+    if (key === "ebr") {
+      return '<g transform="translate(100 262)" fill="' + f.fruit + '" stroke="' + f.fruitLine + '" stroke-width="4">' +
+        '<circle cx="0" cy="-26" r="10.5"/><circle cx="-16" cy="-12" r="10.5"/><circle cx="16" cy="-12" r="10.5"/>' +
+        '<circle cx="-24" cy="4" r="10.5"/><circle cx="0" cy="2" r="10.5"/><circle cx="24" cy="4" r="10.5"/>' +
+        '<circle cx="-14" cy="21" r="10.5"/><circle cx="14" cy="21" r="10.5"/>' +
+        '<path d="M-6 -41 Q0 -52 8 -43 Q2 -44 -6 -41Z" fill="' + f.fruitLine + '" stroke="none"/></g>';
+    }
+    if (key === "lb") {
+      return '<g transform="translate(100 262)">' +
+        '<circle cx="24" cy="2" r="24" fill="' + f.fruit + '" stroke="#ffffff" stroke-width="3"/>' +
+        '<g stroke="#ffffff" stroke-width="2.6" opacity=".92">' +
+          '<line x1="24" y1="-21" x2="24" y2="25"/><line x1="1" y1="2" x2="47" y2="2"/>' +
+          '<line x1="8" y1="-14" x2="40" y2="18"/><line x1="40" y1="-14" x2="8" y2="18"/></g>' +
+        '<circle cx="-25" cy="11" r="14.5" fill="' + f.body + '" stroke="' + f.fruitLine + '" stroke-width="4"/>' +
+        '<circle cx="-2" cy="21" r="12" fill="' + f.body + '" stroke="' + f.fruitLine + '" stroke-width="4"/>' +
+        '<path d="M-16 -16 q11 -17 26 -8 q-15 2 -26 8Z" fill="' + f.fruitLine + '"/>' +
+        '<path d="M-4 -22 q15 -13 28 -3 q-17 -2 -28 3Z" fill="' + f.fruitLine + '"/></g>';
+    }
+    return '<g fill="' + f.fruit + '">' + berry(76, 250, 11, f) + berry(124, 247, 10.5, f) + berry(100, 281, 12, f) + '</g>';
+  }
+  function droplets(seed) {
+    var s = seed, out = '<g fill="#ffffff" opacity=".18">';
+    function rnd() { s = (s * 9301 + 49297) % 233280; return s / 233280; }
+    for (var i = 0; i < 52; i++)
+      out += '<circle cx="' + (34 + rnd() * 132).toFixed(1) + '" cy="' + (48 + rnd() * 318).toFixed(1) + '" r="' + (0.8 + rnd() * 1.8).toFixed(1) + '"/>';
+    return out + '</g>';
+  }
+
+  function canSVG(key) {
+    var f = FLAVORS[key] || FLAVORS.ebr;
+    var id = "cg-" + key;
+    var A = 'font-family="Archivo, system-ui, sans-serif"';
+    return '<svg viewBox="0 0 200 400" role="img" aria-label="NEON FUEL ' + f.short + ', 16 fluid ounce energy drink can">' +
+      '<defs><linearGradient id="' + id + '" x1="0" x2="1">' +
+        '<stop offset="0" stop-color="' + f.bodyDeep + '"/><stop offset=".2" stop-color="' + f.bodyLight + '"/>' +
+        '<stop offset=".52" stop-color="' + f.body + '"/><stop offset="1" stop-color="' + f.bodyDeep + '"/>' +
+      '</linearGradient></defs>' +
+      '<ellipse cx="100" cy="384" rx="62" ry="9" fill="rgba(0,0,0,.42)"/>' +
+      '<path d="M30 62 q0-17 13-21 q57-8 114 0 q13 4 13 21 v272 q0 17-13 21 q-57 8-114 0 q-13-4-13-21Z" fill="url(#' + id + ')"/>' +
+      droplets(key.charCodeAt(0) * 7919) +
+      '<ellipse cx="100" cy="45" rx="70" ry="14" fill="#c2ccd9"/>' +
+      '<ellipse cx="100" cy="42" rx="70" ry="14" fill="url(#can-rim)"/>' +
+      '<ellipse cx="100" cy="42" rx="58" ry="10.5" fill="#a7b1c0"/>' +
+      '<ellipse cx="100" cy="43.5" rx="49" ry="8" fill="#8790a1"/>' +
+      '<rect x="87" y="37" width="27" height="8" rx="4" fill="#e2e8f3"/>' +
+      '<path d="M36 370 q64 9 128 0 v2 q0 13-13 17 q-51 7-102 0 q-13-4-13-17Z" fill="#b4bdcb"/>' +
+      '<text x="100" y="88" text-anchor="middle" ' + A + ' font-weight="800" font-style="italic" font-size="14.5" fill="' + f.flavorInk + '">' + f.short + '</text>' +
+      '<text x="100" y="142" text-anchor="middle" ' + A + ' font-weight="900" font-size="42" letter-spacing="-1.5" fill="#ffffff">NEON</text>' +
+      '<text x="94" y="187" text-anchor="middle" ' + A + ' font-weight="900" font-size="42" letter-spacing="-1.5" fill="#ffffff">FUEL</text>' +
+      '<g data-badge><circle cx="150" cy="173" r="14" fill="none" stroke="' + f.flavorInk + '" stroke-width="4"/>' +
+      '<path d="M153 163 144 176h5l-2 10 10-14h-5z" fill="' + f.flavorInk + '"/></g>' +
+      '<text x="100" y="212" text-anchor="middle" ' + A + ' font-weight="800" font-size="16" fill="' + f.tagInk + '">Fuel What’s Next.</text>' +
+      ribbons(f) + sparks(f) + fruitArt(key, f) +
+      '<rect x="38" y="298" width="124" height="22" rx="7" fill="' + f.barFill + '"/>' +
+      '<text x="100" y="313.5" text-anchor="middle" ' + A + ' font-weight="900" font-size="12" letter-spacing="0.6" fill="' + f.barInk + '">ENERGY DRINK</text>' +
+      '<rect x="38" y="320" width="124" height="28" rx="6" fill="' + f.barFill + '" opacity=".2"/>' +
+      '<g stroke="' + f.barFill + '" stroke-width="1" opacity=".65"><line x1="79" y1="324" x2="79" y2="344"/><line x1="121" y1="324" x2="121" y2="344"/></g>' +
+      '<g fill="' + f.barFill + '">' +
+        '<path d="M61 326 55.5 335h3.2l-1.2 5.4 5.7-7.6h-3.2z"/>' +
+        '<circle cx="100" cy="331" r="4.4" fill="none" stroke="' + f.barFill + '" stroke-width="1.5"/><circle cx="100" cy="331" r="1.3"/>' +
+        '<g transform="translate(141 331)"><circle cx="1.5" cy="-5.5" r="1.9"/>' +
+          '<path d="M-2 -3 l4-1 3 2 2 3-1.4 1-1.8-2.2-2.2 1.2 1.6 2.6-1 4.4-1.6-.4.8-3.6-3.4-3z"/></g>' +
+        '<g ' + A + ' font-weight="800" font-size="5.6" letter-spacing="0.2" text-anchor="middle">' +
+          '<text x="59" y="345">ENERGY</text><text x="100" y="345">FOCUS</text><text x="141" y="345">ENDURANCE</text></g>' +
+      '</g>' +
+      '<text x="100" y="356" text-anchor="middle" ' + A + ' font-weight="700" font-size="7.6" fill="' + f.barFill + '">Powered by SterlingCreations.Ai</text>' +
+      '<text x="100" y="366" text-anchor="middle" ' + A + ' font-weight="700" font-size="7.2" fill="#ffffff" opacity=".9">16 FL OZ (473 mL)</text>' +
       '</svg>';
   }
 
@@ -88,7 +167,37 @@
       '</svg>';
   }
 
-  $$("[data-can]").forEach(function (el) { el.innerHTML = canSVG(el.getAttribute("data-can")); });
+  // The real product photography, served from the brand CDN. The drawn can
+  // renders first and the photograph replaces it only once it has actually
+  // loaded, so a blocked or slow CDN leaves a complete can on screen rather
+  // than a broken image.
+  var PHOTO = {
+    lb:  "https://sterlingcdn.b-cdn.net/neonfuel/NEON-FUEL-Lemon-Blueberry-Main-Product-Shot-transparentback.png",
+    ebr: "https://sterlingcdn.b-cdn.net/neonfuel/NEON-FUEL-Main-Product-Shot-ChatGPT-Image-Apr-22%2C-2026%2C-08_16_51-PM-transparentback.png",
+    bb:  "https://sterlingcdn.b-cdn.net/neonfuel/NEON-FUEL-Main-Product-Shot-transparentback.png"
+  };
+  var PHOTO_ALT = {
+    ebr: "NEON FUEL Electric Blue Raspberry, 16 fluid ounce can",
+    lb:  "NEON FUEL Lemon Blueberry, 16 fluid ounce can",
+    bb:  "NEON FUEL Berry Blast, 16 fluid ounce can"
+  };
+  $$("[data-can]").forEach(function (el) {
+    var key = el.getAttribute("data-can");
+    el.innerHTML = canSVG(key);
+    var url = PHOTO[key];
+    if (!url) return;
+    var img = new Image();
+    img.decoding = "async";
+    img.alt = PHOTO_ALT[key] || "NEON FUEL can";
+    img.className = "can__photo";
+    img.onload = function () {
+      el.innerHTML = "";
+      el.appendChild(img);
+      el.classList.add("can--photo");
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    };
+    img.src = url;
+  });
   $$("[data-pint]").forEach(function (el) { el.innerHTML = pintSVG(); });
   $$("[data-popcorn]").forEach(function (el) { el.innerHTML = popcornSVG(); });
 

@@ -193,10 +193,16 @@ html.lenis, html.lenis body { height: auto; }
 .js .hero__can { opacity: 0; }
 
 /* the can, an SVG built in main.js */
-.can { width: 100%; aspect-ratio: 200 / 360; }
+.can { width: 100%; aspect-ratio: 200 / 400; }
 .can svg { width: 100%; height: 100%; overflow: visible; }
-.can--ebr { --can-body: var(--blue); --can-body-deep: var(--blue-deep); --can-title: #f3e6ee; --can-flavor: var(--lime); --can-tag: var(--magenta); --can-fruit: var(--magenta); --can-fruit-line: var(--lime); }
-.can--lb  { --can-body: var(--lemon); --can-body-deep: #e4b91c; --can-title: var(--indigo); --can-flavor: var(--blue-deep); --can-tag: #5a3dff; --can-fruit: #3358ff; --can-fruit-line: var(--indigo); }
+/* the photograph, once it has loaded, stands in for the drawn can */
+.can--photo { aspect-ratio: auto; }
+.can__photo { width: 100%; height: auto; display: block; }
+
+/* Each flavour carries the seamless-paper colour it is photographed on. */
+[data-flavor="ebr"] { --fl-back: #ee0f7b; --fl-glow: rgba(245, 23, 143, 0.55); --fl-ink: #c8e82a; }
+[data-flavor="lb"]  { --fl-back: #ffc20e; --fl-glow: rgba(255, 194, 14, 0.5);  --fl-ink: #ffe81c; }
+[data-flavor="bb"]  { --fl-back: #1560e8; --fl-glow: rgba(21, 96, 232, 0.55);  --fl-ink: #e8127e; }
 
 /* ---------- 2 · marquee ---------- */
 .marquee { padding: clamp(1rem, 3vh, 2rem) 0; overflow: hidden; border-block: 1px solid rgba(169, 176, 220, 0.15); background: var(--bg-2); }
@@ -233,7 +239,7 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ---------- 4 · flavors rail ---------- */
 .flavors {
-  position: relative; height: 230vh;
+  position: relative; height: 300vh;
   background:
     radial-gradient(70rem 50rem at 78% 18%, rgba(30, 139, 232, 0.20), transparent 62%),
     radial-gradient(46rem 40rem at 12% 88%, rgba(255, 47, 166, 0.12), transparent 66%),
@@ -246,23 +252,70 @@ html.lenis, html.lenis body { height: auto; }
 .rail__outro { width: min(70vw, 28rem); display: grid; align-content: center; gap: 1rem; padding-left: clamp(0rem, 2vw, 2rem); }
 .rail__outro .display { color: var(--lime); }
 .card {
-  width: min(78vw, 30rem); display: grid; grid-template-rows: 1fr auto;
-  border-radius: var(--radius); overflow: hidden; position: relative;
+  position: relative; isolation: isolate;
+  width: min(78vw, 27rem); display: grid; grid-template-rows: 1fr auto;
+  border-radius: var(--radius); overflow: hidden;
   background: var(--surface);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 30px 60px -30px rgba(0, 0, 0, 0.8);
   transform-style: preserve-3d;
+  transition: box-shadow 320ms var(--ease-out);
 }
-.card--ebr { background: radial-gradient(120% 90% at 20% 10%, #1e5fd6 0%, var(--surface) 65%); }
-.card--lb  { background: radial-gradient(120% 90% at 80% 10%, #5a4a12 0%, var(--surface) 65%); }
-.card__visual { display: grid; place-items: center; padding: clamp(1.5rem, 4vh, 3rem) 2rem 0; min-height: clamp(280px, 46vh, 460px); }
-.card__visual .can { width: clamp(120px, 18vh, 200px); filter: drop-shadow(0 30px 30px rgba(0, 0, 0, 0.45)); transform: translateZ(40px); transition: transform 320ms var(--ease-out); }
+/* the flavour's own ground, washed in from the floor of the card */
+.card__wash {
+  position: absolute; inset: 0; z-index: -1; opacity: 0;
+  background:
+    radial-gradient(120% 78% at 50% 108%, var(--fl-back) 0%, transparent 68%),
+    radial-gradient(60% 40% at 50% 42%, var(--fl-glow) 0%, transparent 70%);
+  transition: opacity 420ms var(--ease-out);
+}
+.card__visual {
+  display: grid; place-items: center;
+  padding: clamp(1.5rem, 4vh, 2.6rem) 2rem 0;
+  min-height: clamp(300px, 48vh, 460px);
+}
+.card__visual .can {
+  width: clamp(118px, 17vh, 178px);
+  filter: drop-shadow(0 26px 26px rgba(0, 0, 0, 0.5));
+  transform: translateZ(40px);
+  transition: transform 420ms var(--ease-out), filter 420ms var(--ease-out);
+}
 .card__copy { padding: 1.2rem 1.6rem 1.6rem; display: grid; gap: 0.5rem; }
-.card__copy h3 { font-family: var(--font-display); font-weight: 900; font-stretch: 125%; text-transform: uppercase; font-size: 1.4rem; letter-spacing: -0.01em; margin: 0; }
-.card__copy p { margin: 0; color: var(--ink-soft); }
+.card__copy h3 {
+  font-family: var(--font-display); font-weight: 900; font-stretch: 125%;
+  text-transform: uppercase; font-size: 1.3rem; letter-spacing: -0.01em; margin: 0;
+  transition: color 260ms var(--ease-out);
+}
+.card__copy p { margin: 0; color: var(--ink-soft); transition: color 260ms var(--ease-out); }
 .chips { list-style: none; margin: 0.4rem 0 0; padding: 0; display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.chips li { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 0.7rem; border-radius: 999px; border: 1px solid rgba(244, 241, 255, 0.25); }
+.chips li {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.35rem 0.7rem; border-radius: 999px;
+  border: 1px solid rgba(244, 241, 255, 0.25);
+  transition: border-color 260ms var(--ease-out), color 260ms var(--ease-out), transform 320ms var(--ease-out);
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .card:hover .card__visual .can { transform: translateZ(60px) rotate(-4deg); }
+  .card:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 40px 70px -28px rgba(0,0,0,.9); }
+  .card:hover .card__wash { opacity: 1; }
+  .card:hover .card__visual .can {
+    transform: translateZ(70px) translateY(-14px) scale(1.06);
+    filter: drop-shadow(0 40px 34px rgba(0, 0, 0, 0.55));
+  }
+  .card:hover .card__copy h3 { color: var(--fl-ink); }
+  .card:hover .card__copy p { color: rgba(255, 255, 255, 0.92); }
+  .card:hover .chips li { border-color: var(--fl-ink); color: var(--fl-ink); }
+  .card:hover .chips li:nth-child(1) { transform: translateY(-2px); transition-delay: 0ms; }
+  .card:hover .chips li:nth-child(2) { transform: translateY(-2px); transition-delay: 60ms; }
+  .card:hover .chips li:nth-child(3) { transform: translateY(-2px); transition-delay: 120ms; }
+  /* the bolt badge catches, the way it would under a moving light */
+  .card:hover [data-badge] { animation: badge-pulse 1.5s var(--ease-out) infinite; transform-origin: 150px 173px; }
+}
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  12%  { opacity: .45; transform: scale(1.1); }
+  24%  { opacity: 1; transform: scale(1); }
+  36%  { opacity: .6; transform: scale(1.06); }
+  48%  { opacity: 1; transform: scale(1); }
 }
 
 /* ---------- 5 · the line ---------- */
