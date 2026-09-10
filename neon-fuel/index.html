@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NEON FUEL · Fuel What's Next</title>
+  <meta name="description" content="NEON FUEL is the energy drink, the ice cream and the popcorn. Electric Blue Raspberry and Lemon Blueberry. Drink it, eat it, same flavor, same energy.">
+  <meta property="og:title" content="NEON FUEL · Fuel What's Next">
+  <meta property="og:description" content="Drink it. Eat it. Same flavor. Same energy.">
+  <meta property="og:image" content="assets/hero-sterling-can.jpg">
+  <meta name="theme-color" content="#05081a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231e8be8'/%3E%3Cpath d='M36 12 20 36h12l-4 16 16-24H32z' fill='%23c8ff3d'/%3E%3C/svg%3E">
+  <link rel="preload" href="fonts/Archivo-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.replace('no-js','js')</script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="can-shade" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".28"/>
+      <stop offset=".18" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".38"/>
+    </linearGradient>
+    <linearGradient id="can-rim" x1="0" x2="1">
+      <stop offset="0" stop-color="#9aa6bd"/>
+      <stop offset=".5" stop-color="#eef2f9"/>
+      <stop offset="1" stop-color="#7f8ba3"/>
+    </linearGradient>
+    <symbol id="bolt" viewBox="0 0 64 64"><path d="M36 6 16 36h14l-4 22 22-30H34z"/></symbol>
+  </defs>
+</svg>
+
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro__word">
+    <span class="intro__char">N</span><span class="intro__char">E</span><span class="intro__char">O</span><span class="intro__char">N</span>
+    <span class="intro__char intro__char--gap">&nbsp;</span>
+    <span class="intro__char">F</span><span class="intro__char">U</span><span class="intro__char">E</span><span class="intro__char">L</span>
+  </div>
+  <div class="intro__bolt"><svg><use href="#bolt"/></svg></div>
+</div>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="glow" id="glow" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="nav__logo" href="#top" aria-label="NEON FUEL home">
+    <span class="nav__mark"><svg><use href="#bolt"/></svg></span>
+    <span class="nav__word">NEON FUEL</span>
+  </a>
+  <nav class="nav__links" aria-label="Sections">
+    <a href="#flavors">Flavors</a>
+    <a href="#line">The Line</a>
+    <a href="#spot">The Spot</a>
+    <a href="#brand">The Brand</a>
+  </nav>
+  <a class="btn btn--lime nav__cta" href="#fuel-up" data-magnet>Fuel Up</a>
+</header>
+
+<main id="top">
+
+  <!-- 1 · HERO -->
+  <section class="hero" id="hero">
+    <div class="hero__stage">
+      <div class="hero__bg" data-hero-bg>
+        <picture>
+          <source media="(max-width: 700px)" srcset="assets/hero-sterling-can-m.jpg">
+          <img src="assets/hero-sterling-can.jpg" width="832" height="1248" alt="Sterling holding a can of NEON FUEL Electric Blue Raspberry in front of a neon city skyline" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="hero__grid" data-hero-grid aria-hidden="true"></div>
+      <div class="hero__scrim" aria-hidden="true"></div>
+
+      <div class="hero__copy">
+        <p class="eyebrow hero__eyebrow" data-hero-eyebrow>Electric Blue Raspberry · Energy Drink</p>
+        <h1 class="hero__title" data-split="words">Fuel What's Next.</h1>
+        <p class="hero__lede" data-hero-lede>NEON FUEL is the energy drink, the ice cream and the popcorn. One flavor. The same electric charge.</p>
+        <div class="hero__actions" data-hero-actions>
+          <a class="btn btn--lime" href="#fuel-up" data-magnet>Fuel Up</a>
+          <a class="btn btn--ghost" href="#spot">Watch the spot</a>
+        </div>
+      </div>
+
+      <figure class="hero__can" data-hero-can aria-hidden="true">
+        <div class="can can--ebr" data-can="ebr"></div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2 · MARQUEE -->
+  <section class="marquee" aria-label="Flavors and slogan">
+    <div class="marquee__row" data-marquee="1">
+      <div class="marquee__track">
+        <span>Electric Blue Raspberry</span><i></i><span>Lemon Blueberry</span><i></i><span>Drink it. Eat it.</span><i></i><span>Same flavor. Same energy.</span><i></i>
+        <span>Electric Blue Raspberry</span><i></i><span>Lemon Blueberry</span><i></i><span>Drink it. Eat it.</span><i></i><span>Same flavor. Same energy.</span><i></i>
+      </div>
+    </div>
+    <div class="marquee__row marquee__row--alt" data-marquee="-1">
+      <div class="marquee__track">
+        <span>Energy Drink</span><i></i><span>Ice Cream</span><i></i><span>Popcorn</span><i></i><span>Fuel What's Next</span><i></i>
+        <span>Energy Drink</span><i></i><span>Ice Cream</span><i></i><span>Popcorn</span><i></i><span>Fuel What's Next</span><i></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · MANIFESTO (pinned) -->
+  <section class="manifesto" id="manifesto">
+    <div class="manifesto__stage">
+      <div class="manifesto__bolt" data-manifesto-bolt aria-hidden="true"><svg><use href="#bolt"/></svg></div>
+      <p class="manifesto__line" data-line>Alright. New morning combo.</p>
+      <p class="manifesto__line" data-line>No iced tea today.</p>
+      <p class="manifesto__line" data-line>This hits cleaner. <em>Way</em> better.</p>
+      <p class="manifesto__line manifesto__line--hold" data-line>Drink it. Eat it. <em>Same flavor. Same energy.</em></p>
+    </div>
+  </section>
+
+  <!-- 4 · FLAVORS (horizontal rail) -->
+  <section class="flavors" id="flavors">
+    <div class="flavors__stage">
+      <div class="rail" data-rail>
+        <div class="rail__item rail__intro">
+          <h2 class="display display--lg" data-split="words">Two flavors. Built to glow.</h2>
+          <p class="body">Every NEON FUEL flavor comes as a drink, an ice cream and a popcorn. Pick a flavor, then pick a format.</p>
+        </div>
+
+        <article class="rail__item card card--ebr" data-tilt>
+          <div class="card__visual"><div class="can can--ebr" data-can="ebr"></div></div>
+          <div class="card__copy">
+            <h3>Electric Blue Raspberry</h3>
+            <p>Cold, sharp and bright. The original. Blue can, magenta raspberry, lime lettering.</p>
+            <ul class="chips"><li>Drink</li><li>Ice Cream</li><li>Popcorn</li></ul>
+          </div>
+        </article>
+
+        <article class="rail__item card card--lb" data-tilt>
+          <div class="card__visual"><div class="can can--lb" data-can="lb"></div></div>
+          <div class="card__copy">
+            <h3>Lemon Blueberry</h3>
+            <p>Citrus up front, blueberry underneath. Yellow can, indigo lettering, the same charge.</p>
+            <ul class="chips"><li>Drink</li><li>Ice Cream</li><li>Popcorn</li></ul>
+          </div>
+        </article>
+
+        <div class="rail__item rail__outro">
+          <p class="display display--sm">Powered by <span class="nowrap">SterlingCreations.AI</span></p>
+          <p class="body">Named, designed, shot and scored with AI. The cans, the spot, the copy on this page.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · THE LINE (sticky swap) -->
+  <section class="line" id="line">
+    <div class="line__sticky">
+      <div class="line__visual">
+        <div class="product product--drink is-active" data-product="drink"><div class="can can--ebr" data-can="ebr"></div></div>
+        <div class="product product--pint" data-product="pint"><div class="pint" data-pint></div></div>
+        <div class="product product--popcorn" data-product="popcorn"><div class="popcorn" data-popcorn></div></div>
+      </div>
+      <div class="line__meter" aria-hidden="true"><span data-line-meter></span></div>
+    </div>
+    <div class="line__steps">
+      <div class="line__head">
+        <h2 class="display display--lg" data-split="words">One flavor. Three ways to take it.</h2>
+      </div>
+      <article class="step" data-step="drink">
+        <p class="step__num" aria-hidden="true">Drink</p>
+        <h3>The Energy Drink</h3>
+        <p>The can that started it. Electric Blue Raspberry, served cold, with the bolt on the label and the tagline under it: Fuel What's Next.</p>
+      </article>
+      <article class="step" data-step="pint">
+        <p class="step__num" aria-hidden="true">Ice Cream</p>
+        <h3>The Ice Cream</h3>
+        <p>The same flavor, frozen. A pint of Electric Blue Raspberry for the nights the can is not enough.</p>
+      </article>
+      <article class="step" data-step="popcorn">
+        <p class="step__num" aria-hidden="true">Popcorn</p>
+        <h3>The Popcorn</h3>
+        <p>Sweet, salty and electric. NEON FUEL popcorn, the snack that matches the drink in your other hand.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 6 · THE SPOT (video scales to full-bleed) -->
+  <section class="spot" id="spot">
+    <div class="spot__stage">
+      <div class="spot__frame" data-spot-frame>
+        <video class="spot__video" data-spot-video playsinline muted loop preload="metadata" poster="assets/spot-poster.jpg">
+          <source src="assets/neon-fuel-spot.mp4" type="video/mp4">
+        </video>
+        <button class="spot__sound" type="button" data-spot-sound aria-pressed="false">Sound on</button>
+      </div>
+      <div class="spot__copy" data-spot-copy>
+        <h2 class="display display--xl">The Spot</h2>
+        <p class="body">An eight second commercial for NEON FUEL, created end to end with AI by Sterling Creations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · THE BRAND (flow) -->
+  <section class="brand" id="brand">
+    <figure class="brand__media" data-reveal>
+      <img src="assets/skyline-wide.jpg" width="1664" height="300" alt="Neon skyline from the NEON FUEL world" loading="lazy">
+    </figure>
+    <div class="brand__grid">
+      <div class="brand__lead" data-in>
+        <h2 class="display display--lg" data-split="words">A complete brand, created with AI.</h2>
+        <p class="body">NEON FUEL is a full brand buildout from Sterling Creations AI: a concept taken from a name to a product line, a spokesperson, and a commercial, with AI assisting at every step.</p>
+        <a class="btn btn--ghost" href="https://sterlingcreations.ai/neon-fuel-full-brand-creation/" rel="noopener">See the buildout</a>
+      </div>
+      <ul class="brand__list" data-in data-stagger>
+        <li><strong>Name and identity</strong><span>Logo, bolt mark, the tagline.</span></li>
+        <li><strong>Packaging</strong><span>Can, pint and popcorn bag designs.</span></li>
+        <li><strong>Product shots</strong><span>Hero photography with the founder.</span></li>
+        <li><strong>Commercials</strong><span>UGC style video spots with music.</span></li>
+        <li><strong>Messaging</strong><span>Brand voice and ad copy.</span></li>
+        <li><strong>Color and type system</strong><span>Electric blue, lime, magenta. A mini brand guide.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8 · CLOSE (pinned fill) -->
+  <section class="close" id="fuel-up">
+    <div class="close__stage" data-spotlight>
+      <div class="close__title" aria-label="Fuel What's Next">
+        <span class="close__outline" aria-hidden="true">Fuel What's Next</span>
+        <span class="close__fill" data-close-fill aria-hidden="true">Fuel What's Next</span>
+      </div>
+      <div class="close__actions" data-close-actions>
+        <p class="body">Be first when the next flavor drops.</p>
+        <form class="signup" action="mailto:hello@sterlingcreations.ai" method="post" enctype="text/plain">
+          <label class="sr-only" for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@email.com" required>
+          <button class="btn btn--lime" type="submit" data-magnet>Fuel Up</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__brand">
+    <span class="nav__mark"><svg><use href="#bolt"/></svg></span>
+    <span>NEON FUEL</span>
+  </div>
+  <p>Powered by <a href="https://sterlingcreations.ai" rel="noopener">SterlingCreations.AI</a></p>
+  <nav class="footer__links" aria-label="Social">
+    <a href="https://www.instagram.com/sterling_williams/" rel="noopener">Instagram</a>
+    <a href="https://www.youtube.com/@thewebstylist" rel="noopener">YouTube</a>
+  </nav>
+  <p class="footer__legal">© 2026 Sterling Creations AI. NEON FUEL is a concept brand.</p>
+</footer>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
